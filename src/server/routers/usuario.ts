@@ -1,0 +1,169 @@
+import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
+import { crearRouter, procedimientoAdmin } from '../trpc';
+import { ROLES } from '@/lib/roles';
+import { clienteDeServicio } from '@/lib/supabase/servidor';
+
+/**
+ * M1 · Usuarios y roles.
+ *
+ * Toda operación de este router es del administrador. No hace falta comprobarlo
+ * en cada procedimiento: `procedimientoAdmin` ya lo hace, y las políticas RLS lo
+ * hacen otra vez del lado de la base.
+ */
+
+const telefono = z
+  .string()
+  .regex(/^\+[1-9]\d{7,14}$/, 'El teléfono va en formato internacional, por ejemplo +5493415550188.');
+
+export const routerUsuario = crearRouter({
+  /** Listado de usuarios, con la persona detrás de cada uno. */
+  listar: procedimientoAdmin.query(async ({ ctx }) => {
+    const { data, error } = await ctx.supabase
+      .from('usuario')
+      .select('id, rol, activo, ultimo_acceso_en, persona:persona_id (nombre, apellido, email)')
+      .order('activo', { ascending: false });
+
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    return data ?? [];
+  }),
+
+  /**
+   * Alta de un usuario.
+   *
+   * Son tres cosas encadenadas: la persona, la credencial en Supabase Auth y la
+   * fila de `usuario` que las une con su rol. La credencial se crea con la clave
+   * de servicio porque dar de alta un usuario en Auth no es una operación que
+   * pueda hacer una sesión común.
+   *
+   * No se fija una contraseña acá: se envía una invitación para que la persona
+   * elija la suya. Así ninguna contraseña pasa por el sistema ni por quien la
+   * da de alta.
+   */
+  crear: procedimientoAdmin
+    .input(
+      z.object({
+        nombre: z.string().trim().min(1, 'El nombre no puede quedar vacío.'),
+        apellido: z.string().trim().min(1, 'El apellido no puede quedar vacío.'),
+        tipoDocumento: z.enum(['dni', 'cuit', 'cuil', 'pasaporte']),
+        numeroDocumento: z.string().trim().min(6, 'El documento parece incompleto.'),
+        email: z.email('El correo no tiene un formato válido.'),
+        telefono: telefono.optional(),
+        rol: z.enum(ROLES),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { data: persona, error: errorPersona } = await ctx.supabase
+        .from('persona')
+        .insert({
+          nombre: input.nombre,
+          apellido: input.apellido,
+          tipo_documento: input.tipoDocumento,
+          numero_documento: input.numeroDocumento,
+          email: input.email,
+          telefono: input.telefono ?? null,
+        })
+        .select('id')
+        .single();
+
+      if (errorPersona) {
+        // El índice único de (tipo_documento, numero_documento) es la defensa
+        // real contra el duplicado; acá sólo se traduce a un mensaje legible.
+        const duplicada = errorPersona.code === '23505';
+        throw new TRPCError({
+          code: duplicada ? 'CONFLICT' : 'INTERNAL_SERVER_ERROR',
+          message: duplicada
+            ? 'Ya existe una persona con ese documento.'
+            : errorPersona.message,
+        });
+      }
+
+      const servicio = clienteDeServicio();
+      const { data: credencial, error: errorAuth } = await servicio.auth.admin.inviteUserByEmail(
+        input.email,
+      );
+
+      if (errorAuth || !credencial?.user) {
+        // La persona ya se creó: se deshace para no dejar una ficha sin acceso
+        // que después nadie sabe si es un alta a medias o un dato legítimo.
+        await ctx.supabase.from('persona').delete().eq('id', persona.id);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `No se pudo enviar la invitación: ${errorAuth?.message ?? 'sin detalle'}`,
+        });
+      }
+
+      const { error: errorUsuario } = await ctx.supabase.from('usuario').insert({
+        id: credencial.user.id,
+        persona_id: persona.id,
+        rol: input.rol,
+      });
+
+      if (errorUsuario) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorUsuario.message });
+      }
+
+      return { usuarioId: credencial.user.id, personaId: persona.id };
+    }),
+
+  /** Modificar el rol de un usuario. */
+  cambiarRol: procedimientoAdmin
+    .input(z.object({ usuarioId: z.uuid(), rol: z.enum(ROLES) }))
+    .mutation(async ({ ctx, input }) => {
+      // Quedarse sin ningún administrador deja el sistema sin quien lo
+      // configure, y recuperarlo exige tocar la base a mano.
+      if (input.rol !== 'administrador') {
+        const { count } = await ctx.supabase
+          .from('usuario')
+          .select('id', { count: 'exact', head: true })
+          .eq('rol', 'administrador')
+          .eq('activo', true);
+
+        const { data: actual } = await ctx.supabase
+          .from('usuario')
+          .select('rol')
+          .eq('id', input.usuarioId)
+          .single();
+
+        if (actual?.rol === 'administrador' && (count ?? 0) <= 1) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Es el único administrador activo: asigná otro antes de cambiarle el rol.',
+          });
+        }
+      }
+
+      const { error } = await ctx.supabase
+        .from('usuario')
+        .update({ rol: input.rol })
+        .eq('id', input.usuarioId);
+
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      return { ok: true as const };
+    }),
+
+  /**
+   * Desactivar un usuario.
+   *
+   * Baja lógica: nunca se borra a alguien con historial, porque su nombre figura
+   * en registros de cuidado, en asistencias y en la traza de auditoría.
+   */
+  desactivar: procedimientoAdmin
+    .input(z.object({ usuarioId: z.uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.usuarioId === ctx.sesion.usuarioId) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'No podés desactivar tu propio usuario.',
+        });
+      }
+
+      const { error } = await ctx.supabase
+        .from('usuario')
+        .update({ activo: false })
+        .eq('id', input.usuarioId);
+
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      return { ok: true as const };
+    }),
+});

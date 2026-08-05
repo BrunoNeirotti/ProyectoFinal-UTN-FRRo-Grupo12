@@ -1,12 +1,14 @@
 import { crearRouter, procedimientoAutenticado, procedimientoPublico } from '../trpc';
+import { routerParametro } from './parametro';
+import { routerUsuario } from './usuario';
 import { alcanceDe } from '@/lib/roles';
 
 /**
  * Router raíz.
  *
- * Se arma por módulo (M1 acceso, M2 clientes, M3 cuentas corrientes...) y en ese
- * orden, que es el de prioridad del cronograma. Hoy sólo tiene lo que necesitan
- * las bases: verificar que la capa responde y saber quién soy.
+ * Se arma por módulo y en el orden de prioridad del cronograma. Hoy está M1
+ * (acceso, usuarios y configuración); los siguientes se enganchan acá a medida
+ * que se construyen.
  */
 export const routerApp = crearRouter({
   /** Comprobación de vida. No toca la base ni exige sesión. */
@@ -25,6 +27,10 @@ export const routerApp = crearRouter({
     rol: ctx.sesion.rol,
     areas: alcanceDe(ctx.sesion.rol),
   })),
+
+  // --- M1 ---
+  parametro: routerParametro,
+  usuario: routerUsuario,
 });
 
 export type RouterApp = typeof routerApp;
