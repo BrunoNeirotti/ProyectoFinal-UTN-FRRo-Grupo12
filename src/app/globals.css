@@ -1,1 +1,182 @@
 @import "tailwindcss";
+
+/* =============================================================================
+   RIENDA · Tokens del sistema de diseño
+
+   El bloque :root/.dark de abajo es COPIA LITERAL de
+   `RIENDA-Diseño/fase2/assets/rienda.css`, que es la FUENTE ÚNICA de los colores
+   de la marca. Si un color cambia, se cambia allá y se vuelve a copiar acá.
+   Ningún otro archivo de esta aplicación declara hexadecimales de marca.
+
+   El mapeo a utilidades de Tailwind vive en el bloque `@theme inline` del final,
+   y es el equivalente en Tailwind 4 del `tailwind.config.js` que el prototipo
+   usa con Tailwind 3. `inline` importa: hace que las utilidades referencien la
+   variable en el punto de uso en lugar de copiar su valor, que es lo que permite
+   que el tema oscuro cambie sin regenerar clases.
+   ============================================================================= */
+
+/* El prototipo declara `darkMode: 'class'`. Tailwind 4 usa la preferencia del
+   sistema por omisión, así que hay que redeclarar la variante. Se incluye
+   `.light` para poder forzar el tema claro en un subárbol aunque el documento
+   esté en oscuro, igual que en el prototipo. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root,
+.light {
+  /* --- Escalas base. No usar directo en pantallas: son insumo de los tokens --- */
+  --cacao-50:  #FAF3EE;  --cacao-100: #EFE0D5;  --cacao-200: #D9C3B2;
+  --cacao-700: #5A3A28;  --cacao-800: #3A2218;  --cacao-900: #33201A;
+  --cacao-950: #2A1812;
+  --gold-50:   #FAF4E6;  --gold-100:  #F2E6C9;  --gold-300:  #D9BC6E;
+  --gold-400:  #C9A24B;  --gold-500:  #AF8A3E;  --gold-600:  #977637;
+  --gold-700:  #6F571F;
+  --cream-50:  #FBF8F0;  --cream-100: #F4EEDF;  --cream-200: #E9DFC7;
+
+  /* --- Tokens semánticos · tema claro --- */
+  --bg:             var(--cream-50);
+  --surface:        #FFFFFF;
+  --surface-border: var(--cream-200);
+  --text:           var(--cacao-950);
+  --text-muted:     #7A6A5D;
+  --feature:        var(--cacao-950);
+  --feature-fg:     var(--cream-50);
+  --feature-muted:  #CDBFAE;
+  --accent:         var(--gold-500);
+  --accent-press:   var(--gold-600);
+  --accent-text:    var(--cacao-950);   /* SIEMPRE cacao sobre oro, nunca crema */
+  --accent-ink:     var(--gold-700);
+  --accent-soft:    var(--gold-50);
+
+  /* --- Semáforos. Significado, no marca: siempre acompañados de ícono o texto --- */
+  --ok:      #047857;  --ok-bg:   rgba(4,120,87,.12);
+  --warn:    #92400E;  --warn-bg: rgba(217,119,6,.14);
+  --bad:     #B91C1C;  --bad-bg:  rgba(185,28,28,.12);
+
+  /* --- Veladura neutra para hovers sobre superficie clara --- */
+  --hover-veil: rgba(128,100,80,.10);
+
+  /* --- Radios y sombras --- */
+  --r-lg: .7rem; --r-xl: .75rem; --r-2xl: 1rem;
+  --shadow-sm: 0 1px 2px rgba(42,24,18,.06), 0 1px 3px rgba(42,24,18,.04);
+  --shadow-md: 0 8px 24px rgba(42,24,18,.08);
+}
+
+.dark {
+  --bg:             #1B100B;
+  --surface:        #241712;
+  --surface-border: var(--cacao-800);
+  --text:           var(--cream-100);
+  --text-muted:     #B6A695;
+  /* En oscuro la elevación es "más claro", no "más oscuro": si `feature` queda a la
+     par de `surface`, una tarjeta destacada se vuelve indistinguible de una común. */
+  --feature:        #37241A;
+  --feature-fg:     var(--cream-100);
+  --feature-muted:  #B6A695;
+  --accent:         var(--gold-400);
+  --accent-press:   var(--gold-300);
+  --accent-text:    var(--cacao-950);
+  --accent-ink:     var(--gold-300);
+  --accent-soft:    var(--cacao-800);
+
+  --ok:      #6EE7B7;  --ok-bg:   rgba(16,185,129,.16);
+  --warn:    #FCD34D;  --warn-bg: rgba(245,158,11,.16);
+  --bad:     #FCA5A5;  --bad-bg:  rgba(239,68,68,.18);
+
+  --hover-veil: rgba(255,255,255,.08);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.35);
+}
+
+/* =============================================================================
+   BASE
+   ============================================================================= */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Números en tablas, montos y horas: ancho fijo para que las columnas alineen */
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Foco visible universal. Nunca se quita: sólo se reemplaza por uno mejor.
+   Es requisito de accesibilidad y de la auditoría de contraste del informe. */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  border-radius: var(--r-lg);
+}
+
+/* =============================================================================
+   MAPEO A TAILWIND
+   Espejo de `RIENDA-Diseño/fase2/tailwind.config.js`. Si se agrega un token hay
+   que agregarlo en los dos, igual que la nota de aquel archivo advierte respecto
+   de `assets/rienda-tw.js`.
+   ============================================================================= */
+
+@theme inline {
+  /* Escalas base: insumo de los tokens, no para uso directo en componentes */
+  --color-cacao-50:  var(--cacao-50);
+  --color-cacao-100: var(--cacao-100);
+  --color-cacao-200: var(--cacao-200);
+  --color-cacao-700: var(--cacao-700);
+  --color-cacao-800: var(--cacao-800);
+  --color-cacao-900: var(--cacao-900);
+  --color-cacao-950: var(--cacao-950);
+  --color-gold-50:   var(--gold-50);
+  --color-gold-100:  var(--gold-100);
+  --color-gold-300:  var(--gold-300);
+  --color-gold-400:  var(--gold-400);
+  --color-gold-500:  var(--gold-500);
+  --color-gold-600:  var(--gold-600);
+  --color-gold-700:  var(--gold-700);
+  --color-cream-50:  var(--cream-50);
+  --color-cream-100: var(--cream-100);
+  --color-cream-200: var(--cream-200);
+
+  /* Tokens semánticos: cambian con .dark */
+  --color-bg:             var(--bg);
+  --color-surface:        var(--surface);
+  --color-surface-border: var(--surface-border);
+  --color-feature:        var(--feature);
+  --color-feature-fg:     var(--feature-fg);
+  --color-feature-muted:  var(--feature-muted);
+  --color-fg:             var(--text);
+  --color-fg-muted:       var(--text-muted);
+  --color-accent:         var(--accent);
+  --color-accent-press:   var(--accent-press);
+  --color-accent-fg:      var(--accent-text);
+  --color-accent-ink:     var(--accent-ink);
+  --color-accent-soft:    var(--accent-soft);
+
+  /* Semáforos: semántica de estado, no identidad de marca */
+  --color-ok:      var(--ok);
+  --color-ok-bg:   var(--ok-bg);
+  --color-warn:    var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad:     var(--bad);
+  --color-bad-bg:  var(--bad-bg);
+
+  --color-hover-veil: var(--hover-veil);
+
+  --radius-lg:  var(--r-lg);
+  --radius-xl:  var(--r-xl);
+  --radius-2xl: var(--r-2xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+
+  /* next/font expone las dos familias como variables desde el layout */
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans:  var(--font-inter), system-ui, sans-serif;
+
+  /* Escala tipográfica del MASTER del prototipo */
+  --text-xs:   12px;
+  --text-sm:   14px;
+  --text-base: 16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  30px;
+  --text-4xl:  36px;
+}

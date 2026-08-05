@@ -1,0 +1,45 @@
+name: Verificar
+
+# Las cuatro comprobaciones corren en cada empujón y en cada pedido de
+# incorporación. La rama principal tiene que quedar siempre desplegable, que es
+# lo que la metodología declara en «Gestión de la configuración».
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Estilo
+        run: npm run lint
+
+      # Sintaxis de las migraciones con el analizador de PostgreSQL. Barato y
+      # evita que un error de sintaxis se descubra recién al desplegar.
+      - name: Migraciones
+        run: npm run db:lint
+
+      - name: Pruebas
+        run: npm run test
+
+      # Va al final porque es lo más lento: si algo más falla, no hace falta
+      # esperar la compilación para saberlo.
+      - name: Compilación
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://ejemplo.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: clave-de-compilacion

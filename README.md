@@ -1,34 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RIENDA
 
-## Getting Started
+Red Integral Ecuestre de Negocio, Datos y Administración. Sistema de gestión del **Haras Las
+Lechuzas** (Funes, Santa Fe).
 
-First, run the development server:
+Proyecto Final de Ingeniería en Sistemas de Información, UTN Facultad Regional Rosario, Comisión
+502, 2026. Grupo N°12: Marcos Berruhet, Gastón Boggino y Bruno Neirotti.
+
+El diseño está cerrado y no se reabre acá: las 23 pantallas, las 33 entidades y las 19 reglas de
+negocio viven en `../RIENDA-Diseño/`. Este repositorio construye ese diseño.
+
+---
+
+## Criterio de construcción
+
+**Primero las bases de arquitectura, después cada módulo por prioridad.** Sin rebanadas verticales
+ni atajos que crucen capas antes de tener la base. El orden de los módulos es el del cronograma
+derivado del tamaño funcional, y arranca por M1 (acceso, usuarios y configuración).
+
+**Seguridad desde el día uno.** Autenticación, control de acceso por rol, auditoría y validación en
+los bordes son requisito explícito de la cátedra, no una mejora posterior.
+
+## Cómo levantar el entorno
 
 ```bash
+npm install
+cp .env.example .env.local     # y completar
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Para la base hace falta un proyecto de Supabase. El stack local (`supabase start`) necesita Docker;
+sin él, las migraciones se empujan a un proyecto hospedado con `npm run db:push`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Comandos
 
-## Learn More
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run verificar` | Tipos, estilo, migraciones y pruebas, en ese orden |
+| `npm run typecheck` | TypeScript en modo estricto, sin emitir |
+| `npm run lint` | ESLint |
+| `npm run test` | Pruebas con Vitest |
+| `npm run db:lint` | Sintaxis de las migraciones con el analizador de PostgreSQL |
+| `npm run db:push` | Aplica las migraciones al proyecto de Supabase |
+| `npm run build` | Compilación de producción |
 
-To learn more about Next.js, take a look at the following resources:
+## Cómo está organizado
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+supabase/migrations/   Esquema, invariantes, auditoría y políticas de acceso
+src/app/               Rutas (App Router)
+src/lib/               Lógica sin dependencias de framework, y por eso probada
+src/server/            Contexto, capa de acceso y routers por módulo
+src/proxy.ts           Renovación del token y redirección optimista
+scripts/               Herramientas de verificación
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Cuatro decisiones que conviene conocer antes de tocar código
 
-## Deploy on Vercel
+**Los colores no se declaran acá.** La fuente única es
+`../RIENDA-Diseño/fase2/assets/rienda.css`. Su bloque `:root`/`.dark` está copiado literal en
+`src/app/globals.css`, y el mapeo a utilidades vive en el `@theme inline` del mismo archivo. Ningún
+otro archivo declara hexadecimales de marca.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**El control de acceso está en la base, no en la pantalla.** Las políticas RLS de
+`supabase/migrations/…_rls.sql` son lo que efectivamente impide leer una fila; los guardas de rol de
+`src/server/trpc.ts` existen para fallar temprano con un mensaje entendible. Si alguna vez
+discrepan, manda la base. Una tabla sin política es una tabla inaccesible, así que agregar una
+entidad nueva falla ruidosamente en lugar de quedar abierta.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Hay reglas que la aplicación no puede romper aunque quiera.** El saldo de la cuenta corriente y la
+existencia de un insumo son derivados y los mantiene un disparador; el interés por mora no
+capitaliza; dos clases no pueden solaparse en la misma instalación ni con el mismo instructor; un
+estado de cuenta no se emite dos veces para el mismo período; un alumno menor de edad exige
+responsable y consentimiento del tutor. Están en la base porque una validación que vive sólo en el
+cliente se saltea con una llamada directa a la API.
+
+**`mora_tasa_mensual` está vacío a propósito.** El haras confirmó que cobra mora pero no dio el
+porcentaje. Sin tasa, el sistema no propone intereses y lo dice, que es el estado real del negocio.
+Un valor inventado por omisión se olvida y queda facturando.
+
+## Stack
+
+Next.js 16 (App Router) sobre React 19, Tailwind CSS 4, tRPC 11 con Zod 4, Supabase (PostgreSQL,
+Auth y Storage) y Vitest. Despliegue previsto en Vercel.
+
+> Nota sobre Tailwind: el prototipo trae un `tailwind.config.js` escrito para Tailwind 3. Acá se usa
+> la 4, que se configura desde CSS. La regla que importa se mantiene: los valores de color siguen
+> viviendo sólo en `rienda.css`. Lo que cambia es el mecanismo de mapeo.
