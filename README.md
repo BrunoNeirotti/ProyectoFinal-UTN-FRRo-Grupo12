@@ -31,6 +31,25 @@ npm run dev
 Para la base hace falta un proyecto de Supabase. El stack local (`supabase start`) necesita Docker;
 sin él, las migraciones se empujan a un proyecto hospedado con `npm run db:push`.
 
+El proyecto hospedado es `rienda` (ref `llxpsbotgwjlwirlpbzq`, São Paulo), vinculado con
+`supabase link`. Sus claves van en `.env.local`, junto con `SUPABASE_DB_PASSWORD`.
+
+**El analizador sintáctico no reemplaza a Postgres.** `db:lint` descarta errores de sintaxis, pero
+no detecta, por ejemplo, una expresión no inmutable en una columna generada. Toda migración nueva se
+aplica con `npm run db:push` antes de darla por buena.
+
+### El primer administrador
+
+El alta de usuarios es una operación del administrador, así que al primero hay que crearlo desde
+afuera, con la clave de servicio:
+
+```bash
+node scripts/crear-administrador.mjs --email quien@dominio --nombre Ana --apellido Pérez --documento 12345678
+```
+
+Imprime una contraseña provisoria una sola vez. Es idempotente: si el correo o el documento ya
+existen, los reutiliza. Los demás usuarios se crean desde la pantalla de Usuarios.
+
 ## Comandos
 
 | Comando | Qué hace |
