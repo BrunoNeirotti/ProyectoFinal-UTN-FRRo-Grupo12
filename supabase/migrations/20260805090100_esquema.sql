@@ -330,14 +330,32 @@ create table clase (
   creado_en         timestamptz not null default now(),
   actualizado_en    timestamptz not null default now(),
 
-  -- Rango calculado: es lo que la restricción de exclusión compara.
-  transcurre tstzrange generated always as
-    (tstzrange(inicia_en, inicia_en + (duracion_min || ' minutes')::interval, '[)')) stored,
+  -- Rango que la restricción de exclusión compara. No puede ser una columna
+  -- generada: `timestamptz + interval` depende de la zona horaria de la sesión
+  -- y Postgres no lo admite como inmutable (lo rechazó al aplicar la migración
+  -- contra la base real; el analizador sintáctico no lo detecta). Lo mantiene el
+  -- disparador de abajo y nadie lo escribe a mano.
+  transcurre        tstzrange not null,
 
   constraint clase_suspension_con_motivo check (
     estado <> 'cancelada' or motivo_suspension is not null
   )
 );
+
+create or replace function calcular_transcurre_clase()
+returns trigger language plpgsql as $$
+begin
+  new.transcurre := tstzrange(
+    new.inicia_en,
+    new.inicia_en + make_interval(mins => new.duracion_min),
+    '[)'
+  );
+  return new;
+end $$;
+
+create trigger trg_transcurre_clase
+  before insert or update of inicia_en, duracion_min on clase
+  for each row execute function calcular_transcurre_clase();
 
 -- El conflicto que la agenda marca en rojo no se detecta sólo al dibujar: la
 -- base impide crearlo. Las clases canceladas no ocupan la instalación.
