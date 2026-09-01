@@ -46,3 +46,6 @@ next-env.d.ts
 # Entorno local con credenciales
 .env.local
 .env*.local
+
+# Estado local del CLI de Supabase (ref del proyecto vinculado, versiones)
+supabase/.temp/
