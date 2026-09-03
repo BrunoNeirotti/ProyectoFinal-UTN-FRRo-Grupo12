@@ -108,6 +108,299 @@ body {
 }
 
 /* =============================================================================
+   COMPONENTES
+   Copia literal de las clases de `RIENDA-Diseño/fase2/assets/rienda.css`
+   (secciones 3 a 10, sin los tokens que ya están arriba). Es la misma regla que
+   los colores: esto se cambia allá y se vuelve a copiar acá, no al revés.
+   ============================================================================= */
+
+.link {
+  color: var(--accent-ink);
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: .25rem;
+}
+.link:hover { text-decoration: underline; }
+
+/* --- Botones. Jerarquía: una sola CTA primaria por vista. --- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font-weight: 600; font-size: .9rem; line-height: 1.25;
+  border-radius: var(--r-lg); padding: .55rem 1rem;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: .4; cursor: not-allowed; transform: none; pointer-events: none;
+}
+.btn-pri { background: var(--accent); color: var(--accent-text); }
+.btn-pri:hover { background: var(--accent-press); }
+.btn-sec { background: var(--surface); border-color: var(--accent); color: var(--accent-ink); }
+.btn-sec:hover { background: var(--accent-soft); }
+.btn-gho { color: var(--text); background: transparent; }
+.btn-gho:hover { background: var(--hover-veil); }
+.btn-danger { background: var(--bad); color: #FFFFFF; }
+.dark .btn-danger { color: var(--cacao-950); }
+.btn-sm { padding: .3rem .65rem; font-size: .75rem; gap: .35rem; }
+.btn-lg { padding: .9rem 1rem; font-size: 1rem; border-radius: var(--r-xl); }
+.btn-icon { padding: .55rem; width: 2.25rem; height: 2.25rem; }
+
+/* Botón-ícono chico con borde, para acciones de fila en tablas */
+.ic {
+  display: inline-grid; place-items: center;
+  height: 30px; width: 30px; border-radius: .55rem;
+  border: 1px solid var(--surface-border); background: transparent;
+  color: inherit; cursor: pointer; transition: all .15s ease;
+}
+.ic:hover { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent); }
+
+/* Sobre superficie cacao el oro sube de tono para mantener contraste */
+.on-feature .btn-sec { background: transparent; border-color: var(--gold-300); color: var(--gold-300); }
+.on-feature .btn-sec:hover { background: rgba(255,255,255,.08); }
+.on-feature .btn-gho { color: var(--feature-fg); }
+.on-feature .btn-gho:hover { background: rgba(255,255,255,.10); }
+
+/* --- Superficies. La elevación se comunica con superficie, no con sombras. --- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-xl);
+}
+.card-feature {
+  background: var(--feature); color: var(--feature-fg);
+  border-radius: var(--r-xl); border: 1px solid transparent;
+}
+/* Una superficie cacao es siempre "oscura", aunque el tema sea claro: los
+   semáforos y el oro se redefinen para seguir contrastando ahí adentro. */
+.card-feature, .on-feature, .sidebar, .toast {
+  --ok: #6EE7B7; --ok-bg: rgba(16,185,129,.16);
+  --warn: #FCD34D; --warn-bg: rgba(245,158,11,.16);
+  --bad: #FCA5A5; --bad-bg: rgba(239,68,68,.18);
+  --accent: var(--gold-300);
+  --accent-ink: var(--gold-300);
+}
+.card-accent {
+  background: var(--accent-soft); border: 1px solid var(--accent);
+  border-radius: var(--r-xl); color: var(--text);
+}
+
+/* Fila del maestro en pantallas maestro-detalle (clientes y contratos, etc.) */
+.cli {
+  width: 100%; text-align: left; cursor: pointer;
+  display: flex; align-items: flex-start; gap: .625rem;
+  padding: .625rem .75rem; border: none; border-left: 3px solid transparent;
+  background: transparent; color: inherit; font: inherit;
+  transition: background-color .15s ease;
+}
+.cli:hover { background: var(--hover-veil); }
+.cli[aria-current="true"] { background: var(--accent-soft); border-left-color: var(--accent); }
+.cli-dot { height: .5rem; width: .5rem; border-radius: 999px; margin-top: .45rem; flex-shrink: 0; }
+
+/* --- Formularios. Label siempre visible, helper persistente. --- */
+.label {
+  display: block; font-size: .75rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-muted); margin-bottom: .35rem;
+}
+.input {
+  width: 100%; background: var(--surface); color: var(--text);
+  border: 1px solid var(--surface-border); border-radius: var(--r-lg);
+  padding: .6rem .75rem; font-size: .95rem; font-family: inherit;
+  transition: border-color .15s ease;
+}
+.input::placeholder { color: var(--text-muted); }
+.input:focus-visible { border-color: var(--accent); }
+.input[aria-invalid="true"] { border-color: var(--bad); }
+input[type="checkbox"], input[type="radio"] {
+  accent-color: var(--accent);
+  width: 1rem; height: 1rem; cursor: pointer;
+}
+.helper { font-size: .75rem; color: var(--text-muted); margin-top: .3rem; }
+.error { font-size: .75rem; color: var(--bad); margin-top: .3rem; display: flex; align-items: center; gap: .3rem; }
+
+.tile {
+  aspect-ratio: 1; border-radius: var(--r-2xl);
+  display: grid; place-content: center; gap: .4rem; text-align: center;
+  font-size: 12px; font-weight: 500;
+  background: var(--surface); border: 1px solid var(--surface-border);
+  color: inherit; cursor: pointer; transition: all .15s ease;
+}
+.tile:hover { background: var(--accent-soft); }
+.tile[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+
+.switch {
+  display: inline-flex; align-items: center; height: 1.5rem; width: 2.75rem;
+  border-radius: 999px; padding: .125rem; background: var(--surface-border);
+  border: none; cursor: pointer; transition: background-color .15s ease;
+}
+.switch::after {
+  content: ""; height: 1.25rem; width: 1.25rem; border-radius: 999px;
+  background: #FFFFFF; transition: transform .15s ease;
+}
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(1.25rem); }
+
+/* --- Estados y semáforos. El color nunca es el único indicador. --- */
+.badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: 12px; font-weight: 500;
+  padding: .15rem .55rem; border-radius: 999px;
+  background: var(--hover-veil); color: var(--text-muted);
+}
+.badge-ok { background: var(--ok-bg); color: var(--ok); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
+.badge-bad { background: var(--bad-bg); color: var(--bad); }
+.badge-accent { background: var(--accent-soft); color: var(--accent-ink); }
+.text-ok { color: var(--ok); }
+.text-warn { color: var(--warn); }
+.text-bad { color: var(--bad); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .8rem; padding: .4rem .8rem; border-radius: 999px;
+  border: 1px solid var(--surface-border); background: transparent;
+  color: var(--text); cursor: pointer; transition: all .15s ease;
+}
+.chip:hover { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent); }
+
+.shimmer {
+  background: linear-gradient(90deg, var(--hover-veil) 25%, rgba(128,100,80,.18) 37%, var(--hover-veil) 63%);
+  background-size: 400% 100%;
+  animation: rienda-shimmer 1.4s ease infinite;
+}
+@keyframes rienda-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+.dot {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--accent);
+  display: inline-block; animation: rienda-blink 1s infinite alternate;
+}
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes rienda-blink { from { opacity: .3; transform: translateY(0); } to { opacity: 1; transform: translateY(-2px); } }
+
+.toast {
+  display: flex; align-items: center; gap: .6rem;
+  border-radius: var(--r-xl); padding: .7rem .9rem; font-size: .9rem;
+  background: var(--feature); color: var(--feature-fg);
+}
+
+/* --- Tablas --- */
+.tbl { width: 100%; font-size: .875rem; border-collapse: collapse; }
+.tbl thead th {
+  text-align: left; font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .04em;
+  color: var(--text-muted);
+  padding: .5rem 1rem; border-bottom: 1px solid var(--surface-border);
+}
+.tbl tbody td { padding: .75rem 1rem; border-bottom: 1px solid var(--surface-border); }
+.tbl tbody tr:last-child td { border-bottom: none; }
+.tbl tbody tr:hover { background: var(--hover-veil); }
+.tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tbl th[aria-sort] { cursor: pointer; }
+.tbl th[aria-sort="ascending"]::after { content: " ↑"; color: var(--accent-ink); }
+.tbl th[aria-sort="descending"]::after { content: " ↓"; color: var(--accent-ink); }
+
+/* --- Navegación --- */
+.sidebar {
+  width: 14rem; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  padding: 1.25rem .75rem;
+  background: var(--feature); color: var(--feature-fg);
+  position: sticky; top: 0; height: 100dvh;
+}
+@media (max-width: 767px) { .sidebar { display: none; } }
+.sidebar-brand {
+  display: flex; align-items: center; gap: .5rem;
+  padding: 0 .5rem; margin-bottom: 1.75rem;
+  font-family: var(--font-serif); font-size: 1.25rem; letter-spacing: .03em;
+  color: var(--feature-fg); text-decoration: none;
+}
+.sidebar-mark {
+  height: 2rem; width: 2rem; flex-shrink: 0;
+  display: grid; place-items: center;
+  color: var(--accent);
+  font-family: var(--font-serif); font-size: .95rem;
+}
+.sidebar-mark svg { height: 100%; width: 100%; }
+.sidebar-nav {
+  flex: 1; min-height: 0; overflow-y: auto;
+  display: flex; flex-direction: column; gap: .125rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.22) transparent;
+}
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 999px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-group {
+  padding: 1rem .75rem .25rem; margin: 0;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .15em;
+  color: var(--feature-muted);
+}
+.nav-item {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .5rem .75rem; border-radius: var(--r-lg);
+  font-size: .875rem; color: inherit; text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background-color .15s ease;
+}
+.nav-item:hover { background: rgba(255,255,255,.10); }
+.nav-item[aria-current="page"] {
+  background: rgba(255,255,255,.06);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+.nav-item[aria-current="page"] svg { color: var(--accent); }
+.nav-item[data-pendiente] { opacity: .45; cursor: default; }
+.nav-item[data-pendiente]:hover { background: transparent; }
+.nav-item[data-pendiente]::after { content: "·"; margin-left: auto; color: var(--feature-muted); font-size: 1.2rem; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: .875rem 1.25rem;
+  border-bottom: 1px solid var(--surface-border);
+  position: sticky; top: 0; z-index: 20;
+  background: var(--bg);
+}
+@media (min-width: 768px) { .topbar { padding-left: 1.75rem; padding-right: 1.75rem; } }
+
+.breadcrumb {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .875rem; color: var(--text-muted); min-width: 0;
+}
+.breadcrumb a { color: inherit; text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent-ink); }
+.breadcrumb [aria-current="page"] { color: var(--text); font-weight: 500; }
+
+.avatar {
+  height: 2.25rem; width: 2.25rem; border-radius: 999px;
+  display: grid; place-items: center; flex-shrink: 0;
+  background: var(--feature); color: var(--accent);
+  font-family: var(--font-serif); font-size: .875rem;
+}
+
+.bottom-nav {
+  display: grid; text-align: center; font-size: 11px;
+  border-top: 1px solid var(--surface-border);
+  background: var(--surface); color: var(--text-muted);
+}
+.bottom-nav a {
+  padding: .625rem .25rem; color: inherit; text-decoration: none;
+  display: flex; flex-direction: column; align-items: center; gap: .15rem;
+  min-height: 44px; justify-content: center;
+}
+.bottom-nav a[aria-current="page"] { color: var(--accent-ink); font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* =============================================================================
    MAPEO A TAILWIND
    Espejo de `RIENDA-Diseño/fase2/tailwind.config.js`. Si se agrega un token hay
    que agregarlo en los dos, igual que la nota de aquel archivo advierte respecto

@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: 'Acceso al sistema' };
  */
 export default function Ingresar() {
   return (
-    <main className="flex min-h-dvh items-center justify-center p-6">
+    <div className="flex min-h-dvh items-center justify-center p-6">
       <div className="w-full max-w-sm rounded-2xl bg-feature p-8 text-feature-fg shadow-md">
         <p className="text-xs tracking-widest text-feature-muted uppercase">Haras Las Lechuzas</p>
         <h1 className="mt-1 font-serif text-2xl">Acceso al sistema</h1>
@@ -25,6 +25,6 @@ export default function Ingresar() {
           <FormularioDeIngreso />
         </Suspense>
       </div>
-    </main>
+    </div>
   );
 }

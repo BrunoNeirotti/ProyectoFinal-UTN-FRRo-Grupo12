@@ -9,7 +9,7 @@ export default async function NuevoCaballo() {
   const [clientes, instalaciones] = await Promise.all([api.cliente.listar(), api.instalacion.listar()]);
 
   return (
-    <main className="mx-auto max-w-3xl p-6 md:p-10">
+    <div className="mx-auto max-w-3xl p-6 md:p-10">
       <h1 className="font-serif text-3xl text-fg">Nuevo caballo</h1>
       <p className="mt-1 text-fg-muted">Sin propietario queda como caballo del haras.</p>
       <div className="mt-6">
@@ -18,6 +18,6 @@ export default async function NuevoCaballo() {
           instalaciones={instalaciones.map((i) => ({ id: i.id, nombre: i.nombre }))}
         />
       </div>
-    </main>
+    </div>
   );
 }

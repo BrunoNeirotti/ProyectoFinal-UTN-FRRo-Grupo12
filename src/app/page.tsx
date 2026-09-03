@@ -1,37 +1,26 @@
+import { redirect } from 'next/navigation';
+import { TRPCError } from '@trpc/server';
+import { llamador } from '@/lib/trpc/servidor';
+
 /**
- * Página provisoria del andamiaje.
- *
- * No es una pantalla del sistema: las 23 pantallas están diseñadas y se
- * construyen módulo por módulo, empezando por M1. Esto existe para verificar que
- * los tokens de color portados desde `rienda.css` se resuelven, que las dos
- * familias tipográficas cargan y que el tema oscuro conmuta. Se reemplaza al
- * montar el acceso.
+ * Puerta de entrada. Todavía no hay dashboard (M11), así que en lugar de un
+ * placeholder envía a la primera pantalla construida que el rol alcanza — el
+ * mismo orden en que aparecen en el sidebar.
  */
-export default function Inicio() {
-  return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 p-8">
-      <div>
-        <p className="text-sm tracking-wide text-fg-muted uppercase">Haras Las Lechuzas</p>
-        <h1 className="font-serif text-4xl text-fg">RIENDA</h1>
-        <p className="mt-1 text-fg-muted">
-          Red Integral Ecuestre de Negocio, Datos y Administración
-        </p>
-      </div>
+export default async function Inicio() {
+  const api = await llamador();
 
-      <div className="rounded-2xl border border-surface-border bg-surface p-6 shadow-sm">
-        <h2 className="font-serif text-xl text-fg">Bases de arquitectura</h2>
-        <ul className="mt-3 space-y-1 text-sm text-fg-muted">
-          <li>Esquema de 33 entidades con sus invariantes en la base</li>
-          <li>Control de acceso por rol con seguridad a nivel de fila</li>
-          <li>Traza de auditoría por disparador</li>
-          <li>Capa de acceso con validación en los bordes</li>
-        </ul>
-      </div>
+  let sesion;
+  try {
+    sesion = await api.quienSoy();
+  } catch (e) {
+    if (e instanceof TRPCError && e.code === 'UNAUTHORIZED') redirect('/ingresar');
+    throw e;
+  }
 
-      <div className="rounded-xl bg-accent px-4 py-3 text-accent-fg">
-        <span className="font-semibold">Tokens activos.</span> Si este bloque se ve dorado con
-        texto cacao, el sistema de diseño quedó bien portado.
-      </div>
-    </main>
-  );
+  if (sesion.areas.includes('clientes')) redirect('/clientes');
+  if (sesion.areas.includes('bienestar')) redirect('/caballos');
+  if (sesion.areas.includes('configuracion')) redirect('/configuracion');
+
+  redirect('/ingresar');
 }

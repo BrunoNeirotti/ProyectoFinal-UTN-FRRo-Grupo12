@@ -21,12 +21,12 @@ export default async function FichaCaballo({ params }: PageProps<'/caballos/[id]
   const [clientes, instalaciones] = await Promise.all([api.cliente.listar(), api.instalacion.listar()]);
 
   return (
-    <main className="mx-auto max-w-4xl p-6 md:p-10">
+    <div className="mx-auto max-w-4xl p-6 md:p-10">
       <FichaDeCaballo
         ficha={ficha}
         propietarios={clientes.map((c) => ({ id: c.id, nombre: c.nombre }))}
         instalaciones={instalaciones.map((i) => ({ id: i.id, nombre: i.nombre }))}
       />
-    </main>
+    </div>
   );
 }

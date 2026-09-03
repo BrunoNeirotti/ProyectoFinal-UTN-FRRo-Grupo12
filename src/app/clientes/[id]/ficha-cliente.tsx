@@ -1,20 +1,21 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
+import { PencilSimple, Horse, Student, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { RouterApp } from '@/server/routers/_app';
 import { desactivarCliente, modificarCliente, registrarConsentimiento, revocarConsentimiento } from '../acciones';
 import { crearContrato, darDeBajaContrato, modificarContrato } from '../acciones-contrato';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
+import { BotonEnviar } from '../../botones';
 
 type Salidas = inferRouterOutputs<RouterApp>;
 type Ficha = Salidas['cliente']['ficha'];
 type Servicio = Salidas['servicio']['listar'][number];
 
 const inicial: ResultadoDeGuardado = { estado: 'inicial' };
-const comun = 'mt-1 w-full rounded-lg border border-surface-border bg-bg px-3 py-2 text-sm text-fg';
+const ESTADO_CONTRATO_BADGE = { vigente: 'badge-ok', suspendido: 'badge-warn', finalizado: '' } as const;
 
 function nombreCliente(cliente: Ficha['cliente']) {
   return cliente.tipo === 'persona_juridica'
@@ -27,17 +28,18 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
+      <section className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-2xl text-fg">{nombreCliente(cliente)}</h1>
             <p className="mt-0.5 text-sm text-fg-muted">
               {cliente.tipo === 'persona_juridica' ? 'Persona jurídica' : 'Persona física'}
-              {!cliente.activo && ' · inactivo'}
+              {!cliente.activo && <span className="badge ml-2">Inactivo</span>}
             </p>
           </div>
           <details>
-            <summary className="cursor-pointer rounded-lg border border-surface-border px-3 py-1.5 text-sm text-fg-muted">
+            <summary className="btn btn-sec btn-sm cursor-pointer">
+              <PencilSimple size={14} aria-hidden="true" />
               Editar
             </summary>
             <FormularioEditar cliente={cliente} />
@@ -46,19 +48,19 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
 
         <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <dt className="text-xs text-fg-muted">CUIT</dt>
+            <dt className="label">CUIT</dt>
             <dd className="tnum">{cliente.cuit ?? '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs text-fg-muted">Condición IVA</dt>
+            <dt className="label">Condición IVA</dt>
             <dd>{cliente.condicion_iva ?? '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs text-fg-muted">Canal preferido</dt>
+            <dt className="label">Canal preferido</dt>
             <dd>{cliente.canal_preferido === 'whatsapp' ? 'WhatsApp' : 'Correo'}</dd>
           </div>
           <div>
-            <dt className="text-xs text-fg-muted">Día de vencimiento</dt>
+            <dt className="label">Día de vencimiento</dt>
             <dd className="tnum">{cliente.dia_vencimiento ?? 'Por omisión'}</dd>
           </div>
         </dl>
@@ -75,32 +77,38 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
       />
 
       <div className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
+        <section className="card p-5">
           <h2 className="font-serif text-lg text-fg">Caballos</h2>
           {caballos.length === 0 && <p className="mt-2 text-sm text-fg-muted">Sin caballos a pupilaje.</p>}
-          <ul className="mt-2 space-y-2">
+          <ul className="mt-2 space-y-1">
             {caballos.map((c) => (
               <li key={c.id}>
-                <Link href={`/caballos/${c.id}`} className="text-sm font-medium text-fg hover:text-accent-ink">
-                  {c.nombre}
+                <Link href={`/caballos/${c.id}`} className="flex items-center gap-2 rounded-lg p-2 -mx-2 text-sm hover:bg-hover-veil">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-ink">
+                    <Horse size={16} aria-hidden="true" />
+                  </span>
+                  <span className="font-medium text-fg">{c.nombre}</span>
+                  <span className="text-xs text-fg-muted">{c.instalacion?.nombre ?? 'sin instalación'}</span>
                 </Link>
-                <span className="ml-2 text-xs text-fg-muted">{c.instalacion?.nombre ?? 'sin instalación'}</span>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className="rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
+        <section className="card p-5">
           <h2 className="font-serif text-lg text-fg">Alumnos</h2>
           {alumnos.length === 0 && <p className="mt-2 text-sm text-fg-muted">Sin alumnos.</p>}
           <ul className="mt-2 space-y-2">
             {alumnos.map((a) => (
-              <li key={a.id} className="flex items-center gap-2 text-sm">
-                <span className="font-medium text-fg">{a.persona?.apellido}, {a.persona?.nombre}</span>
+              <li key={a.id} className="flex items-center gap-2">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-ink">
+                  <Student size={16} aria-hidden="true" />
+                </span>
+                <span className="text-sm font-medium text-fg">{a.persona?.apellido}, {a.persona?.nombre}</span>
                 {a.consentimiento_tutor_en ? (
-                  <span className="text-xs text-ok">Consentimiento OK</span>
+                  <span className="badge badge-ok"><CheckCircle size={12} aria-hidden="true" />Consent. OK</span>
                 ) : (
-                  <span className="text-xs text-bad">Sin consentimiento</span>
+                  <span className="badge badge-bad"><WarningCircle size={12} aria-hidden="true" />Sin consent.</span>
                 )}
               </li>
             ))}
@@ -122,30 +130,30 @@ function ConsentimientoWidget({ cliente }: { cliente: Ficha['cliente'] }) {
   const [resultadoRev, enviarRev] = useActionState(revocarConsentimiento, inicial);
 
   return (
-    <div className="mt-4 rounded-lg border border-surface-border p-3 text-sm">
+    <div className="card mt-4 p-3 text-sm">
       <p>
         Consentimiento de mensajería:{' '}
         {vigente ? (
-          <span className="text-ok">otorgado el {cliente.consentimiento_en?.slice(0, 10)}</span>
+          <span className="badge badge-ok"><CheckCircle size={12} aria-hidden="true" />otorgado el {cliente.consentimiento_en?.slice(0, 10)}</span>
         ) : (
-          <span className="text-bad">no vigente</span>
+          <span className="badge badge-bad"><WarningCircle size={12} aria-hidden="true" />no vigente</span>
         )}
       </p>
       {vigente ? (
         <form action={enviarRev} className="mt-2">
           <input type="hidden" name="clienteId" value={cliente.id} />
-          <BotonSecundario texto="Revocar" />
-          {resultadoRev.estado === 'error' && <p className="mt-1 text-xs text-bad">{resultadoRev.mensaje}</p>}
+          <BotonEnviar texto="Revocar" variante="sec" tamano="sm" />
+          {resultadoRev.estado === 'error' && <p className="error">{resultadoRev.mensaje}</p>}
         </form>
       ) : (
         <form action={enviarReg} className="mt-2 flex flex-wrap items-end gap-2">
           <input type="hidden" name="clienteId" value={cliente.id} />
-          <label className="text-xs text-fg-muted">
-            Medio
-            <input name="medio" required placeholder="WhatsApp, verbal, formulario…" className={comun} />
+          <label className="block">
+            <span className="label">Medio</span>
+            <input name="medio" required placeholder="WhatsApp, verbal, formulario…" className="input" />
           </label>
-          <BotonSecundario texto="Registrar consentimiento" />
-          {resultadoReg.estado === 'error' && <p className="text-xs text-bad">{resultadoReg.mensaje}</p>}
+          <BotonEnviar texto="Registrar consentimiento" variante="sec" tamano="sm" />
+          {resultadoReg.estado === 'error' && <p className="error">{resultadoReg.mensaje}</p>}
         </form>
       )}
     </div>
@@ -157,31 +165,31 @@ function FormularioEditar({ cliente }: { cliente: Ficha['cliente'] }) {
   const [requiereFactura, setRequiereFactura] = useState(cliente.requiere_factura);
 
   return (
-    <form action={enviar} className="mt-3 max-w-xl space-y-3 rounded-lg border border-surface-border p-4">
+    <form action={enviar} className="card mt-3 max-w-xl space-y-4 p-4">
       <input type="hidden" name="clienteId" value={cliente.id} />
       {cliente.tipo === 'persona_juridica' && (
-        <label className="block text-xs text-fg-muted">
-          Razón social
-          <input name="razonSocial" defaultValue={cliente.razon_social ?? ''} required className={comun} />
+        <label className="block">
+          <span className="label">Razón social</span>
+          <input name="razonSocial" defaultValue={cliente.razon_social ?? ''} required className="input" />
         </label>
       )}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block text-xs text-fg-muted">
-          Canal preferido
-          <select name="canalPreferido" defaultValue={cliente.canal_preferido} className={comun}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="label">Canal preferido</span>
+          <select name="canalPreferido" defaultValue={cliente.canal_preferido} className="input">
             <option value="whatsapp">WhatsApp</option>
             <option value="email">Correo</option>
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Día de vencimiento pactado
+        <label className="block">
+          <span className="label">Día de vencimiento pactado</span>
           <input
             name="diaVencimiento"
             type="number"
             min="1"
             max="28"
             defaultValue={cliente.dia_vencimiento ?? ''}
-            className={comun}
+            className="input"
           />
         </label>
       </div>
@@ -196,14 +204,14 @@ function FormularioEditar({ cliente }: { cliente: Ficha['cliente'] }) {
         Pide factura
       </label>
       {requiereFactura && (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block text-xs text-fg-muted">
-            CUIT
-            <input name="cuit" defaultValue={cliente.cuit ?? ''} required className={comun} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className="label">CUIT</span>
+            <input name="cuit" defaultValue={cliente.cuit ?? ''} required className="input" />
           </label>
-          <label className="block text-xs text-fg-muted">
-            Condición frente al IVA
-            <select name="condicionIva" defaultValue={cliente.condicion_iva ?? ''} required className={comun}>
+          <label className="block">
+            <span className="label">Condición frente al IVA</span>
+            <select name="condicionIva" defaultValue={cliente.condicion_iva ?? ''} required className="input">
               <option value="">Elegir…</option>
               <option value="responsable_inscripto">Responsable inscripto</option>
               <option value="monotributo">Monotributo</option>
@@ -213,9 +221,9 @@ function FormularioEditar({ cliente }: { cliente: Ficha['cliente'] }) {
           </label>
         </div>
       )}
-      {resultado.estado === 'error' && <p className="text-xs text-bad">{resultado.mensaje}</p>}
-      {resultado.estado === 'ok' && <p className="text-xs text-ok">Guardado.</p>}
-      <BotonEnviar texto="Guardar cambios" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+      {resultado.estado === 'ok' && <p className="helper text-ok">Guardado.</p>}
+      <BotonEnviar texto="Guardar cambios" variante="sec" />
     </form>
   );
 }
@@ -225,13 +233,11 @@ function FormularioDesactivar({ clienteId }: { clienteId: string }) {
   return (
     <form action={enviar} className="mt-2">
       <input type="hidden" name="clienteId" value={clienteId} />
-      <p className="text-xs text-fg-muted">
-        No borra nada: el cliente queda inactivo pero su historial se conserva.
-      </p>
+      <p className="helper">No borra nada: el cliente queda inactivo pero su historial se conserva.</p>
       <div className="mt-2">
-        <BotonSecundario texto="Confirmar baja" />
+        <BotonEnviar texto="Confirmar baja" variante="sec" tamano="sm" />
       </div>
-      {resultado.estado === 'error' && <p className="mt-1 text-xs text-bad">{resultado.mensaje}</p>}
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
     </form>
   );
 }
@@ -250,19 +256,19 @@ function SeccionContratos({
   alumnos: Ficha['alumnos'];
 }) {
   return (
-    <section className="rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
+    <section className="card p-5">
       <h2 className="font-serif text-lg text-fg">Contratos</h2>
 
       <div className="mt-3 overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="tbl">
           <caption className="sr-only">Contratos del cliente con su servicio, importe y estado.</caption>
           <thead>
-            <tr className="border-b border-surface-border text-left text-fg-muted">
-              <th className="py-2 pr-3 font-medium">Servicio</th>
-              <th className="py-2 pr-3 font-medium">Aplica a</th>
-              <th className="py-2 pr-3 font-medium">Desde</th>
-              <th className="py-2 pr-3 text-right font-medium">Importe pactado</th>
-              <th className="py-2 font-medium">Estado</th>
+            <tr>
+              <th scope="col">Servicio</th>
+              <th scope="col">Aplica a</th>
+              <th scope="col">Desde</th>
+              <th scope="col" className="num">Importe pactado</th>
+              <th scope="col">Estado</th>
             </tr>
           </thead>
           <tbody className="tnum">
@@ -294,14 +300,16 @@ function SeccionContratos({
 function FilaContrato({ contrato: c, clienteId }: { contrato: Ficha['contratos'][number]; clienteId: string }) {
   const objeto = c.caballo ? c.caballo.nombre : c.alumno ? `${c.alumno.persona?.apellido}, ${c.alumno.persona?.nombre}` : '—';
   return (
-    <tr className="border-b border-surface-border align-top">
-      <td className="py-2 pr-3 font-medium">{c.servicio?.nombre}</td>
-      <td className="py-2 pr-3">{objeto}</td>
-      <td className="py-2 pr-3">{c.fecha_inicio}</td>
-      <td className="py-2 pr-3 text-right">{c.importe_pactado ? `$${Number(c.importe_pactado).toLocaleString('es-AR')}` : '—'}</td>
-      <td className="py-2">
+    <tr className="align-top">
+      <td className="font-medium">{c.servicio?.nombre}</td>
+      <td>{objeto}</td>
+      <td>{c.fecha_inicio}</td>
+      <td className="num">{c.importe_pactado ? `$${Number(c.importe_pactado).toLocaleString('es-AR')}` : '—'}</td>
+      <td>
         <details>
-          <summary className="cursor-pointer text-accent-ink">{c.estado}</summary>
+          <summary className="cursor-pointer">
+            <span className={`badge ${ESTADO_CONTRATO_BADGE[c.estado]}`}>{c.estado}</span>
+          </summary>
           <FormularioEditarContrato contrato={c} clienteId={clienteId} />
         </details>
       </td>
@@ -320,34 +328,34 @@ function FormularioEditarContrato({
   const [resultadoBaja, enviarBaja] = useActionState(darDeBajaContrato, inicial);
 
   return (
-    <div className="mt-2 space-y-2 rounded-lg border border-surface-border p-3">
-      <form action={enviar} className="space-y-2">
+    <div className="card mt-2 space-y-3 p-3">
+      <form action={enviar} className="space-y-3">
         <input type="hidden" name="contratoId" value={c.id} />
         <input type="hidden" name="clienteId" value={clienteId} />
-        <label className="block text-xs text-fg-muted">
-          Estado
-          <select name="estado" defaultValue={c.estado ?? 'vigente'} className={comun}>
+        <label className="block">
+          <span className="label">Estado</span>
+          <select name="estado" defaultValue={c.estado ?? 'vigente'} className="input">
             <option value="vigente">Vigente</option>
             <option value="suspendido">Suspendido</option>
             <option value="finalizado">Finalizado</option>
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Importe pactado (vacío = tarifa vigente)
-          <input name="importePactado" type="number" min="0" step="0.01" defaultValue={c.importe_pactado ?? ''} className={comun} />
+        <label className="block">
+          <span className="label">Importe pactado (vacío = tarifa vigente)</span>
+          <input name="importePactado" type="number" min="0" step="0.01" defaultValue={c.importe_pactado ?? ''} className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Fecha de fin
-          <input name="fechaFin" type="date" defaultValue={c.fecha_fin ?? ''} className={comun} />
+        <label className="block">
+          <span className="label">Fecha de fin</span>
+          <input name="fechaFin" type="date" defaultValue={c.fecha_fin ?? ''} className="input" />
         </label>
-        {resultado.estado === 'error' && <p className="text-xs text-bad">{resultado.mensaje}</p>}
-        <BotonSecundario texto="Guardar" />
+        {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+        <BotonEnviar texto="Guardar" variante="sec" tamano="sm" />
       </form>
       <form action={enviarBaja}>
         <input type="hidden" name="contratoId" value={c.id} />
         <input type="hidden" name="clienteId" value={clienteId} />
-        <button type="submit" className="text-xs text-bad underline">Dar de baja ahora</button>
-        {resultadoBaja.estado === 'error' && <p className="mt-1 text-xs text-bad">{resultadoBaja.mensaje}</p>}
+        <button type="submit" className="link text-xs text-bad">Dar de baja ahora</button>
+        {resultadoBaja.estado === 'error' && <p className="error">{resultadoBaja.mensaje}</p>}
       </form>
     </div>
   );
@@ -369,15 +377,15 @@ function FormularioNuevoContrato({
   const servicio = servicios.find((s) => s.id === servicioId);
 
   return (
-    <form action={enviar} className="mt-2 space-y-3 rounded-lg border border-surface-border p-4">
+    <form action={enviar} className="card mt-2 space-y-4 p-4">
       <input type="hidden" name="clienteId" value={clienteId} />
-      <label className="block text-xs text-fg-muted">
-        Servicio
+      <label className="block">
+        <span className="label">Servicio</span>
         <select
           name="servicioId"
           value={servicioId}
           onChange={(e) => setServicioId(e.target.value)}
-          className={comun}
+          className="input"
         >
           {servicios.map((s) => (
             <option key={s.id} value={s.id}>{s.nombre}</option>
@@ -386,9 +394,9 @@ function FormularioNuevoContrato({
       </label>
 
       {servicio?.aplicaA === 'caballo' ? (
-        <label className="block text-xs text-fg-muted">
-          Caballo
-          <select name="caballoId" required className={comun}>
+        <label className="block">
+          <span className="label">Caballo</span>
+          <select name="caballoId" required className="input">
             <option value="">Elegir…</option>
             {caballos.map((c) => (
               <option key={c.id} value={c.id}>{c.nombre}</option>
@@ -396,9 +404,9 @@ function FormularioNuevoContrato({
           </select>
         </label>
       ) : (
-        <label className="block text-xs text-fg-muted">
-          Alumno
-          <select name="alumnoId" required className={comun}>
+        <label className="block">
+          <span className="label">Alumno</span>
+          <select name="alumnoId" required className="input">
             <option value="">Elegir…</option>
             {alumnos.map((a) => (
               <option key={a.id} value={a.id}>{a.persona?.apellido}, {a.persona?.nombre}</option>
@@ -407,46 +415,20 @@ function FormularioNuevoContrato({
         </label>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block text-xs text-fg-muted">
-          Fecha de inicio
-          <input name="fechaInicio" type="date" required className={comun} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="label">Fecha de inicio</span>
+          <input name="fechaInicio" type="date" required className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Importe pactado (opcional; pisa la tarifa)
-          <input name="importePactado" type="number" min="0" step="0.01" className={comun} />
+        <label className="block">
+          <span className="label">Importe pactado (opcional; pisa la tarifa)</span>
+          <input name="importePactado" type="number" min="0" step="0.01" className="input" />
         </label>
       </div>
 
-      {resultado.estado === 'error' && <p className="text-xs text-bad">{resultado.mensaje}</p>}
-      {resultado.estado === 'ok' && <p className="text-xs text-ok">Contrato creado.</p>}
-      <BotonEnviar texto="Crear contrato" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+      {resultado.estado === 'ok' && <p className="helper text-ok">Contrato creado.</p>}
+      <BotonEnviar texto="Crear contrato" variante="sec" />
     </form>
-  );
-}
-
-function BotonEnviar({ texto }: { texto: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-fg disabled:opacity-60"
-    >
-      {pending ? 'Guardando…' : texto}
-    </button>
-  );
-}
-
-function BotonSecundario({ texto }: { texto: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-fg disabled:opacity-60"
-    >
-      {pending ? 'Guardando…' : texto}
-    </button>
   );
 }

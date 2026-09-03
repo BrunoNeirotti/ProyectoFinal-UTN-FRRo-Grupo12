@@ -1,9 +1,9 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import { crearCaballo } from './acciones';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
+import { BotonEnviar } from '../botones';
 
 interface Opcion {
   id: string;
@@ -11,7 +11,6 @@ interface Opcion {
 }
 
 const inicial: ResultadoDeGuardado = { estado: 'inicial' };
-const comun = 'mt-1 w-full rounded-lg border border-surface-border bg-bg px-3 py-2 text-sm text-fg';
 
 export function FormularioNuevoCaballo({
   propietarios,
@@ -23,25 +22,25 @@ export function FormularioNuevoCaballo({
   const [resultado, enviar] = useActionState(crearCaballo, inicial);
 
   return (
-    <form action={enviar} className="max-w-2xl space-y-4">
-      <label className="block text-xs text-fg-muted">
-        Nombre
-        <input name="nombre" required className={comun} />
+    <form action={enviar} className="max-w-2xl space-y-5">
+      <label className="block">
+        <span className="label">Nombre</span>
+        <input name="nombre" required className="input" />
       </label>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block text-xs text-fg-muted">
-          Propietario
-          <select name="propietarioId" defaultValue="" className={comun}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="label">Propietario</span>
+          <select name="propietarioId" defaultValue="" className="input">
             <option value="">Del haras</option>
             {propietarios.map((p) => (
               <option key={p.id} value={p.id}>{p.nombre}</option>
             ))}
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Instalación
-          <select name="instalacionId" defaultValue="" className={comun}>
+        <label className="block">
+          <span className="label">Instalación</span>
+          <select name="instalacionId" defaultValue="" className="input">
             <option value="">Sin asignar</option>
             {instalaciones.map((i) => (
               <option key={i.id} value={i.id}>{i.nombre}</option>
@@ -50,58 +49,43 @@ export function FormularioNuevoCaballo({
         </label>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block text-xs text-fg-muted">
-          Raza
-          <input name="raza" className={comun} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="label">Raza</span>
+          <input name="raza" className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Sexo
-          <select name="sexo" defaultValue="" className={comun}>
+        <label className="block">
+          <span className="label">Sexo</span>
+          <select name="sexo" defaultValue="" className="input">
             <option value="">Sin especificar</option>
             <option value="macho">Macho</option>
             <option value="macho_castrado">Macho castrado</option>
             <option value="hembra">Hembra</option>
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Pelaje
-          <input name="pelaje" className={comun} />
+        <label className="block">
+          <span className="label">Pelaje</span>
+          <input name="pelaje" className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Peso (kg)
-          <input name="pesoKg" type="number" min="0" step="0.1" className={comun} />
+        <label className="block">
+          <span className="label">Peso (kg)</span>
+          <input name="pesoKg" type="number" min="0" step="0.1" className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Fecha de nacimiento
-          <input name="fechaNacimiento" type="date" className={comun} />
+        <label className="block">
+          <span className="label">Fecha de nacimiento</span>
+          <input name="fechaNacimiento" type="date" className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Fecha de ingreso
-          <input name="fechaIngreso" type="date" className={comun} />
+        <label className="block">
+          <span className="label">Fecha de ingreso</span>
+          <input name="fechaIngreso" type="date" className="input" />
         </label>
       </div>
 
       {resultado.estado === 'error' && (
-        <p role="alert" className="rounded-lg bg-bad-bg px-3 py-2 text-sm text-bad">
-          {resultado.mensaje}
-        </p>
+        <p role="alert" className="error">{resultado.mensaje}</p>
       )}
 
-      <BotonEnviar />
+      <BotonEnviar texto="Crear caballo" cargando="Creando…" />
     </form>
-  );
-}
-
-function BotonEnviar() {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-lg bg-accent px-5 py-2.5 font-semibold text-accent-fg disabled:opacity-60"
-    >
-      {pending ? 'Creando…' : 'Crear caballo'}
-    </button>
   );
 }

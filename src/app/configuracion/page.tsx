@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { TRPCError } from '@trpc/server';
+import { WarningCircle } from '@phosphor-icons/react/dist/ssr';
 import { llamador } from '@/lib/trpc/servidor';
 import { proponeIntereses } from '@/lib/parametros';
 import { FormularioDeReglas } from './formulario';
@@ -47,22 +48,26 @@ export default async function Configuracion() {
   }));
 
   return (
-    <main className="mx-auto max-w-5xl p-6 md:p-10">
+    <div className="mx-auto max-w-5xl p-6 md:p-10">
+      <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Sistema</p>
       <h1 className="font-serif text-3xl text-fg">Configuración</h1>
       <p className="mt-1 text-fg-muted">
-        Las reglas que gobiernan la cobranza, la agenda y los mensajes. Cambiarlas no requiere
-        tocar el sistema.
+        Lo que hace que el sistema sea de este haras y no genérico: sus reglas, sus precios, sus
+        boxes y su gente.
       </p>
 
       {tasa && !proponeIntereses(tasa.valor) && (
-        <div className="mt-6 rounded-xl bg-warn-bg px-4 py-3 text-sm text-warn">
-          <strong className="font-semibold">La tasa de mora no está definida.</strong> Mientras siga
-          vacía, el sistema no propone intereses en la cobranza. No es un error de configuración:
-          es el estado que se relevó.
+        <div className="card-accent mt-6 flex items-start gap-2 p-4 text-sm text-warn">
+          <WarningCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+          <p>
+            <strong className="font-semibold">La tasa de mora no está definida.</strong> Mientras
+            siga vacía, el sistema no propone intereses en la cobranza. No es un error de
+            configuración: es el estado que se relevó.
+          </p>
         </div>
       )}
 
-      <section className="mt-8">
+      <section className="card mt-8 p-5">
         <h2 className="font-serif text-xl text-fg">Reglas del haras</h2>
         <FormularioDeReglas parametros={parametros} />
       </section>
@@ -72,6 +77,6 @@ export default async function Configuracion() {
         <SeccionServicios servicios={servicios} />
         <SeccionInstalaciones instalaciones={instalaciones} />
       </div>
-    </main>
+    </div>
   );
 }

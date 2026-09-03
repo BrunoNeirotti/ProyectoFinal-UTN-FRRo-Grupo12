@@ -1,21 +1,22 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
+import { PencilSimple, Horse } from '@phosphor-icons/react';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { RouterApp } from '@/server/routers/_app';
 import { darDeBajaCaballo, modificarCaballo } from '../acciones';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { edadEn } from '@/lib/personas';
+import { BotonEnviar } from '../../botones';
 
 type Salidas = inferRouterOutputs<RouterApp>;
 type Ficha = Salidas['caballo']['ficha'];
 type Opcion = { id: string; nombre: string | null };
 
 const inicial: ResultadoDeGuardado = { estado: 'inicial' };
-const comun = 'mt-1 w-full rounded-lg border border-surface-border bg-bg px-3 py-2 text-sm text-fg';
 const ESTADOS = { activo: 'Activo', en_tratamiento: 'En tratamiento', retirado: 'Retirado' } as const;
+const ESTADO_BADGE = { activo: 'badge-ok', en_tratamiento: 'badge-warn', retirado: '' } as const;
 
 export function FichaDeCaballo({
   ficha,
@@ -36,36 +37,41 @@ export function FichaDeCaballo({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
+      <section className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-2xl text-fg">{caballo.nombre}</h1>
-            <p className="mt-0.5 text-sm text-fg-muted">
-              {caballo.instalacion?.nombre ?? 'Sin instalación asignada'} · {ESTADOS[caballo.estado]}
-            </p>
+          <div className="flex items-start gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-ink">
+              <Horse size={22} aria-hidden="true" />
+            </span>
+            <div>
+              <h1 className="font-serif text-2xl text-fg">{caballo.nombre}</h1>
+              <p className="mt-0.5 text-sm text-fg-muted">{caballo.instalacion?.nombre ?? 'Sin instalación asignada'}</p>
+              <span className={`badge mt-1.5 ${ESTADO_BADGE[caballo.estado]}`}>{ESTADOS[caballo.estado]}</span>
+            </div>
           </div>
           <details>
-            <summary className="cursor-pointer rounded-lg border border-surface-border px-3 py-1.5 text-sm text-fg-muted">
+            <summary className="btn btn-sec btn-sm cursor-pointer">
+              <PencilSimple size={14} aria-hidden="true" />
               Editar
             </summary>
             <FormularioEditar caballo={caballo} propietarios={propietarios} instalaciones={instalaciones} />
           </details>
         </div>
 
-        <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          <div><dt className="text-xs text-fg-muted">Raza</dt><dd>{caballo.raza ?? '—'}</dd></div>
-          <div><dt className="text-xs text-fg-muted">Sexo</dt><dd>{caballo.sexo ?? '—'}</dd></div>
+        <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <div><dt className="label">Raza</dt><dd>{caballo.raza ?? '—'}</dd></div>
+          <div><dt className="label">Sexo</dt><dd>{caballo.sexo ?? '—'}</dd></div>
           <div>
-            <dt className="text-xs text-fg-muted">Edad</dt>
+            <dt className="label">Edad</dt>
             <dd className="tnum">{caballo.fecha_nacimiento ? `${edadEn(caballo.fecha_nacimiento)} años` : '—'}</dd>
           </div>
-          <div><dt className="text-xs text-fg-muted">Pelaje</dt><dd>{caballo.pelaje ?? '—'}</dd></div>
-          <div><dt className="text-xs text-fg-muted">Peso</dt><dd className="tnum">{caballo.peso_kg ? `${caballo.peso_kg} kg` : '—'}</dd></div>
+          <div><dt className="label">Pelaje</dt><dd>{caballo.pelaje ?? '—'}</dd></div>
+          <div><dt className="label">Peso</dt><dd className="tnum">{caballo.peso_kg ? `${caballo.peso_kg} kg` : '—'}</dd></div>
           <div>
-            <dt className="text-xs text-fg-muted">Propietario</dt>
+            <dt className="label">Propietario</dt>
             <dd>
               {caballo.propietario ? (
-                <Link href={`/clientes/${caballo.propietario.id}`} className="text-accent-ink hover:underline">
+                <Link href={`/clientes/${caballo.propietario.id}`} className="link">
                   {nombrePropietario}
                 </Link>
               ) : (
@@ -76,29 +82,27 @@ export function FichaDeCaballo({
         </dl>
       </section>
 
-      <section className="rounded-xl border border-surface-border bg-surface p-5 shadow-sm">
+      <section className="card p-5">
         <h2 className="font-serif text-lg text-fg">Contratos</h2>
-        <p className="mt-1 text-xs text-fg-muted">
-          Se dan de alta desde la ficha del cliente propietario.
-        </p>
+        <p className="mt-1 text-xs text-fg-muted">Se dan de alta desde la ficha del cliente propietario.</p>
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="tbl">
             <caption className="sr-only">Contratos de este caballo con su servicio, importe y estado.</caption>
             <thead>
-              <tr className="border-b border-surface-border text-left text-fg-muted">
-                <th className="py-2 pr-3 font-medium">Servicio</th>
-                <th className="py-2 pr-3 font-medium">Desde</th>
-                <th className="py-2 pr-3 text-right font-medium">Importe</th>
-                <th className="py-2 font-medium">Estado</th>
+              <tr>
+                <th scope="col">Servicio</th>
+                <th scope="col">Desde</th>
+                <th scope="col" className="num">Importe</th>
+                <th scope="col">Estado</th>
               </tr>
             </thead>
             <tbody className="tnum">
               {contratos.map((c) => (
-                <tr key={c.id} className="border-b border-surface-border">
-                  <td className="py-2 pr-3 font-medium">{c.servicio?.nombre}</td>
-                  <td className="py-2 pr-3">{c.fecha_inicio}</td>
-                  <td className="py-2 pr-3 text-right">{c.importe_pactado ? `$${Number(c.importe_pactado).toLocaleString('es-AR')}` : '—'}</td>
-                  <td className="py-2">{c.estado}</td>
+                <tr key={c.id}>
+                  <td className="font-medium">{c.servicio?.nombre}</td>
+                  <td>{c.fecha_inicio}</td>
+                  <td className="num">{c.importe_pactado ? `$${Number(c.importe_pactado).toLocaleString('es-AR')}` : '—'}</td>
+                  <td><span className="badge badge-accent">{c.estado}</span></td>
                 </tr>
               ))}
               {contratos.length === 0 && (
@@ -109,7 +113,7 @@ export function FichaDeCaballo({
         </div>
       </section>
 
-      <div className="rounded-xl border border-surface-border bg-surface p-5 text-sm text-fg-muted shadow-sm">
+      <div className="card p-5 text-sm text-fg-muted">
         Sanidad, alimentación e historial de cuidados se suman acá cuando M9 esté construido: hoy la
         ficha muestra lo que M2 ya sostiene.
       </div>
@@ -135,64 +139,64 @@ function FormularioEditar({
 }) {
   const [resultado, enviar] = useActionState(modificarCaballo, inicial);
   return (
-    <form action={enviar} className="mt-3 max-w-xl space-y-3 rounded-lg border border-surface-border p-4">
+    <form action={enviar} className="card mt-3 max-w-xl space-y-4 p-4">
       <input type="hidden" name="caballoId" value={caballo.id} />
-      <label className="block text-xs text-fg-muted">
-        Nombre
-        <input name="nombre" defaultValue={caballo.nombre} required className={comun} />
+      <label className="block">
+        <span className="label">Nombre</span>
+        <input name="nombre" defaultValue={caballo.nombre} required className="input" />
       </label>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block text-xs text-fg-muted">
-          Propietario
-          <select name="propietarioId" defaultValue={caballo.propietario?.id ?? ''} className={comun}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className="label">Propietario</span>
+          <select name="propietarioId" defaultValue={caballo.propietario?.id ?? ''} className="input">
             <option value="">Del haras</option>
             {propietarios.map((p) => (
               <option key={p.id} value={p.id}>{p.nombre}</option>
             ))}
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Instalación
-          <select name="instalacionId" defaultValue={caballo.instalacion?.id ?? ''} className={comun}>
+        <label className="block">
+          <span className="label">Instalación</span>
+          <select name="instalacionId" defaultValue={caballo.instalacion?.id ?? ''} className="input">
             <option value="">Sin asignar</option>
             {instalaciones.map((i) => (
               <option key={i.id} value={i.id}>{i.nombre}</option>
             ))}
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Raza
-          <input name="raza" defaultValue={caballo.raza ?? ''} className={comun} />
+        <label className="block">
+          <span className="label">Raza</span>
+          <input name="raza" defaultValue={caballo.raza ?? ''} className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Sexo
-          <select name="sexo" defaultValue={caballo.sexo ?? ''} className={comun}>
+        <label className="block">
+          <span className="label">Sexo</span>
+          <select name="sexo" defaultValue={caballo.sexo ?? ''} className="input">
             <option value="">Sin especificar</option>
             <option value="macho">Macho</option>
             <option value="macho_castrado">Macho castrado</option>
             <option value="hembra">Hembra</option>
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Pelaje
-          <input name="pelaje" defaultValue={caballo.pelaje ?? ''} className={comun} />
+        <label className="block">
+          <span className="label">Pelaje</span>
+          <input name="pelaje" defaultValue={caballo.pelaje ?? ''} className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Peso (kg)
-          <input name="pesoKg" type="number" min="0" step="0.1" defaultValue={caballo.peso_kg ?? ''} className={comun} />
+        <label className="block">
+          <span className="label">Peso (kg)</span>
+          <input name="pesoKg" type="number" min="0" step="0.1" defaultValue={caballo.peso_kg ?? ''} className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Estado
-          <select name="estado" defaultValue={caballo.estado} className={comun}>
+        <label className="block">
+          <span className="label">Estado</span>
+          <select name="estado" defaultValue={caballo.estado} className="input">
             <option value="activo">Activo</option>
             <option value="en_tratamiento">En tratamiento</option>
             <option value="retirado">Retirado</option>
           </select>
         </label>
       </div>
-      {resultado.estado === 'error' && <p className="text-xs text-bad">{resultado.mensaje}</p>}
-      {resultado.estado === 'ok' && <p className="text-xs text-ok">Guardado.</p>}
-      <BotonEnviar texto="Guardar cambios" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+      {resultado.estado === 'ok' && <p className="helper text-ok">Guardado.</p>}
+      <BotonEnviar texto="Guardar cambios" variante="sec" />
     </form>
   );
 }
@@ -202,21 +206,8 @@ function FormularioBaja({ caballoId }: { caballoId: string }) {
   return (
     <form action={enviar} className="mt-2">
       <input type="hidden" name="caballoId" value={caballoId} />
-      <BotonEnviar texto="Confirmar baja" />
-      {resultado.estado === 'error' && <p className="mt-1 text-xs text-bad">{resultado.mensaje}</p>}
+      <BotonEnviar texto="Confirmar baja" variante="sec" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
     </form>
-  );
-}
-
-function BotonEnviar({ texto }: { texto: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-fg disabled:opacity-60"
-    >
-      {pending ? 'Guardando…' : texto}
-    </button>
   );
 }

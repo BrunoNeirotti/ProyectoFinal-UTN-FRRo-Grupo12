@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, Inter } from 'next/font/google';
 import { Nav } from './nav';
+import { Cabecera } from './cabecera';
 import './globals.css';
 
 /**
@@ -49,8 +50,13 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="es-AR" className={`${fraunces.variable} ${inter.variable}`}>
       <body className="font-sans antialiased">
-        <Nav />
-        {children}
+        <div className="flex min-h-dvh">
+          <Nav />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Cabecera />
+            <main className="min-w-0 flex-1">{children}</main>
+          </div>
+        </div>
       </body>
     </html>
   );

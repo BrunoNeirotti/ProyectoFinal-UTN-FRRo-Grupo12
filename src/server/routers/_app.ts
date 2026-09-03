@@ -28,12 +28,22 @@ export const routerApp = crearRouter({
    * `FORBIDDEN`. El alcance sale de la misma tabla que usan los guardas, así que
    * lo que se muestra y lo que se permite no pueden discrepar.
    */
-  quienSoy: procedimientoAutenticado.query(({ ctx }) => ({
-    usuarioId: ctx.sesion.usuarioId,
-    personaId: ctx.sesion.personaId,
-    rol: ctx.sesion.rol,
-    areas: alcanceDe(ctx.sesion.rol),
-  })),
+  quienSoy: procedimientoAutenticado.query(async ({ ctx }) => {
+    const { data: persona } = await ctx.supabase
+      .from('persona')
+      .select('nombre, apellido')
+      .eq('id', ctx.sesion.personaId)
+      .maybeSingle();
+
+    return {
+      usuarioId: ctx.sesion.usuarioId,
+      personaId: ctx.sesion.personaId,
+      rol: ctx.sesion.rol,
+      areas: alcanceDe(ctx.sesion.rol),
+      nombre: persona?.nombre ?? null,
+      apellido: persona?.apellido ?? null,
+    };
+  }),
 
   // --- M1 ---
   parametro: routerParametro,

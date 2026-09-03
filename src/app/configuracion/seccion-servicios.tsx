@@ -1,9 +1,9 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import { crearServicio, crearTarifa, modificarServicio } from './acciones-servicios';
 import type { ResultadoDeGuardado } from './acciones';
+import { BotonEnviar } from '../botones';
 
 export interface ServicioVisible {
   id: string;
@@ -18,28 +18,29 @@ export interface ServicioVisible {
 const UNIDADES = { mensual: 'Mensual', por_clase: 'Por clase', por_evento: 'Por evento' } as const;
 
 const inicial: ResultadoDeGuardado = { estado: 'inicial' };
-const comun = 'mt-1 w-full rounded-lg border border-surface-border bg-bg px-3 py-2 text-sm text-fg tnum';
 
 export function SeccionServicios({ servicios }: { servicios: ServicioVisible[] }) {
   return (
-    <section className="rounded-xl border border-surface-border bg-surface p-4 shadow-sm">
-      <h2 className="font-serif text-xl text-fg">Servicios y tarifas</h2>
-      <p className="mt-1 text-sm text-fg-muted">
-        El catálogo que vende el haras. El precio se divide por servicio y no por nivel: actualizar
-        un precio crea una tarifa nueva con su fecha de vigencia, nunca pisa la anterior.
-      </p>
+    <section className="card overflow-hidden">
+      <div className="border-b border-surface-border px-5 py-4">
+        <h2 className="font-serif text-lg text-fg">Servicios y tarifas</h2>
+        <p className="mt-1 text-sm text-fg-muted">
+          El catálogo que vende el haras. El precio se divide por servicio y no por nivel: actualizar
+          un precio crea una tarifa nueva con su fecha de vigencia, nunca pisa la anterior.
+        </p>
+      </div>
 
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+        <table className="tbl min-w-[600px]">
           <caption className="sr-only">Servicios con su tarifa vigente.</caption>
           <thead>
-            <tr className="border-b border-surface-border text-left text-fg-muted">
-              <th className="py-2 pr-3 font-medium">Servicio</th>
-              <th className="py-2 pr-3 font-medium">Unidad</th>
-              <th className="py-2 pr-3 font-medium">Modalidad</th>
-              <th className="py-2 pr-3 text-right font-medium">Vigente</th>
-              <th className="py-2 pr-3 font-medium">Desde</th>
-              <th className="py-2 font-medium">Estado</th>
+            <tr>
+              <th scope="col">Servicio</th>
+              <th scope="col">Unidad</th>
+              <th scope="col">Modalidad</th>
+              <th scope="col" className="num">Vigente</th>
+              <th scope="col">Desde</th>
+              <th scope="col">Estado</th>
             </tr>
           </thead>
           <tbody className="tnum">
@@ -57,7 +58,7 @@ export function SeccionServicios({ servicios }: { servicios: ServicioVisible[] }
         </table>
       </div>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
+      <div className="grid gap-5 border-t border-surface-border p-5 md:grid-cols-2">
         <FormularioNuevoServicio />
         <FormularioNuevaTarifa servicios={servicios} />
       </div>
@@ -67,61 +68,57 @@ export function SeccionServicios({ servicios }: { servicios: ServicioVisible[] }
 
 function FilaServicio({ servicio: s }: { servicio: ServicioVisible }) {
   return (
-    <>
-      <tr className={`border-b border-surface-border ${s.activo ? '' : 'text-fg-muted'}`}>
-        <td className="py-2 pr-3 font-medium">{s.nombre}</td>
-        <td className="py-2 pr-3">{UNIDADES[s.unidad]}</td>
-        <td className="py-2 pr-3">{s.modalidad === 'individual' ? 'Individual' : s.modalidad === 'grupal' ? 'Grupal' : '—'}</td>
-        <td className="py-2 pr-3 text-right font-medium">
-          {s.tarifaVigente ? `$${s.tarifaVigente.importe.toLocaleString('es-AR')}` : 'Sin tarifa'}
-        </td>
-        <td className="py-2 pr-3">{s.tarifaVigente?.vigenteDesde ?? '—'}</td>
-        <td className="py-2">
-          <details>
-            <summary className="cursor-pointer text-accent-ink">
-              {s.activo ? 'Activo' : 'Inactivo'} · editar
-            </summary>
-            <FormularioEditarServicio servicio={s} />
-          </details>
-        </td>
-      </tr>
-    </>
+    <tr className={s.activo ? '' : 'text-fg-muted'}>
+      <td className="font-medium">{s.nombre}</td>
+      <td className="text-xs">{UNIDADES[s.unidad]}</td>
+      <td className="text-xs">{s.modalidad === 'individual' ? <span className="badge">Individual</span> : s.modalidad === 'grupal' ? <span className="badge">Grupal</span> : '—'}</td>
+      <td className="num font-medium">
+        {s.tarifaVigente ? `$${s.tarifaVigente.importe.toLocaleString('es-AR')}` : 'Sin tarifa'}
+      </td>
+      <td className="text-fg-muted">{s.tarifaVigente?.vigenteDesde ?? '—'}</td>
+      <td>
+        <details>
+          <summary className="cursor-pointer">
+            <span className={`badge ${s.activo ? 'badge-ok' : ''}`}>{s.activo ? 'Activo' : 'Inactivo'}</span>
+          </summary>
+          <FormularioEditarServicio servicio={s} />
+        </details>
+      </td>
+    </tr>
   );
 }
 
 function FormularioEditarServicio({ servicio: s }: { servicio: ServicioVisible }) {
   const [resultado, enviar] = useActionState(modificarServicio, inicial);
   return (
-    <form action={enviar} className="mt-2 space-y-2 rounded-lg border border-surface-border p-3">
+    <form action={enviar} className="card mt-2 space-y-3 p-3">
       <input type="hidden" name="servicioId" value={s.id} />
-      <label className="block text-xs text-fg-muted">
-        Nombre
-        <input name="nombre" defaultValue={s.nombre} required className={comun} />
+      <label className="block">
+        <span className="label">Nombre</span>
+        <input name="nombre" defaultValue={s.nombre} required className="input" />
       </label>
-      <label className="block text-xs text-fg-muted">
-        Unidad
-        <select name="unidad" defaultValue={s.unidad} className={comun}>
+      <label className="block">
+        <span className="label">Unidad</span>
+        <select name="unidad" defaultValue={s.unidad} className="input">
           <option value="mensual">Mensual</option>
           <option value="por_clase">Por clase</option>
           <option value="por_evento">Por evento</option>
         </select>
       </label>
-      <label className="block text-xs text-fg-muted">
-        Modalidad (sólo clases)
-        <select name="modalidad" defaultValue={s.modalidad ?? ''} className={comun}>
+      <label className="block">
+        <span className="label">Modalidad (sólo clases)</span>
+        <select name="modalidad" defaultValue={s.modalidad ?? ''} className="input">
           <option value="">No aplica</option>
           <option value="individual">Individual</option>
           <option value="grupal">Grupal</option>
         </select>
       </label>
-      <label className="flex items-center gap-2 text-xs text-fg-muted">
+      <label className="flex items-center gap-2 text-sm text-fg">
         <input type="checkbox" name="activo" value="true" defaultChecked={s.activo} />
         Activo
       </label>
-      {resultado.estado === 'error' && (
-        <p role="alert" className="text-xs text-bad">{resultado.mensaje}</p>
-      )}
-      <BotonEnviar texto="Guardar" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+      <BotonEnviar texto="Guardar" variante="sec" tamano="sm" />
     </form>
   );
 }
@@ -129,52 +126,50 @@ function FormularioEditarServicio({ servicio: s }: { servicio: ServicioVisible }
 function FormularioNuevoServicio() {
   const [resultado, enviar] = useActionState(crearServicio, inicial);
   return (
-    <form action={enviar} className="space-y-2 rounded-lg border border-surface-border p-3">
+    <form action={enviar} className="card space-y-3 p-4">
       <h3 className="text-sm font-medium text-fg">Nuevo servicio</h3>
-      <label className="block text-xs text-fg-muted">
-        Nombre
-        <input name="nombre" required placeholder="Clases escuela" className={comun} />
+      <label className="block">
+        <span className="label">Nombre</span>
+        <input name="nombre" required placeholder="Clases escuela" className="input" />
       </label>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="block text-xs text-fg-muted">
-          Unidad
-          <select name="unidad" className={comun}>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="label">Unidad</span>
+          <select name="unidad" className="input">
             <option value="mensual">Mensual</option>
             <option value="por_clase">Por clase</option>
             <option value="por_evento">Por evento</option>
           </select>
         </label>
-        <label className="block text-xs text-fg-muted">
-          Aplica a
-          <select name="aplicaA" className={comun}>
+        <label className="block">
+          <span className="label">Aplica a</span>
+          <select name="aplicaA" className="input">
             <option value="caballo">Caballo</option>
             <option value="alumno">Alumno</option>
           </select>
         </label>
       </div>
-      <label className="block text-xs text-fg-muted">
-        Modalidad (sólo clases)
-        <select name="modalidad" defaultValue="" className={comun}>
+      <label className="block">
+        <span className="label">Modalidad (sólo clases)</span>
+        <select name="modalidad" defaultValue="" className="input">
           <option value="">No aplica</option>
           <option value="individual">Individual</option>
           <option value="grupal">Grupal</option>
         </select>
       </label>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="block text-xs text-fg-muted">
-          Importe inicial
-          <input name="importeInicial" type="number" min="0" step="0.01" required className={comun} />
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="label">Importe inicial</span>
+          <input name="importeInicial" type="number" min="0" step="0.01" required className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Vigente desde
-          <input name="vigenteDesde" type="date" required className={comun} />
+        <label className="block">
+          <span className="label">Vigente desde</span>
+          <input name="vigenteDesde" type="date" required className="input" />
         </label>
       </div>
-      {resultado.estado === 'error' && (
-        <p role="alert" className="text-xs text-bad">{resultado.mensaje}</p>
-      )}
-      {resultado.estado === 'ok' && <p role="status" className="text-xs text-ok">Servicio creado.</p>}
-      <BotonEnviar texto="Crear servicio" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+      {resultado.estado === 'ok' && <p className="helper text-ok">Servicio creado.</p>}
+      <BotonEnviar texto="Crear servicio" variante="sec" />
     </form>
   );
 }
@@ -182,47 +177,30 @@ function FormularioNuevoServicio() {
 function FormularioNuevaTarifa({ servicios }: { servicios: ServicioVisible[] }) {
   const [resultado, enviar] = useActionState(crearTarifa, inicial);
   return (
-    <form action={enviar} className="space-y-2 rounded-lg border border-surface-border p-3">
+    <form action={enviar} className="card space-y-3 p-4">
       <h3 className="text-sm font-medium text-fg">Nueva tarifa</h3>
-      <p className="text-xs text-fg-muted">
-        Actualiza el precio de un servicio existente sin pisar la vigencia anterior.
-      </p>
-      <label className="block text-xs text-fg-muted">
-        Servicio
-        <select name="servicioId" required className={comun}>
+      <p className="helper mt-0">Actualiza el precio de un servicio existente sin pisar la vigencia anterior.</p>
+      <label className="block">
+        <span className="label">Servicio</span>
+        <select name="servicioId" required className="input">
           {servicios.map((s) => (
             <option key={s.id} value={s.id}>{s.nombre}</option>
           ))}
         </select>
       </label>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="block text-xs text-fg-muted">
-          Importe
-          <input name="importe" type="number" min="0" step="0.01" required className={comun} />
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="label">Importe</span>
+          <input name="importe" type="number" min="0" step="0.01" required className="input" />
         </label>
-        <label className="block text-xs text-fg-muted">
-          Vigente desde
-          <input name="vigenteDesde" type="date" required className={comun} />
+        <label className="block">
+          <span className="label">Vigente desde</span>
+          <input name="vigenteDesde" type="date" required className="input" />
         </label>
       </div>
-      {resultado.estado === 'error' && (
-        <p role="alert" className="text-xs text-bad">{resultado.mensaje}</p>
-      )}
-      {resultado.estado === 'ok' && <p role="status" className="text-xs text-ok">Tarifa creada.</p>}
-      <BotonEnviar texto="Crear tarifa" />
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
+      {resultado.estado === 'ok' && <p className="helper text-ok">Tarifa creada.</p>}
+      <BotonEnviar texto="Crear tarifa" variante="sec" />
     </form>
-  );
-}
-
-function BotonEnviar({ texto }: { texto: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-fg disabled:opacity-60"
-    >
-      {pending ? 'Guardando…' : texto}
-    </button>
   );
 }

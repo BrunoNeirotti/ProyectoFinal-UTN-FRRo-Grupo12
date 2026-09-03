@@ -21,8 +21,8 @@ export default async function FichaDeCliente({ params }: PageProps<'/clientes/[i
   const servicios = await api.servicio.listar();
 
   return (
-    <main className="mx-auto max-w-5xl p-6 md:p-10">
+    <div className="mx-auto max-w-5xl p-6 md:p-10">
       <FichaCliente ficha={ficha} servicios={servicios} />
-    </main>
+    </div>
   );
 }
