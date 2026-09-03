@@ -10,15 +10,18 @@ export default async function FichaCaballo({ params }: PageProps<'/caballos/[id]
   const { id } = await params;
   const api = await llamador();
 
-  let ficha;
+  let ficha, clientes, instalaciones;
   try {
-    ficha = await api.caballo.ficha({ caballoId: id });
+    // Las tres son independientes: se piden juntas para no pagar la latencia tres veces.
+    [ficha, clientes, instalaciones] = await Promise.all([
+      api.caballo.ficha({ caballoId: id }),
+      api.cliente.listar(),
+      api.instalacion.listar(),
+    ]);
   } catch (e) {
     if (e instanceof TRPCError && e.code === 'NOT_FOUND') notFound();
     throw e;
   }
-
-  const [clientes, instalaciones] = await Promise.all([api.cliente.listar(), api.instalacion.listar()]);
 
   return (
     <div className="mx-auto max-w-4xl p-6 md:p-10">

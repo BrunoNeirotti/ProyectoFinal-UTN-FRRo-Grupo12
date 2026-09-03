@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { clienteDeServidor } from '@/lib/supabase/servidor';
 import type { Rol } from '@/lib/roles';
 
@@ -7,6 +8,11 @@ import type { Rol } from '@/lib/roles';
  * El rol se lee de la tabla `usuario` y no del token: el token dice quién es la
  * persona, no qué puede hacer. Si el rol viviera en el token, revocarle permisos
  * a alguien no tendría efecto hasta que su sesión venciera.
+ *
+ * `cache()` lo memoiza por request: el sidebar, la cabecera y la propia pantalla
+ * llaman a `llamador()` cada uno por su cuenta, y sin esto cada uno repetía el
+ * viaje a Supabase Auth más la consulta a `usuario` — tres veces la misma
+ * pregunta en una sola carga de página, cruzando el Atlántico cada vez.
  */
 export interface SesionActiva {
   usuarioId: string;
@@ -16,7 +22,7 @@ export interface SesionActiva {
 
 export type Contexto = Awaited<ReturnType<typeof crearContexto>>;
 
-export async function crearContexto() {
+export const crearContexto = cache(async function crearContexto() {
   const supabase = await clienteDeServidor();
 
   const {
@@ -44,4 +50,4 @@ export async function crearContexto() {
   }
 
   return { supabase, sesion };
-}
+});

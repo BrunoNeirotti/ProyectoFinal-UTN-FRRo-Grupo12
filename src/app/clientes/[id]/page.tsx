@@ -10,15 +10,14 @@ export default async function FichaDeCliente({ params }: PageProps<'/clientes/[i
   const { id } = await params;
   const api = await llamador();
 
-  let ficha;
+  let ficha, servicios;
   try {
-    ficha = await api.cliente.ficha({ clienteId: id });
+    // Independientes entre sí: se piden juntas para no pagar la latencia dos veces.
+    [ficha, servicios] = await Promise.all([api.cliente.ficha({ clienteId: id }), api.servicio.listar()]);
   } catch (e) {
     if (e instanceof TRPCError && e.code === 'NOT_FOUND') notFound();
     throw e;
   }
-
-  const servicios = await api.servicio.listar();
 
   return (
     <div className="mx-auto max-w-5xl p-6 md:p-10">
