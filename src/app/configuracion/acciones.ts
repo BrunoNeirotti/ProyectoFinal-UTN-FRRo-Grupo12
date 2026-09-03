@@ -4,6 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { TRPCError } from '@trpc/server';
 import { CLAVES, CATALOGO, type Clave, type ValorParametro } from '@/lib/parametros';
 import { llamador } from '@/lib/trpc/servidor';
+import type { ResultadoDeGuardado } from '@/lib/formularios';
+
+export type { ResultadoDeGuardado };
 
 /**
  * Acción de servidor del formulario de reglas.
@@ -13,10 +16,6 @@ import { llamador } from '@/lib/trpc/servidor';
  * conjunto, vive en un solo lugar. Duplicarla acá sería garantizar que algún día
  * las dos versiones digan cosas distintas.
  */
-export type ResultadoDeGuardado =
-  | { estado: 'inicial' }
-  | { estado: 'ok'; guardados: number }
-  | { estado: 'error'; mensaje: string };
 
 export async function guardarReglas(
   _previo: ResultadoDeGuardado,

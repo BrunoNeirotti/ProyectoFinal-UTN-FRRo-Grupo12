@@ -36,7 +36,9 @@ El proyecto hospedado es `rienda` (ref `llxpsbotgwjlwirlpbzq`, São Paulo), vinc
 
 **El analizador sintáctico no reemplaza a Postgres.** `db:lint` descarta errores de sintaxis, pero
 no detecta, por ejemplo, una expresión no inmutable en una columna generada. Toda migración nueva se
-aplica con `npm run db:push` antes de darla por buena.
+aplica con `npm run db:push` antes de darla por buena, y después se corre `npm run db:tipos`: el
+esquema tipado es lo que hace que `.from('tabla').select(...)` falle en el editor y no en producción
+si una columna o una relación embebida está mal escrita.
 
 ### El primer administrador
 
@@ -61,6 +63,7 @@ existen, los reutiliza. Los demás usuarios se crean desde la pantalla de Usuari
 | `npm run test` | Pruebas con Vitest |
 | `npm run db:lint` | Sintaxis de las migraciones con el analizador de PostgreSQL |
 | `npm run db:push` | Aplica las migraciones al proyecto de Supabase |
+| `npm run db:tipos` | Regenera `src/lib/supabase/tipos-generados.ts` contra el esquema vinculado |
 | `npm run build` | Compilación de producción |
 
 ## Cómo está organizado

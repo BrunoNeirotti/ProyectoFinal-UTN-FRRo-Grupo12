@@ -13,6 +13,7 @@
     "db:diff": "supabase db diff",
     "db:push": "supabase db push",
     "db:lint": "node scripts/validar-migraciones.mjs",
+    "db:tipos": "supabase gen types typescript --linked > src/lib/supabase/tipos-generados.ts",
     "verificar": "npm run typecheck && npm run lint && npm run db:lint && npm run test"
   },
   "dependencies": {

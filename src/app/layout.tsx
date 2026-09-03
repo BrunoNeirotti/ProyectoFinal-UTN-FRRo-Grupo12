@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, Inter } from 'next/font/google';
+import { Nav } from './nav';
 import './globals.css';
 
 /**
@@ -47,7 +48,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="es-AR" className={`${fraunces.variable} ${inter.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <Nav />
+        {children}
+      </body>
     </html>
   );
 }

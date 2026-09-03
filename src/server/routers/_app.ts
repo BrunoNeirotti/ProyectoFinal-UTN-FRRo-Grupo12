@@ -1,6 +1,13 @@
 import { crearRouter, procedimientoAutenticado, procedimientoPublico } from '../trpc';
 import { routerParametro } from './parametro';
 import { routerUsuario } from './usuario';
+import { routerServicio } from './servicio';
+import { routerTarifa } from './tarifa';
+import { routerInstalacion } from './instalacion';
+import { routerCliente } from './cliente';
+import { routerAlumno } from './alumno';
+import { routerCaballo } from './caballo';
+import { routerContrato } from './contrato';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -31,6 +38,15 @@ export const routerApp = crearRouter({
   // --- M1 ---
   parametro: routerParametro,
   usuario: routerUsuario,
+  servicio: routerServicio,
+  tarifa: routerTarifa,
+  instalacion: routerInstalacion,
+
+  // --- M2 ---
+  cliente: routerCliente,
+  alumno: routerAlumno,
+  caballo: routerCaballo,
+  contrato: routerContrato,
 });
 
 export type RouterApp = typeof routerApp;

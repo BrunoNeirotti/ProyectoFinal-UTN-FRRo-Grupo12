@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import type { Database } from './tipos-generados';
 
 /**
  * Cliente de Supabase para el servidor, atado a la sesión del usuario.
@@ -12,7 +13,7 @@ import { cookies } from 'next/headers';
 export async function clienteDeServidor() {
   const almacen = await cookies();
 
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -48,7 +49,7 @@ export function clienteDeServicio() {
   const clave = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!clave) throw new Error('Falta SUPABASE_SERVICE_ROLE_KEY');
 
-  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, clave, {
+  return createServerClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, clave, {
     cookies: { getAll: () => [], setAll: () => {} },
   });
 }
