@@ -8,6 +8,7 @@ import { FormularioDeReglas } from './formulario';
 import { SeccionServicios } from './seccion-servicios';
 import { SeccionInstalaciones } from './seccion-instalaciones';
 import { SeccionUsuarios } from './seccion-usuarios';
+import { SeccionPlantillas } from './seccion-plantillas';
 
 export const metadata: Metadata = { title: 'Configuración' };
 
@@ -17,8 +18,7 @@ export const metadata: Metadata = { title: 'Configuración' };
  * Cierra el hito de M1: «el haras puede entrar al sistema con sus usuarios
  * reales y ver sus propias reglas configuradas». Reglas, usuarios, servicios
  * y tarifas, e instalaciones son las cuatro áreas medidas en el conteo de
- * puntos de función de M1 (`entrega3/puntos-funcion.js`); las plantillas de
- * mensajes (M5) quedan para cuando se construya ese módulo.
+ * puntos de función de M1; plantillas de mensajes es de M5.
  */
 export default async function Configuracion() {
   const api = await llamador();
@@ -34,10 +34,11 @@ export default async function Configuracion() {
   }
 
   const tasa = parametros.find((p) => p.clave === 'mora_tasa_mensual');
-  const [servicios, instalaciones, usuariosCrudos] = await Promise.all([
+  const [servicios, instalaciones, usuariosCrudos, plantillasCrudas] = await Promise.all([
     api.servicio.listar(),
     api.instalacion.listar(),
     api.usuario.listar(),
+    api.plantillaMensaje.listar(),
   ]);
   const usuarios = usuariosCrudos.map((u) => ({
     id: u.id,
@@ -45,6 +46,19 @@ export default async function Configuracion() {
     activo: u.activo,
     ultimoAccesoEn: u.ultimo_acceso_en,
     persona: u.persona,
+  }));
+  const plantillas = plantillasCrudas.map((p) => ({
+    id: p.id,
+    codigo: p.codigo,
+    canal: p.canal,
+    asunto: p.asunto,
+    cuerpo: p.cuerpo,
+    activa: p.activa,
+    nombreMeta: p.nombre_meta,
+    categoria: p.categoria,
+    estadoAprobacion: p.estado_aprobacion,
+    motivoRechazo: p.motivo_rechazo,
+    firmanteOrigen: p.firmante_origen,
   }));
 
   return (
@@ -76,6 +90,7 @@ export default async function Configuracion() {
         <SeccionUsuarios usuarios={usuarios} />
         <SeccionServicios servicios={servicios} />
         <SeccionInstalaciones instalaciones={instalaciones} />
+        <SeccionPlantillas plantillas={plantillas} />
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ import { routerAlumno } from './alumno';
 import { routerCaballo } from './caballo';
 import { routerContrato } from './contrato';
 import { routerCuentaCorriente } from './cuentaCorriente';
+import { routerPlantillaMensaje } from './plantillaMensaje';
+import { routerMensaje } from './mensaje';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -61,6 +63,10 @@ export const routerApp = crearRouter({
 
   // --- M3 ---
   cuentaCorriente: routerCuentaCorriente,
+
+  // --- M5 ---
+  plantillaMensaje: routerPlantillaMensaje,
+  mensaje: routerMensaje,
 });
 
 export type RouterApp = typeof routerApp;
