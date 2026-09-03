@@ -18,6 +18,7 @@ export default async function Inicio() {
     throw e;
   }
 
+  if (sesion.areas.includes('gerencia')) redirect('/cobranza');
   if (sesion.areas.includes('clientes')) redirect('/clientes');
   if (sesion.areas.includes('bienestar')) redirect('/caballos');
   if (sesion.areas.includes('configuracion')) redirect('/configuracion');

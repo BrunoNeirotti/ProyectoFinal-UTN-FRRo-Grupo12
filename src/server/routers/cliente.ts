@@ -183,6 +183,16 @@ export const routerCliente = crearRouter({
         .single();
 
       if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+
+      // Todo cliente tiene cuenta corriente desde que existe (decisión 1.5):
+      // M3 posta los cargos ahí, y sin esto no habría dónde.
+      const { error: errorCuenta } = await ctx.supabase
+        .from('cuenta_corriente')
+        .insert({ cliente_id: data.id });
+      if (errorCuenta) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorCuenta.message });
+      }
+
       return { clienteId: data.id as string };
     }),
 

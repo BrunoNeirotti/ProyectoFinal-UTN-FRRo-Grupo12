@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Horse, Student, UsersThree, GearSix, type Icon } from '@phosphor-icons/react';
+import { Horse, Student, UsersThree, GearSix, Wallet, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
 
 interface Enlace {
@@ -18,6 +18,10 @@ interface Enlace {
  * si la pantalla ya existe: el sitemap tiene 16 módulos y hoy hay 3.
  */
 const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
+  {
+    titulo: 'Gerencia',
+    enlaces: [{ area: 'gerencia', href: '/cobranza', texto: 'Cobranza', icono: Wallet }],
+  },
   {
     titulo: 'Clientes y contratos',
     enlaces: [{ area: 'clientes', href: '/clientes', texto: 'Clientes', icono: UsersThree }],

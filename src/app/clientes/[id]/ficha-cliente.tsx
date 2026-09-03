@@ -37,13 +37,18 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
               {!cliente.activo && <span className="badge ml-2">Inactivo</span>}
             </p>
           </div>
-          <details>
-            <summary className="btn btn-sec btn-sm cursor-pointer">
-              <PencilSimple size={14} aria-hidden="true" />
-              Editar
-            </summary>
-            <FormularioEditar cliente={cliente} />
-          </details>
+          <div className="flex gap-2">
+            <Link href={`/cobranza/${cliente.id}`} className="btn btn-sec btn-sm">
+              Cuenta corriente
+            </Link>
+            <details>
+              <summary className="btn btn-sec btn-sm cursor-pointer">
+                <PencilSimple size={14} aria-hidden="true" />
+                Editar
+              </summary>
+              <FormularioEditar cliente={cliente} />
+            </details>
+          </div>
         </div>
 
         <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
