@@ -25,7 +25,8 @@ import type { Database } from '@/lib/supabase/tipos-generados';
 
 const procedimiento = procedimientoDeArea('gerencia');
 
-async function cuentaDeCliente(supabase: SupabaseClient<Database>, clienteId: string) {
+/** También la usa `pago.ts` (M4) para imputar un pago a la cuenta correcta. */
+export async function cuentaDeCliente(supabase: SupabaseClient<Database>, clienteId: string) {
   const { data: existente } = await supabase
     .from('cuenta_corriente')
     .select('id')
@@ -44,7 +45,8 @@ async function cuentaDeCliente(supabase: SupabaseClient<Database>, clienteId: st
   return nueva.id;
 }
 
-function nombreDeCliente(c: {
+/** También la usa `pago.ts` (M4): un pago se lista por el nombre de quien pagó. */
+export function nombreDeCliente(c: {
   tipo: string;
   razon_social: string | null;
   persona: { nombre: string; apellido: string } | null;

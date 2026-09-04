@@ -9,6 +9,7 @@ import { routerAlumno } from './alumno';
 import { routerCaballo } from './caballo';
 import { routerContrato } from './contrato';
 import { routerCuentaCorriente } from './cuentaCorriente';
+import { routerPago } from './pago';
 import { routerPlantillaMensaje } from './plantillaMensaje';
 import { routerMensaje } from './mensaje';
 import { alcanceDe } from '@/lib/roles';
@@ -63,6 +64,9 @@ export const routerApp = crearRouter({
 
   // --- M3 ---
   cuentaCorriente: routerCuentaCorriente,
+
+  // --- M4 ---
+  pago: routerPago,
 
   // --- M5 ---
   plantillaMensaje: routerPlantillaMensaje,
