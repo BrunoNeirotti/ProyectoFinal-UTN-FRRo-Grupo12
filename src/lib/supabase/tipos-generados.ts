@@ -1,12 +1,3 @@
-/**
- * Archivo generado. No se edita a mano.
- *
- * Se regenera con `npm run db:tipos` después de cada migración nueva, contra
- * el proyecto vinculado (`rienda`). Sin esto, `.from('tabla').select(...)`
- * queda sin tipar y cada columna mal escrita o cada relación embebida ambigua
- * se descubre recién en producción.
- */
-
 export type Json =
   | string
   | number
@@ -108,6 +99,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      arca_ticket: {
+        Row: {
+          actualizado_en: string
+          credenciales: Json
+          servicio: string
+        }
+        Insert: {
+          actualizado_en?: string
+          credenciales: Json
+          servicio: string
+        }
+        Update: {
+          actualizado_en?: string
+          credenciales?: Json
+          servicio?: string
+        }
+        Relationships: []
       }
       asistencia: {
         Row: {

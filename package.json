@@ -17,6 +17,7 @@
     "verificar": "npm run typecheck && npm run lint && npm run db:lint && npm run test"
   },
   "dependencies": {
+    "@arcasdk/core": "2.0.2",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.1",
@@ -25,6 +26,7 @@
     "@trpc/server": "^11.18.0",
     "@trpc/tanstack-react-query": "^11.18.0",
     "next": "16.3.0",
+    "qrcode": "1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/qrcode": "1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.1.10",

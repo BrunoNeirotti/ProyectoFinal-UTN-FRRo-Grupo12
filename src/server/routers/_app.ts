@@ -10,6 +10,9 @@ import { routerCaballo } from './caballo';
 import { routerContrato } from './contrato';
 import { routerCuentaCorriente } from './cuentaCorriente';
 import { routerPago } from './pago';
+import { routerIdentidadFiscal } from './identidadFiscal';
+import { routerPuntoVenta } from './puntoVenta';
+import { routerComprobante } from './comprobante';
 import { routerPlantillaMensaje } from './plantillaMensaje';
 import { routerMensaje } from './mensaje';
 import { alcanceDe } from '@/lib/roles';
@@ -71,6 +74,11 @@ export const routerApp = crearRouter({
   // --- M5 ---
   plantillaMensaje: routerPlantillaMensaje,
   mensaje: routerMensaje,
+
+  // --- M6 ---
+  identidadFiscal: routerIdentidadFiscal,
+  puntoVenta: routerPuntoVenta,
+  comprobante: routerComprobante,
 });
 
 export type RouterApp = typeof routerApp;

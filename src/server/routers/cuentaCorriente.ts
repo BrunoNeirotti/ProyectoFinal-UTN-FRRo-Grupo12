@@ -390,19 +390,25 @@ export const routerCuentaCorriente = crearRouter({
       return { ok: true as const };
     }),
 
-  /** Informe de cargos sin comprobante (EO): sólo tiene sentido para quien pide factura. */
+  /**
+   * Informe de cargos sin comprobante (EO): sólo tiene sentido para quien pide
+   * factura. "Sin comprobante" incluye el cargo que nunca se intentó Y el que
+   * se intentó y ARCA rechazó (M6): un rechazo no es un comprobante válido,
+   * así que el cargo sigue pendiente hasta que se reintente con éxito.
+   */
   informeCargosSinComprobante: procedimiento.query(async ({ ctx }) => {
     const { data, error } = await ctx.supabase
       .from('movimiento_cuenta')
       .select(
-        'id, concepto, importe, periodo, creado_en, cuenta:cuenta_corriente_id (cliente:cliente_id (id, tipo, razon_social, requiere_factura, persona:persona_id (nombre, apellido)))',
+        'id, concepto, importe, periodo, creado_en, comprobante_id, comprobante:comprobante_id (estado), cuenta:cuenta_corriente_id (cliente:cliente_id (id, tipo, razon_social, requiere_factura, persona:persona_id (nombre, apellido)))',
       )
       .eq('tipo', 'cargo')
-      .is('comprobante_id', null)
       .order('creado_en', { ascending: false });
 
     if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
 
-    return (data ?? []).filter((m) => m.cuenta?.cliente?.requiere_factura);
+    return (data ?? []).filter(
+      (m) => m.cuenta?.cliente?.requiere_factura && (!m.comprobante_id || m.comprobante?.estado === 'rechazado'),
+    );
   }),
 });

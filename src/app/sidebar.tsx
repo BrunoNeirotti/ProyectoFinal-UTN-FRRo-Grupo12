@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, type Icon } from '@phosphor-icons/react';
+import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
 
 interface Enlace {
@@ -23,6 +23,7 @@ const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
     enlaces: [
       { area: 'gerencia', href: '/cobranza', texto: 'Cobranza', icono: Wallet },
       { area: 'gerencia', href: '/pagos', texto: 'Pagos', icono: CreditCard },
+      { area: 'gerencia', href: '/facturacion', texto: 'Facturación', icono: Receipt },
     ],
   },
   {

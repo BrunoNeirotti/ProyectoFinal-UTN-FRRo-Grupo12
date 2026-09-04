@@ -9,6 +9,8 @@ import { SeccionServicios } from './seccion-servicios';
 import { SeccionInstalaciones } from './seccion-instalaciones';
 import { SeccionUsuarios } from './seccion-usuarios';
 import { SeccionPlantillas } from './seccion-plantillas';
+import { SeccionIdentidadFiscal } from './seccion-identidad-fiscal';
+import { SeccionPuntosDeVenta } from './seccion-puntos-venta';
 
 export const metadata: Metadata = { title: 'Configuración' };
 
@@ -34,11 +36,13 @@ export default async function Configuracion() {
   }
 
   const tasa = parametros.find((p) => p.clave === 'mora_tasa_mensual');
-  const [servicios, instalaciones, usuariosCrudos, plantillasCrudas] = await Promise.all([
+  const [servicios, instalaciones, usuariosCrudos, plantillasCrudas, identidades, puntosVenta] = await Promise.all([
     api.servicio.listar(),
     api.instalacion.listar(),
     api.usuario.listar(),
     api.plantillaMensaje.listar(),
+    api.identidadFiscal.listar(),
+    api.puntoVenta.listar(),
   ]);
   const usuarios = usuariosCrudos.map((u) => ({
     id: u.id,
@@ -91,6 +95,8 @@ export default async function Configuracion() {
         <SeccionServicios servicios={servicios} />
         <SeccionInstalaciones instalaciones={instalaciones} />
         <SeccionPlantillas plantillas={plantillas} />
+        <SeccionIdentidadFiscal identidades={identidades} />
+        <SeccionPuntosDeVenta puntos={puntosVenta} />
       </div>
     </div>
   );
