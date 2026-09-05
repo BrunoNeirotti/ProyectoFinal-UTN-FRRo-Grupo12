@@ -52,6 +52,26 @@ node scripts/crear-administrador.mjs --email quien@dominio --nombre Ana --apelli
 Imprime una contraseña provisoria una sola vez. Es idempotente: si el correo o el documento ya
 existen, los reutiliza. Los demás usuarios se crean desde la pantalla de Usuarios.
 
+### Datos de demostración
+
+Para recorrer el sistema con un establecimiento completo adelante —clientes, alumnos, caballos,
+contratos, tres meses de clases dictadas con su asistencia, y la cartera en los tres estados del
+semáforo:
+
+```bash
+node scripts/sembrar-demo.mjs
+```
+
+**Borra lo que haya y lo reemplaza**, salvo los parámetros, el catálogo de servicios, las
+plantillas de mensaje, la identidad fiscal con su punto de venta y la sesión con la que se entra.
+Se puede repetir cuantas veces haga falta. Crea además un instructor y un peón con acceso propio, y
+escribe sus claves en la salida.
+
+No siembra comprobantes ni mensajes, y no es un olvido: un CAE inventado sería un documento legal
+falso —M6 emite de verdad contra homologación desde su pantalla— y las plantillas de WhatsApp
+siguen sin aprobación de Meta, así que un envío hoy fallaría. Las dos cosas se prueban donde
+efectivamente ocurren.
+
 ## Comandos
 
 | Comando | Qué hace |
