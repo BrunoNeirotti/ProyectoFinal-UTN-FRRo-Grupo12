@@ -311,12 +311,16 @@ input[type="checkbox"], input[type="radio"] {
   position: sticky; top: 0; height: 100dvh;
 }
 @media (max-width: 767px) { .sidebar { display: none; } }
+/* La marca es un solo dibujo, no un icono al lado de un texto: ya no hacen falta
+   ni la caja del isotipo ni la tipografía del nombre. `.sidebar-mark` se
+   conserva unas líneas más abajo porque el prototipo la sigue usando y los dos
+   archivos tienen que poder compararse. */
 .sidebar-brand {
-  display: flex; align-items: center; gap: .5rem;
-  padding: 0 .5rem; margin-bottom: 1.75rem;
-  font-family: var(--font-serif); font-size: 1.25rem; letter-spacing: .03em;
-  color: var(--feature-fg); text-decoration: none;
+  display: block;
+  padding: 0 .4rem; margin-bottom: 1.75rem;
+  color: var(--accent); text-decoration: none;
 }
+.sidebar-logo { display: block; width: 100%; height: auto; }
 .sidebar-mark {
   height: 2rem; width: 2rem; flex-shrink: 0;
   display: grid; place-items: center;

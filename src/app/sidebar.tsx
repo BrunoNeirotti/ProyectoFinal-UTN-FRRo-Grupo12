@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
-import { Isotipo } from './marca';
+import { Logotipo } from './marca';
 
 interface Enlace {
   area: Area;
@@ -52,13 +52,8 @@ export function Sidebar({ areas }: { areas: readonly Area[] }) {
 
   return (
     <aside className="sidebar">
-      <Link href="/" className="sidebar-brand">
-        {/* La «R» de texto era el respaldo del prototipo para cuando el isotipo
-            no cargaba; el dibujo aprobado es el de `marca.svg`. */}
-        <span className="sidebar-mark">
-          <Isotipo />
-        </span>
-        RIENDA
+      <Link href="/" className="sidebar-brand" aria-label="RIENDA, ir al inicio">
+        <Logotipo className="sidebar-logo" />
       </Link>
 
       <nav className="sidebar-nav" aria-label="Navegación principal">
