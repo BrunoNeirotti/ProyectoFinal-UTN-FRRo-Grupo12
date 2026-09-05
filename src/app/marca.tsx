@@ -61,11 +61,15 @@ export function Isotipo({ className }: { className?: string }) {
  * una virgolilla trazada como la R; junto con la pierna, son los dos únicos
  * trazos despegados.
  *
- * **Queda una deuda declarada:** esas curvas son de Segoe Script, de Microsoft.
- * Para el prototipo y la defensa no hay problema; antes de vender el sistema hay
- * que revisar la licencia. La alternativa ya está dibujada y no tiene esa deuda
- * —`fase2/assets/marca-logotipo-linea.svg`, mismo ritmo con geometría propia—,
- * así que cambiar es reemplazar este trazado, no rehacer el logotipo.
+ * **Licencia: resuelta.** Las curvas son de Segoe Script, de Microsoft, y el
+ * grupo confirmó el 05/09/2026 que cuenta con la licencia para usarla. No es un
+ * punto abierto.
+ *
+ * Existe igual una segunda versión con el mismo ritmo y geometría propia
+ * —`fase2/assets/marca-logotipo-linea.svg`, obtenida adelgazando la mancha de la
+ * fuente a su línea media—, por si algún día conviene un trazo de ancho
+ * constante como el del isotipo. Cambiar sería reemplazar este trazado, no
+ * rehacer el logotipo.
  */
 export function Logotipo({ className }: { className?: string }) {
   return (
