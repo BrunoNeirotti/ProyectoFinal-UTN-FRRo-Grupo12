@@ -320,7 +320,9 @@ input[type="checkbox"], input[type="radio"] {
   padding: 0 .4rem; margin-bottom: 1.75rem;
   color: var(--accent); text-decoration: none;
 }
-.sidebar-logo { display: block; width: 100%; height: auto; }
+/* Al 80 % del ancho disponible: a caja llena la marca pesa demasiado
+   arriba de la navegación y compite con ella. */
+.sidebar-logo { display: block; width: 80%; height: auto; }
 .sidebar-mark {
   height: 2rem; width: 2rem; flex-shrink: 0;
   display: grid; place-items: center;
