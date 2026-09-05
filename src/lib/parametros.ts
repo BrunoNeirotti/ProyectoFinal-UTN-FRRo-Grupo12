@@ -23,6 +23,7 @@ export const CLAVES = [
   'cobranza_sabado_habil',
   'mensajes_ventana_desde',
   'mensajes_ventana_hasta',
+  'riesgo_asistencia_puntos',
 ] as const;
 
 export type Clave = (typeof CLAVES)[number];
@@ -63,6 +64,12 @@ export const CATALOGO: Record<Clave, Declaracion> = {
   // clave por clave: se controla al guardar el conjunto (ver `validarConjunto`).
   mensajes_ventana_desde: { tipo: 'entero', esquema: z.int().min(0).max(23), admiteVacio: false },
   mensajes_ventana_hasta: { tipo: 'entero', esquema: z.int().min(0).max(23), admiteVacio: false },
+
+  // M8. Cuántos puntos tiene que caer la asistencia de un alumno respecto del
+  // promedio de los tres meses anteriores para que el sistema lo marque en
+  // riesgo. El tope de 100 no es decorativo: con 100 la marca no se enciende
+  // nunca, que es la forma de apagar el aviso sin sacar la columna.
+  riesgo_asistencia_puntos: { tipo: 'entero', esquema: z.int().min(1).max(100), admiteVacio: false },
 };
 
 export type ValorParametro = number | boolean | string | null;

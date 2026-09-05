@@ -90,6 +90,11 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-serif text-3xl text-fg">{clase.servicio?.nombre ?? 'Clase'}</h1>
         <span className={`badge ${estado.badge}`}>{estado.texto}</span>
+        {clase.estado !== 'cancelada' && (
+          <Link href={`/agenda/${clase.id}/asistencia`} className="btn btn-sec btn-sm ml-auto">
+            {clase.estado === 'dictada' ? 'Ver la asistencia' : 'Tomar asistencia'}
+          </Link>
+        )}
       </div>
       <p className="mt-1 text-fg-muted first-letter:uppercase">
         {fechaLarga} · {cuando.hora} · {clase.duracion_min} minutos

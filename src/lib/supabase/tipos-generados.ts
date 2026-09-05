@@ -139,7 +139,7 @@ export type Database = {
           id?: string
           observaciones?: string | null
           presente: boolean
-          registrado_por: string
+          registrado_por?: string
         }
         Update: {
           actualizado_en?: string

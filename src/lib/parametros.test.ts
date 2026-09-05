@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
@@ -17,22 +17,29 @@ describe('catálogo de parámetros', () => {
     // Si alguien agrega una clave de un lado y se olvida del otro, la pantalla
     // de Configuración muestra un campo que no existe en la base, o al revés.
     // Esta prueba es la que impide que se desincronicen en silencio.
-    const sql = readFileSync(
-      join(
-        import.meta.dirname,
-        '..',
-        '..',
-        'supabase',
-        'migrations',
-        '20260805090400_configuracion_inicial.sql',
-      ),
-      'utf8',
-    );
-    const enLaMigracion = [...sql.matchAll(/\(\s*'([a-z_]+)',\s*(?:'[^']*'|null),\s*'(?:entero|decimal|booleano|texto)'/g)]
+    // Se leen TODAS las migraciones y no sólo la configuración inicial: cada
+    // módulo nuevo puede sumar su parámetro, y `riesgo_asistencia_puntos` (M8)
+    // es el primero que llega por esa vía.
+    const migraciones = join(import.meta.dirname, '..', '..', 'supabase', 'migrations');
+    const sql = readdirSync(migraciones)
+      .filter((archivo) => archivo.endsWith('.sql'))
+      .map((archivo) => readFileSync(join(migraciones, archivo), 'utf8'))
+      .join('\n');
+
+    // Se miran sólo las sentencias que insertan en `parametro`. Buscar la forma
+    // de la fila en el archivo entero traía de premio los valores del enum
+    // `tipo_parametro`, que se escriben igual y no son claves de nada.
+    const altas = sql
+      .split(/insert into parametro\b/)
+      .slice(1)
+      .map((fragmento) => fragmento.split(';')[0] ?? '')
+      .join('\n');
+
+    const enLasMigraciones = [...altas.matchAll(/\(\s*'([a-z_]+)',\s*(?:'[^']*'|null),\s*'(?:entero|decimal|booleano|texto)'/g)]
       .map((m) => m[1])
       .sort();
 
-    expect(enLaMigracion).toEqual([...CLAVES].sort());
+    expect(enLasMigraciones).toEqual([...CLAVES].sort());
   });
 
   it('sólo la tasa de mora admite quedar sin valor', () => {
@@ -139,8 +146,8 @@ describe('proponeIntereses', () => {
 });
 
 describe('cobertura del catálogo', () => {
-  it('declara las nueve claves y ninguna de más', () => {
-    expect(CLAVES).toHaveLength(9);
+  it('declara las diez claves y ninguna de más', () => {
+    expect(CLAVES).toHaveLength(10);
     for (const clave of CLAVES) {
       expect(CATALOGO[clave as Clave]).toBeDefined();
     }

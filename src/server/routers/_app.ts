@@ -17,6 +17,7 @@ import { routerPlantillaMensaje } from './plantillaMensaje';
 import { routerMensaje } from './mensaje';
 import { routerClase } from './clase';
 import { routerInscripcion } from './inscripcion';
+import { routerAsistencia } from './asistencia';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -85,6 +86,9 @@ export const routerApp = crearRouter({
   // --- M7 ---
   clase: routerClase,
   inscripcion: routerInscripcion,
+
+  // --- M8 ---
+  asistencia: routerAsistencia,
 });
 
 export type RouterApp = typeof routerApp;

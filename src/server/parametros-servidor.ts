@@ -60,3 +60,24 @@ export async function antelacionMinimaDeCancelacion(
 
   return data ? (convertir(data.valor, data.tipo) as number) : 3;
 }
+
+/**
+ * Cuántos puntos tiene que caer la asistencia para marcar a un alumno en riesgo
+ * (`riesgo_asistencia_puntos`).
+ *
+ * Vale el mismo criterio que para la antelación de cancelación: el valor de
+ * respaldo es el que sembró la migración de M8, y no uno inventado acá. Dos
+ * valores por omisión distintos para el mismo parámetro es cómo se llega a que
+ * la pantalla y el reporte marquen alumnos distintos.
+ */
+export async function umbralDeRiesgoDeAsistencia(
+  supabase: SupabaseClient<Database>,
+): Promise<number> {
+  const { data } = await supabase
+    .from('parametro')
+    .select('valor, tipo')
+    .eq('clave', 'riesgo_asistencia_puntos')
+    .maybeSingle();
+
+  return data ? ((convertir(data.valor, data.tipo) as number) ?? 25) : 25;
+}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, type Icon } from '@phosphor-icons/react';
+import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
 import { Logotipo } from './marca';
 
@@ -35,6 +35,7 @@ const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
     titulo: 'Enseñanza',
     enlaces: [
       { area: 'ensenanza', href: '/agenda', texto: 'Agenda', icono: CalendarBlank },
+      { area: 'ensenanza', href: '/asistencia', texto: 'Asistencia', icono: CheckSquare },
       { area: 'clientes', href: '/alumnos', texto: 'Alumnos', icono: Student },
     ],
   },
