@@ -134,14 +134,21 @@ export default async function Agenda({ searchParams }: PageProps<'/agenda'>) {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px] border-collapse">
+          {/*
+            `table-fixed` reparte el ancho en columnas iguales. Sin eso el día
+            que tiene clases se estira y se come a los vacíos, y la semana deja
+            de leerse como una grilla: la única columna ancha es la que tiene
+            algo, que es exactamente la información que el ancho no debería
+            estar transmitiendo.
+          */}
+          <table className="w-full min-w-[820px] table-fixed border-collapse">
             <caption className="sr-only">
               Grilla semanal de clases por hora y día. Cada clase enlaza a su detalle, con los
               alumnos inscriptos.
             </caption>
             <thead>
               <tr>
-                <th scope="col" className="w-16"><span className="sr-only">Hora</span></th>
+                <th scope="col" className="w-14"><span className="sr-only">Hora</span></th>
                 {columnas.map((fecha, i) => (
                   <th
                     key={fecha}

@@ -1,12 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import {
-  programarClase,
-  verificarDisponibilidad,
-  type ResultadoDeDisponibilidad,
-} from './acciones';
-import type { ResultadoDeGuardado } from '@/lib/formularios';
+import { programarOVerificar, type ResultadoDeAltaDeClase } from './acciones';
 import { BotonEnviar } from '../botones';
 
 export interface Opcion {
@@ -18,8 +13,7 @@ export interface ServicioDeClase extends Opcion {
   modalidad: 'individual' | 'grupal' | null;
 }
 
-const inicial: ResultadoDeGuardado = { estado: 'inicial' };
-const inicialDisponibilidad: ResultadoDeDisponibilidad = { estado: 'inicial' };
+const inicial: ResultadoDeAltaDeClase = { estado: 'inicial' };
 
 export const NIVELES = [
   { valor: 'inicial', texto: 'Inicial' },
@@ -49,11 +43,7 @@ export function FormularioDeClase({
   instalaciones: Opcion[];
   fechaSugerida: string;
 }) {
-  const [resultado, enviar] = useActionState(programarClase, inicial);
-  const [disponibilidad, verificar] = useActionState(
-    verificarDisponibilidad,
-    inicialDisponibilidad,
-  );
+  const [resultado, enviar] = useActionState(programarOVerificar, inicial);
   const [servicioId, setServicioId] = useState('');
 
   const modalidad = servicios.find((s) => s.id === servicioId)?.modalidad ?? null;
@@ -160,33 +150,40 @@ export function FormularioDeClase({
           <p className="helper">Orienta a quién inscribir; no restringe (RN-15).</p>
         </label>
 
-        {disponibilidad.estado === 'libre' && (
+        {resultado.estado === 'libre' && (
           <p className="helper text-ok sm:col-span-3">
             La instalación y el instructor están libres en ese horario.
           </p>
         )}
-        {disponibilidad.estado === 'ocupado' && (
-          <p className="error sm:col-span-3">{disponibilidad.mensaje}</p>
-        )}
-        {disponibilidad.estado === 'error' && (
-          <p className="error sm:col-span-3">{disponibilidad.mensaje}</p>
-        )}
-        {resultado.estado === 'error' && <p className="error sm:col-span-3">{resultado.mensaje}</p>}
-        {resultado.estado === 'ok' && (
+        {resultado.estado === 'programada' && (
           <p className="helper text-ok sm:col-span-3">Clase programada.</p>
+        )}
+        {(resultado.estado === 'ocupado' || resultado.estado === 'error') && (
+          <p className="error sm:col-span-3">{resultado.mensaje}</p>
         )}
 
         {/*
-          Los dos botones envían el mismo formulario con los mismos campos: el
-          de alta por el `action`, el de verificación por su `formAction`. Así
-          se consulta la disponibilidad de lo que está escrito, sin duplicar el
-          formulario ni obligar a cargarlo dos veces.
+          Los dos botones envían el mismo formulario y la misma acción; lo que
+          los distingue es el valor de `accion` que cada uno agrega al
+          `FormData`. Así se consulta la disponibilidad de lo que está escrito
+          sin duplicar el formulario, y el cartel de resultado es uno solo.
         */}
         <div className="flex flex-wrap gap-2 sm:col-span-3">
-          <BotonEnviar texto="Programar clase" tamano="sm" cargando="Programando…" />
-          <button type="submit" formAction={verificar} className="btn btn-sec btn-sm">
-            Verificar disponibilidad
-          </button>
+          <BotonEnviar
+            texto="Programar clase"
+            tamano="sm"
+            cargando="Programando…"
+            name="accion"
+            value="programar"
+          />
+          <BotonEnviar
+            texto="Verificar disponibilidad"
+            variante="sec"
+            tamano="sm"
+            cargando="Verificando…"
+            name="accion"
+            value="verificar"
+          />
         </div>
       </form>
     </details>

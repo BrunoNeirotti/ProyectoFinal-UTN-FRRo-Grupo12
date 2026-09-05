@@ -8,16 +8,23 @@ export function BotonEnviar({
   cargando,
   variante = 'pri',
   tamano,
+  name,
+  value,
 }: {
   texto: string;
   cargando?: string;
   variante?: 'pri' | 'sec';
   tamano?: 'sm';
+  /** Para formularios con más de un botón de envío: llega en el `FormData`. */
+  name?: string;
+  value?: string;
 }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
+      name={name}
+      value={value}
       disabled={pending}
       className={`btn btn-${variante}${tamano ? ` btn-${tamano}` : ''}`}
     >

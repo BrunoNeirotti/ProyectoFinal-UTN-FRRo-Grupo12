@@ -22,63 +22,63 @@ function cupoOpcional(datos: FormData): number | null {
 }
 
 /**
- * Consulta previa de disponibilidad (EO «detección de conflicto de
- * instalación»).
+ * Alta de clase y consulta previa de disponibilidad, en una sola acción.
  *
- * Existe aparte del alta porque contesta antes de guardar: el instructor prueba
- * un horario, ve contra qué choca y corrige, en lugar de completar el
- * formulario entero para que se lo rechacen. El alta vuelve a preguntar igual,
- * porque entre una cosa y la otra alguien pudo tomar la franja.
+ * Van juntas porque comparten formulario y, sobre todo, porque comparten
+ * cartel: con dos estados separados quedaba el «Clase programada» de la vez
+ * anterior arriba del conflicto que se acababa de detectar. Un formulario dice
+ * una cosa por vez, y es la última que pasó.
+ *
+ * La consulta previa (EO «detección de conflicto de instalación») contesta
+ * antes de guardar, para que el instructor pruebe un horario y corrija en lugar
+ * de completar todo y que se lo rechacen. El alta vuelve a preguntar igual:
+ * entre una cosa y la otra alguien pudo tomar la franja.
  */
-export type ResultadoDeDisponibilidad =
+export type ResultadoDeAltaDeClase =
   | { estado: 'inicial' }
+  | { estado: 'programada' }
   | { estado: 'libre' }
   | { estado: 'ocupado'; mensaje: string }
   | { estado: 'error'; mensaje: string };
 
-export async function verificarDisponibilidad(
-  _previo: ResultadoDeDisponibilidad,
+export async function programarOVerificar(
+  _previo: ResultadoDeAltaDeClase,
   datos: FormData,
-): Promise<ResultadoDeDisponibilidad> {
+): Promise<ResultadoDeAltaDeClase> {
+  const soloVerificar = texto(datos, 'accion') === 'verificar';
+
+  const horario = {
+    instructorId: texto(datos, 'instructorId'),
+    instalacionId: texto(datos, 'instalacionId'),
+    fecha: texto(datos, 'fecha'),
+    hora: texto(datos, 'hora'),
+    duracionMin: Number(datos.get('duracionMin') ?? 60),
+  };
+
   try {
     const api = await llamador();
-    const r = await api.clase.verificarConflicto({
-      instalacionId: texto(datos, 'instalacionId'),
-      instructorId: texto(datos, 'instructorId'),
-      fecha: texto(datos, 'fecha'),
-      hora: texto(datos, 'hora'),
-      duracionMin: Number(datos.get('duracionMin') ?? 60),
-      claseId: texto(datos, 'claseId') || undefined,
-    });
 
-    return r.libre ? { estado: 'libre' } : { estado: 'ocupado', mensaje: r.mensaje ?? '' };
-  } catch (e) {
-    if (e instanceof TRPCError) return { estado: 'error', mensaje: e.message };
-    return { estado: 'error', mensaje: 'No se pudo verificar la disponibilidad.' };
-  }
-}
+    if (soloVerificar) {
+      const r = await api.clase.verificarConflicto(horario);
+      return r.libre ? { estado: 'libre' } : { estado: 'ocupado', mensaje: r.mensaje ?? '' };
+    }
 
-export async function programarClase(
-  _previo: ResultadoDeGuardado,
-  datos: FormData,
-): Promise<ResultadoDeGuardado> {
-  try {
-    const api = await llamador();
     await api.clase.crear({
+      ...horario,
       servicioId: texto(datos, 'servicioId'),
-      instructorId: texto(datos, 'instructorId'),
-      instalacionId: texto(datos, 'instalacionId'),
-      fecha: texto(datos, 'fecha'),
-      hora: texto(datos, 'hora'),
-      duracionMin: Number(datos.get('duracionMin') ?? 60),
       cupo: cupoOpcional(datos),
       nivel: nivelOpcional(datos),
     });
     revalidatePath('/agenda');
-    return { estado: 'ok', guardados: 1 };
+    return { estado: 'programada' };
   } catch (e) {
     if (e instanceof TRPCError) return { estado: 'error', mensaje: e.message };
-    return { estado: 'error', mensaje: 'No se pudo programar la clase.' };
+    return {
+      estado: 'error',
+      mensaje: soloVerificar
+        ? 'No se pudo verificar la disponibilidad.'
+        : 'No se pudo programar la clase.',
+    };
   }
 }
 

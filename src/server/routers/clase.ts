@@ -5,11 +5,13 @@ import { crearRouter, procedimientoDeArea } from '../trpc';
 import type { Database } from '@/lib/supabase/tipos-generados';
 import {
   ZONA_HARAS,
+  cancelacionEnTermino,
   cupoDeClase,
   instanteDesdeLocal,
   ocupacionDeInstalaciones,
   semanaDe,
 } from '@/lib/agenda';
+import { antelacionMinimaDeCancelacion } from '../parametros-servidor';
 
 /**
  * M7 · Agenda de clases.
@@ -281,9 +283,33 @@ export const routerClase = crearRouter({
         .eq('estado', 'activo')
         .order('nombre');
 
+      const diasMinimos = await antelacionMinimaDeCancelacion(ctx.supabase);
+      const ahora = new Date();
+
       return {
         clase,
-        inscripciones: anotados,
+        /**
+         * Cada inscripción viene con las dos marcas que el CUS05 pide que queden
+         * ASENTADAS, no anunciadas al pasar:
+         *
+         *   * `conContratoVigente` (camino 4.b): la inscripción sin respaldo
+         *     contractual «queda señalada». Un cartel que aparece al guardar y
+         *     desaparece al recargar no señala nada, y quien lo necesita —el que
+         *     liquida el período— no estaba mirando cuando se guardó.
+         *   * `enTermino` (camino 5.a): la antelación con que se canceló, contra
+         *     `cancelacion_clase_dias`. Se evalúa al mostrar y no se guarda,
+         *     porque el dato duro es `cancelado_en` y el parámetro puede cambiar.
+         */
+        inscripciones: anotados.map((i) => ({
+          ...i,
+          conContratoVigente: i.alumno ? respaldados.has(i.alumno.id) : false,
+          enTermino:
+            i.cancelado_en == null
+              ? null
+              : cancelacionEnTermino(clase.inicia_en, new Date(i.cancelado_en), diasMinimos),
+        })),
+        diasMinimos,
+        ahora,
         cupo: cupoDeClase(clase.servicio?.modalidad ?? null, clase.cupo, activos.length),
         candidatos,
         caballos: caballos ?? [],

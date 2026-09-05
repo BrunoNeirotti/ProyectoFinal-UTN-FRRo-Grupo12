@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TRPCError } from '@trpc/server';
 import { llamador } from '@/lib/trpc/servidor';
-import { partesLocales } from '@/lib/agenda';
+import { ZONA_HARAS, partesLocales } from '@/lib/agenda';
 import { BotonCancelarInscripcion, FormularioInscribir } from './inscripciones';
 import { FormularioModificar, FormularioSuspender } from './formularios-clase';
 
@@ -15,6 +15,23 @@ const NIVEL_TEXTO = {
   nivel_2: 'Nivel 2',
   nivel_3: 'Nivel 3',
 } as const;
+
+/**
+ * Las marcas de tiempo se muestran en hora del haras y no en la del servidor.
+ * `toLocaleString` sin `timeZone` usa la del proceso, que en Vercel es UTC: una
+ * cancelación de las 22:40 aparecía como del día siguiente a la 01:40.
+ */
+function fechaCorta(iso: string) {
+  return new Date(iso).toLocaleDateString('es-AR', { timeZone: ZONA_HARAS });
+}
+
+function fechaYHora(iso: string) {
+  return new Date(iso).toLocaleString('es-AR', {
+    timeZone: ZONA_HARAS,
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+}
 
 const ESTADO = {
   programada: { texto: 'Programada', badge: 'badge-accent' },
@@ -105,7 +122,9 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
             {cupo.limite === null ? cupo.ocupados : `${cupo.ocupados}/${cupo.limite}`}
           </p>
           <p className="helper">
-            {cupo.limite === null ? 'Sin control de cupo' : `${cupo.disponibles} disponibles`}
+            {cupo.limite === null
+              ? 'Sin control de cupo'
+              : `${cupo.disponibles} ${cupo.disponibles === 1 ? 'disponible' : 'disponibles'}`}
           </p>
         </div>
       </div>
@@ -141,10 +160,15 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
                 <tr key={i.id}>
                   <td className="font-medium text-fg">
                     {[i.alumno?.persona?.nombre, i.alumno?.persona?.apellido].filter(Boolean).join(' ')}
+                    {!i.conContratoVigente && (
+                      <span className="badge badge-warn ml-2" title="La clase se dictaría sin respaldo contractual (CUS05, 4.b).">
+                        Sin contrato
+                      </span>
+                    )}
                   </td>
                   <td>{i.alumno?.nivel ? NIVEL_TEXTO[i.alumno.nivel] : '—'}</td>
                   <td>{i.caballo?.nombre ?? 'Sin asignar'}</td>
-                  <td className="text-xs">{new Date(i.inscripto_en).toLocaleDateString('es-AR')}</td>
+                  <td className="text-xs">{fechaCorta(i.inscripto_en)}</td>
                   <td>
                     {clase.estado === 'programada' && (
                       <BotonCancelarInscripcion claseId={clase.id} inscripcionId={i.id} />
@@ -180,7 +204,7 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
             <h2 className="font-serif text-lg text-fg">Cancelaciones</h2>
             <p className="helper">
               Se conservan porque la antelación con que se avisó es lo que después define cómo se
-              imputa la clase.
+              imputa la clase. El establecimiento pide avisar con {detalle.diasMinimos} días.
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -190,6 +214,7 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
                 <tr>
                   <th scope="col">Alumno</th>
                   <th scope="col">Canceló</th>
+                  <th scope="col">Antelación</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,7 +224,14 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
                       {[i.alumno?.persona?.nombre, i.alumno?.persona?.apellido].filter(Boolean).join(' ')}
                     </td>
                     <td className="text-xs">
-                      {i.cancelado_en ? new Date(i.cancelado_en).toLocaleString('es-AR') : '—'}
+                      {i.cancelado_en ? fechaYHora(i.cancelado_en) : '—'}
+                    </td>
+                    <td>
+                      {i.enTermino === false ? (
+                        <span className="badge badge-warn">Fuera de término</span>
+                      ) : (
+                        <span className="text-xs text-fg-muted">En término</span>
+                      )}
                     </td>
                   </tr>
                 ))}

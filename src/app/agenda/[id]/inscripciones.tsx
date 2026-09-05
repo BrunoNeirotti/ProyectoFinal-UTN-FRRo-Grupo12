@@ -83,14 +83,22 @@ export function FormularioInscribir({
       </label>
 
       {resultado.estado === 'error' && <p className="error sm:col-span-3">{resultado.mensaje}</p>}
-      {resultado.estado === 'ok' && resultado.advertencia && (
-        <p className="helper flex items-start gap-1.5 text-warn sm:col-span-3">
-          <WarningCircle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-          {resultado.advertencia}
+      {resultado.estado === 'ok' && (
+        /*
+          La advertencia por falta de contrato NO se agota acá: la fila queda
+          marcada «Sin contrato» en la tabla de arriba, que es lo que el CUS05
+          pide (4.b: la inscripción «queda señalada»). Este texto sólo confirma
+          que se guardó y remite a la marca, que es la que va a seguir estando
+          cuando alguien mire la clase la semana que viene.
+        */
+        <p
+          className={`helper sm:col-span-3 ${resultado.advertencia ? 'flex items-start gap-1.5 text-warn' : 'text-ok'}`}
+        >
+          {resultado.advertencia && (
+            <WarningCircle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+          )}
+          {resultado.advertencia ?? 'Alumno inscripto.'}
         </p>
-      )}
-      {resultado.estado === 'ok' && !resultado.advertencia && (
-        <p className="helper text-ok sm:col-span-3">Alumno inscripto.</p>
       )}
 
       <div className="sm:col-span-3">
@@ -100,7 +108,14 @@ export function FormularioInscribir({
   );
 }
 
-/** Cancelar una inscripción. Fuera de término se registra igual, y se dice. */
+/**
+ * Cancelar una inscripción.
+ *
+ * No informa acá si entró en término: al cancelar, la fila se va de la tabla de
+ * inscriptos y este componente se desmonta con ella, así que el aviso no
+ * llegaba a verse nunca. La antelación queda asentada en la tabla de
+ * cancelaciones, que es además donde hay que mirarla al liquidar el período.
+ */
 export function BotonCancelarInscripcion({
   claseId,
   inscripcionId,
@@ -117,11 +132,6 @@ export function BotonCancelarInscripcion({
       <button type="submit" className="link text-xs text-accent-ink">Cancelar</button>
 
       {resultado.estado === 'error' && <p className="error text-xs">{resultado.mensaje}</p>}
-      {resultado.estado === 'ok' && !resultado.enTermino && (
-        <p className="helper text-xs text-warn">
-          Fuera de término: se pedía avisar con {resultado.diasMinimos} días.
-        </p>
-      )}
     </form>
   );
 }

@@ -39,3 +39,24 @@ export async function obtenerParametrosDeCobranza(
     moraAplicacion: (mapa.get('mora_aplicacion') as 'asistida' | 'automatica') ?? 'asistida',
   };
 }
+
+/**
+ * Antelación mínima para cancelar una clase, en días (`cancelacion_clase_dias`).
+ *
+ * La leen el detalle de la clase —para decir de cada cancelación si entró en
+ * término— y la cancelación misma. Vive acá y no en cada router por lo mismo
+ * que los de cobranza: un parámetro del establecimiento leído en dos lugares
+ * termina con dos valores de respaldo distintos. El que se usa si falta es el
+ * que sembró la configuración inicial.
+ */
+export async function antelacionMinimaDeCancelacion(
+  supabase: SupabaseClient<Database>,
+): Promise<number> {
+  const { data } = await supabase
+    .from('parametro')
+    .select('valor, tipo')
+    .eq('clave', 'cancelacion_clase_dias')
+    .maybeSingle();
+
+  return data ? (convertir(data.valor, data.tipo) as number) : 3;
+}

@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoDeArea } from '../trpc';
 import { cancelacionEnTermino, cupoDeClase } from '@/lib/agenda';
-import { convertir } from '@/lib/parametros';
+import { antelacionMinimaDeCancelacion } from '../parametros-servidor';
 
 /**
  * M7 · Inscripciones a una clase.
@@ -141,13 +141,7 @@ export const routerInscripcion = crearRouter({
         });
       }
 
-      const { data: parametro } = await ctx.supabase
-        .from('parametro')
-        .select('valor, tipo')
-        .eq('clave', 'cancelacion_clase_dias')
-        .maybeSingle();
-
-      const diasMinimos = parametro ? (convertir(parametro.valor, parametro.tipo) as number) : 3;
+      const diasMinimos = await antelacionMinimaDeCancelacion(ctx.supabase);
       const ahora = new Date();
       const enTermino = inscripcion.clase
         ? cancelacionEnTermino(inscripcion.clase.inicia_en, ahora, diasMinimos)
