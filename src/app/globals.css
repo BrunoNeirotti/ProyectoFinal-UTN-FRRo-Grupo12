@@ -392,6 +392,24 @@ input[type="checkbox"], input[type="radio"] {
 }
 .bottom-nav a[aria-current="page"] { color: var(--accent-ink); font-weight: 500; }
 
+/* --- Calendario (agenda de clases) --- */
+.cell {
+  border-top: 1px solid var(--surface-border);
+  border-left: 1px solid var(--surface-border);
+  padding: .25rem; min-height: 54px;
+}
+.ev { border-radius: .5rem; padding: .35rem .5rem; font-size: 11px; line-height: 1.25 }
+.ev-cls  { background: var(--accent-soft); border-left: 4px solid var(--accent); color: var(--text) }
+.ev-dark { background: var(--feature); color: var(--feature-fg) }
+.ev-warn { background: var(--bad-bg); border-left: 4px solid var(--bad); color: var(--bad) }
+
+.nav-btn {
+  height: 28px; width: 28px; border-radius: 999px;
+  border: 1px solid var(--surface-border); background: transparent; color: inherit;
+  display: grid; place-items: center; cursor: pointer;
+}
+.nav-btn:hover { background: var(--accent-soft); color: var(--accent-ink) }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

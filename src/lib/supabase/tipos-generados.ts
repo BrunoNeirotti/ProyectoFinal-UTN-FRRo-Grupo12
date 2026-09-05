@@ -323,7 +323,7 @@ export type Database = {
           motivo_suspension?: string | null
           nivel?: Database["public"]["Enums"]["nivel_alumno"] | null
           servicio_id: string
-          transcurre: unknown
+          transcurre?: unknown
         }
         Update: {
           actualizado_en?: string
@@ -1878,6 +1878,10 @@ export type Database = {
       }
     }
     Functions: {
+      alumnos_con_contrato_vigente: {
+        Args: { p_al?: string; p_servicio: string }
+        Returns: string[]
+      }
       base_de_mora: {
         Args: { p_al: string; p_cuenta: string }
         Returns: number
@@ -1891,6 +1895,10 @@ export type Database = {
       rol_actual: {
         Args: never
         Returns: Database["public"]["Enums"]["rol_usuario"]
+      }
+      tiene_contrato_vigente: {
+        Args: { p_al?: string; p_alumno: string; p_servicio: string }
+        Returns: boolean
       }
       usuario_actual: { Args: never; Returns: string }
     }

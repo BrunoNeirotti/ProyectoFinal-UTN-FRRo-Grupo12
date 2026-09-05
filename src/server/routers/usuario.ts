@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { crearRouter, procedimientoAdmin } from '../trpc';
+import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { ROLES } from '@/lib/roles';
 import { clienteDeServicio } from '@/lib/supabase/servidor';
 
@@ -26,6 +26,34 @@ export const routerUsuario = crearRouter({
 
     if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
     return data ?? [];
+  }),
+
+  /**
+   * Quiénes pueden figurar como instructor de una clase (M7).
+   *
+   * No es `listar` con un filtro: aquél es del administrador y devuelve correo y
+   * último acceso. Éste lo consulta un instructor para elegir quién dicta y para
+   * filtrar la grilla, así que devuelve lo justo —identificador y nombre— y se
+   * apoya en la política `usuario_lectura`, que M7 abrió a todo el personal.
+   *
+   * Incluye al administrador porque en este haras el dueño también dicta, y
+   * porque `clase_escritura` ya lo habilita a programar.
+   */
+  instructores: procedimientoDeArea('ensenanza').query(async ({ ctx }) => {
+    const { data, error } = await ctx.supabase
+      .from('usuario')
+      .select('id, persona:persona_id (nombre, apellido)')
+      .in('rol', ['instructor', 'administrador'])
+      .eq('activo', true);
+
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+
+    return (data ?? [])
+      .map((u) => ({
+        id: u.id,
+        nombre: [u.persona?.nombre, u.persona?.apellido].filter(Boolean).join(' '),
+      }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es-AR'));
   }),
 
   /**

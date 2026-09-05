@@ -15,6 +15,8 @@ import { routerPuntoVenta } from './puntoVenta';
 import { routerComprobante } from './comprobante';
 import { routerPlantillaMensaje } from './plantillaMensaje';
 import { routerMensaje } from './mensaje';
+import { routerClase } from './clase';
+import { routerInscripcion } from './inscripcion';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -79,6 +81,10 @@ export const routerApp = crearRouter({
   identidadFiscal: routerIdentidadFiscal,
   puntoVenta: routerPuntoVenta,
   comprobante: routerComprobante,
+
+  // --- M7 ---
+  clase: routerClase,
+  inscripcion: routerInscripcion,
 });
 
 export type RouterApp = typeof routerApp;

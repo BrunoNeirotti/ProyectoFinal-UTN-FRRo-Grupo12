@@ -20,6 +20,7 @@ export default async function Inicio() {
 
   if (sesion.areas.includes('gerencia')) redirect('/cobranza');
   if (sesion.areas.includes('clientes')) redirect('/clientes');
+  if (sesion.areas.includes('ensenanza')) redirect('/agenda');
   if (sesion.areas.includes('bienestar')) redirect('/caballos');
   if (sesion.areas.includes('configuracion')) redirect('/configuracion');
 
