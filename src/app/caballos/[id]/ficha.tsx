@@ -113,11 +113,6 @@ export function FichaDeCaballo({
         </div>
       </section>
 
-      <div className="card p-5 text-sm text-fg-muted">
-        Sanidad, alimentación e historial de cuidados se suman acá cuando M9 esté construido: hoy la
-        ficha muestra lo que M2 ya sostiene.
-      </div>
-
       {caballo.estado !== 'retirado' && (
         <details>
           <summary className="cursor-pointer text-sm text-bad">Dar de baja</summary>

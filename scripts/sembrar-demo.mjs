@@ -74,9 +74,11 @@ const PERSONAS_QUE_QUEDAN = [
 for (const tabla of [
   'asistencia', 'inscripcion', 'clase', 'inscripcion_evento', 'evento', 'mensaje',
   'movimiento_cuenta', 'pago', 'comprobante', 'estado_cuenta', 'cuenta_corriente', 'contrato',
-  'movimiento_stock', 'detalle_orden_compra', 'orden_compra', 'proveedor', 'insumo',
-  'evento_sanitario', 'registro_cuidado', 'plan_alimentario', 'alumno', 'caballo', 'cliente',
-  'tarifa', 'instalacion',
+  'movimiento_stock', 'detalle_orden_compra', 'orden_compra', 'proveedor',
+  // `plan_alimentario` va antes que `insumo`: el plan nombra de qué existencia
+  // sale la ración, así que borrar el insumo primero choca con esa clave ajena.
+  'evento_sanitario', 'registro_cuidado', 'plan_alimentario', 'insumo',
+  'alumno', 'caballo', 'cliente', 'tarifa', 'instalacion',
 ]) {
   const { error } = await db.from(tabla).delete().not('id', 'is', null);
   if (error) {

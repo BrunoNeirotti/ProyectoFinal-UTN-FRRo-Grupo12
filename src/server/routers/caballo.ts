@@ -9,11 +9,11 @@ import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
  * `es_personal()`), porque instructores y peones lo necesitan en el campo. El
  * alta, la edición y la baja son del administrador (RLS: `caballo_escritura`).
  *
- * La ficha consolidada de la Pantalla 11 suma pestañas de Sanidad, Alimentación
- * e Historial que dependen de `evento_sanitario`, `plan_alimentario` y
- * `registro_cuidado` (M9), todavía sin construir. Esta ficha muestra lo que M2
- * ya sostiene —identidad, alojamiento, propietario y contratos— y las demás
- * secciones se enganchan acá cuando M9 esté listo, sin mover esta pantalla.
+ * Este router sigue trayendo lo que M2 sostiene: identidad, alojamiento,
+ * propietario y contratos. Sanidad, alimentación e historial de cuidados los
+ * agregó M9 sin tocar esta pantalla, con sus propias consultas en el componente
+ * `BienestarDelCaballo`: cada módulo trae lo suyo, y la ficha de M2 no tuvo que
+ * recibir por props tres consultas que no le pertenecen.
  */
 
 const procedimientoLectura = procedimientoDeArea('bienestar');
