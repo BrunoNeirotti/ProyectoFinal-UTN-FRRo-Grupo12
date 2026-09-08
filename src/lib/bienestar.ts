@@ -17,7 +17,7 @@
  * firmas están puestas para que M14 enganche la cola sin migrar datos.
  */
 
-import { ZONA_HARAS, partesLocales } from './agenda';
+import { ZONA_HARAS, instanteDesdeLocal, partesLocales } from './agenda';
 
 export const MOMENTOS = ['manana', 'mediodia', 'tarde'] as const;
 
@@ -40,6 +40,38 @@ export const TIPOS_CUIDADO = ['alimentacion', 'higiene', 'desparasitacion'] as c
 
 export type TipoCuidado = (typeof TIPOS_CUIDADO)[number];
 
+export const TIPOS_SANITARIOS = [
+  'desparasitacion',
+  'vacunacion',
+  'herrador',
+  'veterinario',
+  'otro',
+] as const;
+
+export type TipoSanitario = (typeof TIPOS_SANITARIOS)[number];
+
+/**
+ * Cómo se nombra en pantalla cada tipo de cuidado y de evento sanitario.
+ *
+ * Un `Record` sobre los dos dominios y no uno por cada uno: la jornada, el
+ * cronograma y la ficha del caballo muestran las dos clases de fila y a ninguna
+ * le sirve el valor crudo del enum, que llega sin tilde y en minúscula.
+ */
+export const TIPO_TEXTO: Record<TipoSanitario | TipoCuidado, string> = {
+  desparasitacion: 'Desparasitación',
+  vacunacion: 'Vacunación',
+  herrador: 'Herrador',
+  veterinario: 'Veterinario',
+  otro: 'Otro',
+  alimentacion: 'Alimentación',
+  higiene: 'Higiene',
+};
+
+/** El rótulo de un tipo, o el valor crudo si algún día aparece uno nuevo. */
+export function tipoEnTexto(tipo: string): string {
+  return TIPO_TEXTO[tipo as TipoSanitario] ?? tipo;
+}
+
 // -----------------------------------------------------------------------------
 // El momento de la jornada
 //
@@ -61,6 +93,40 @@ const CORTES: readonly { desde: number; momento: Momento }[] = [
 export function momentoDe(instante: Date | string, zona: string = ZONA_HARAS): Momento {
   const hora = Number(partesLocales(instante, zona).hora.slice(0, 2));
   return CORTES.find((c) => hora >= c.desde)?.momento ?? 'manana';
+}
+
+/** Hora del haras que representa a cada momento cuando el registro llega tarde. */
+export const HORA_DEL_MOMENTO: Record<Momento, string> = {
+  manana: '07:30',
+  mediodia: '12:00',
+  tarde: '17:30',
+};
+
+/**
+ * Cuándo ocurrió la toma que se está registrando.
+ *
+ * El peón no siempre carga mientras sirve: la toma de la mañana se registra a
+ * media tarde con toda normalidad. Sellar esas filas con la hora del envío las
+ * mandaría al momento equivocado -es lo que hacía antes de esta función- y la
+ * jornada seguiría mostrando pendiente una toma ya servida.
+ *
+ * Por eso `ocurrido_en` es «cuándo pasó, según el peón» y no «cuándo se envió»:
+ * cuando se registra dentro del mismo momento se usa el instante real, que es
+ * mejor dato; cuando se registra fuera, la hora representativa del momento. El
+ * momento en que se cargó no se pierde, lo guarda `registrado_en`.
+ */
+export function ocurrenciaDelMomento(
+  momento: Momento,
+  fecha: string,
+  ahora: Date = new Date(),
+  zona: string = ZONA_HARAS,
+): string {
+  const enEsteMomento =
+    momentoDe(ahora, zona) === momento && partesLocales(ahora, zona).fecha === fecha;
+
+  return enEsteMomento
+    ? ahora.toISOString()
+    : instanteDesdeLocal(fecha, HORA_DEL_MOMENTO[momento], zona).toISOString();
 }
 
 // -----------------------------------------------------------------------------

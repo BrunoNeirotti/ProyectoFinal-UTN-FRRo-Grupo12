@@ -78,7 +78,12 @@ export default async function Alimentacion({
         ))}
       </form>
 
-      <PlanillaDeAlimentacion tareas={tareas} momento={MOMENTO_TEXTO[turno.momento]} />
+      <PlanillaDeAlimentacion
+        tareas={tareas}
+        momento={turno.momento}
+        momentoTexto={MOMENTO_TEXTO[turno.momento]}
+        fecha={turno.fecha}
+      />
     </div>
   );
 }

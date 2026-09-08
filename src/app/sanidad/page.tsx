@@ -2,13 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { WarningCircle } from '@phosphor-icons/react/dist/ssr';
 import { llamador } from '@/lib/trpc/servidor';
-import {
-  FormularioAplicar,
-  FormularioOmitir,
-  FormularioProgramar,
-  TIPO_TEXTO,
-  type TipoSanitario,
-} from './formularios';
+import { tipoEnTexto } from '@/lib/bienestar';
+import { FormularioAplicar, FormularioOmitir, FormularioProgramar } from './formularios';
 
 export const metadata: Metadata = { title: 'Sanidad' };
 
@@ -72,7 +67,7 @@ export default async function Sanidad() {
               {sanidad.alertas.map((a) => (
                 <tr key={`${a.caballoId}-${a.tipo}`}>
                   <td>{a.caballoNombre ?? '—'}</td>
-                  <td>{TIPO_TEXTO[a.tipo as TipoSanitario] ?? a.tipo}</td>
+                  <td>{tipoEnTexto(a.tipo)}</td>
                   <td className="tnum">{fechaLarga(a.proximaFecha)}</td>
                   <td>
                     <span className={`badge ${a.estado === 'vencido' ? 'badge-bad' : 'badge-warn'}`}>
@@ -104,7 +99,7 @@ export default async function Sanidad() {
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="font-medium">
                     {e.caballo?.nombre ?? 'Caballo'} ·{' '}
-                    {TIPO_TEXTO[e.tipo as TipoSanitario] ?? e.tipo}
+                    {tipoEnTexto(e.tipo)}
                   </p>
                   <p className="tnum text-sm text-muted">previsto {fechaLarga(e.fecha)}</p>
                 </div>

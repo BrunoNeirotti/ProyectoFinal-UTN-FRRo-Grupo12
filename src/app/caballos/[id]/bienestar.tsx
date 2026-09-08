@@ -1,19 +1,9 @@
 import { llamador } from '@/lib/trpc/servidor';
-import { MOMENTO_TEXTO, clasificarVencimiento } from '@/lib/bienestar';
+import { MOMENTO_TEXTO, clasificarVencimiento, tipoEnTexto } from '@/lib/bienestar';
 import { esAdministrador } from '@/lib/roles';
 import { antelacionDeAvisoSanitario } from '@/server/parametros-servidor';
 import { clienteDeServidor } from '@/lib/supabase/servidor';
 import { FormularioPlan } from './formulario-plan';
-
-const TIPO_TEXTO: Record<string, string> = {
-  desparasitacion: 'Desparasitación',
-  vacunacion: 'Vacunación',
-  herrador: 'Herrador',
-  veterinario: 'Veterinario',
-  otro: 'Otro',
-  alimentacion: 'Alimentación',
-  higiene: 'Higiene',
-};
 
 const ESTADO_BADGE: Record<string, string> = {
   previsto: 'badge-accent',
@@ -129,7 +119,7 @@ export async function BienestarDelCaballo({ caballoId }: { caballoId: string }) 
                 return (
                   <tr key={e.id}>
                     <td className="tnum">{fechaCorta(e.fecha)}</td>
-                    <td>{TIPO_TEXTO[e.tipo] ?? e.tipo}</td>
+                    <td>{tipoEnTexto(e.tipo)}</td>
                     <td>
                       <span className={`badge ${ESTADO_BADGE[e.estado]}`}>{e.estado}</span>
                     </td>
@@ -163,7 +153,7 @@ export async function BienestarDelCaballo({ caballoId }: { caballoId: string }) 
             {registros.slice(0, 20).map((r) => (
               <li key={r.id} className="card flex flex-wrap items-baseline gap-x-3 p-3 text-sm">
                 <span className="tnum text-muted">{fechaCorta(r.ocurrido_en)}</span>
-                <span className="font-medium">{TIPO_TEXTO[r.tipo] ?? r.tipo}</span>
+                <span className="font-medium">{tipoEnTexto(r.tipo)}</span>
                 {r.instalacion?.nombre && <span className="text-muted">{r.instalacion.nombre}</span>}
                 <span className="text-muted">
                   {r.usuario?.persona

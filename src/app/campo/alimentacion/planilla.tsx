@@ -46,9 +46,14 @@ const inicial: ResultadoDeTanda = { estado: 'inicial' };
 export function PlanillaDeAlimentacion({
   tareas,
   momento,
+  momentoTexto,
+  fecha,
 }: {
   tareas: TareaVisible[];
+  /** El valor del enum: viaja con el formulario para fechar el registro. */
   momento: string;
+  momentoTexto: string;
+  fecha: string;
 }) {
   const pendientes = useMemo(() => tareas.filter((t) => !t.hecho), [tareas]);
   const [salteados, setSalteados] = useState<ReadonlySet<string>>(new Set());
@@ -66,7 +71,7 @@ export function PlanillaDeAlimentacion({
     return (
       <div className="card mt-4 p-6 text-center">
         <CheckCircle size={28} weight="fill" className="mx-auto text-ok" aria-hidden="true" />
-        <p className="mt-2 font-serif text-lg">La toma de la {momento} está completa.</p>
+        <p className="mt-2 font-serif text-lg">La toma de la {momentoTexto} está completa.</p>
         <p className="mt-1 text-sm text-muted">
           {tareas.length} {tareas.length === 1 ? 'caballo registrado' : 'caballos registrados'}.
         </p>
@@ -77,6 +82,8 @@ export function PlanillaDeAlimentacion({
   return (
     <form action={accion} className="mt-4">
       <input type="hidden" name="filas" value={pendientes.map((t) => t.caballoId).join(',')} />
+      <input type="hidden" name="momento" value={momento} />
+      <input type="hidden" name="fecha" value={fecha} />
 
       <ul className="space-y-2">
         {pendientes.map((tarea) => {

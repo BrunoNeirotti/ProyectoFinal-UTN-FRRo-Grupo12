@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { TRPCError } from '@trpc/server';
 import { llamador } from '@/lib/trpc/servidor';
+import { MOMENTOS, type Momento, ocurrenciaDelMomento } from '@/lib/bienestar';
 
 /**
  * Registrar una tanda de cuidados tiene un final que el `ResultadoDeGuardado`
@@ -40,6 +41,16 @@ function numeroOpcional(datos: FormData, campo: string): number | null {
 function filasDelFormulario(datos: FormData) {
   const ahora = new Date().toISOString();
 
+  // Cuándo pasó lo que se está registrando. El formulario manda el momento y la
+  // fecha de la planilla; de ahí sale el instante, que no es el del envío
+  // salvo que se esté cargando dentro del mismo momento. Ver
+  // `ocurrenciaDelMomento`: sin esto, la toma de la mañana cargada a la tarde
+  // quedaba contada como la del mediodía.
+  const momento = MOMENTOS.find((m) => m === texto(datos, 'momento'));
+  const fecha = texto(datos, 'fecha');
+  const ocurridoEn =
+    momento && fecha ? ocurrenciaDelMomento(momento as Momento, fecha) : ahora;
+
   return texto(datos, 'filas')
     .split(',')
     .filter(Boolean)
@@ -50,7 +61,7 @@ function filasDelFormulario(datos: FormData) {
       id: texto(datos, `id-${clave}`),
       caballoId: texto(datos, `caballo-${clave}`) || null,
       instalacionId: texto(datos, `instalacion-${clave}`) || null,
-      ocurridoEn: texto(datos, 'ocurridoEn') || ahora,
+      ocurridoEn,
       registradoEn: ahora,
       observaciones: texto(datos, `obs-${clave}`) || undefined,
       insumoId: texto(datos, `insumo-${clave}`) || null,

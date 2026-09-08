@@ -1,21 +1,12 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { TIPOS_SANITARIOS, TIPO_TEXTO } from '@/lib/bienestar';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { BotonEnviar } from '../botones';
 import { aplicarCiclo, omitirCiclo, programarCiclo } from './acciones';
 
 const inicial: ResultadoDeGuardado = { estado: 'inicial' };
-
-export const TIPO_TEXTO = {
-  desparasitacion: 'Desparasitación',
-  vacunacion: 'Vacunación',
-  herrador: 'Herrador',
-  veterinario: 'Veterinario',
-  otro: 'Otro',
-} as const;
-
-export type TipoSanitario = keyof typeof TIPO_TEXTO;
 
 export interface CaballoOpcion {
   id: string;
@@ -60,9 +51,9 @@ export function FormularioProgramar({ caballos }: { caballos: CaballoOpcion[] })
         <label className="label">
           Tipo
           <select className="input" name="tipo" defaultValue="desparasitacion" required>
-            {Object.entries(TIPO_TEXTO).map(([valor, texto]) => (
+            {TIPOS_SANITARIOS.map((valor) => (
               <option key={valor} value={valor}>
-                {texto}
+                {TIPO_TEXTO[valor]}
               </option>
             ))}
           </select>

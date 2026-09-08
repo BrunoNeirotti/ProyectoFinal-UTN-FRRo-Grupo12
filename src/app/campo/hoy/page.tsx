@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { BowlFood, Broom, CaretRight, FirstAidKit, WarningCircle } from '@phosphor-icons/react/dist/ssr';
 import { llamador } from '@/lib/trpc/servidor';
 import { esAdministrador } from '@/lib/roles';
-import { MOMENTO_TEXTO } from '@/lib/bienestar';
+import { MOMENTO_TEXTO, tipoEnTexto } from '@/lib/bienestar';
 
 export const metadata: Metadata = { title: 'Mi jornada' };
 
@@ -101,7 +101,7 @@ export default async function MiJornada() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{a.caballoNombre ?? 'Caballo'}</p>
                   <p className="tnum text-sm text-muted">
-                    {a.tipo.replace('_', ' ')} ·{' '}
+                    {tipoEnTexto(a.tipo)} ·{' '}
                     {a.diasRestantes < 0
                       ? `vencida hace ${Math.abs(a.diasRestantes)} días`
                       : a.diasRestantes === 0

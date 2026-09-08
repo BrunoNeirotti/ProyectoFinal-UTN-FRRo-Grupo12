@@ -7,6 +7,7 @@ import {
   diasEntre,
   fechaCorrida,
   momentoDe,
+  ocurrenciaDelMomento,
   planVigenteEn,
   planesVigentesEn,
   rotacionDeDroga,
@@ -41,6 +42,39 @@ describe('momentoDe', () => {
   it('toma la hora del corte como parte del momento que empieza, no del anterior', () => {
     expect(momentoDe('2026-09-08T14:00:00Z')).toBe('mediodia'); // 11:00 locales
     expect(momentoDe('2026-09-08T13:59:00Z')).toBe('manana'); // 10:59 locales
+  });
+});
+
+describe('ocurrenciaDelMomento', () => {
+  it('usa el instante real cuando se registra dentro del mismo momento', () => {
+    // 09:00 locales del 8, registrando la mañana del 8.
+    const ahora = new Date('2026-09-08T12:00:00Z');
+    expect(ocurrenciaDelMomento('manana', '2026-09-08', ahora)).toBe(ahora.toISOString());
+  });
+
+  it('fecha la toma en su momento cuando el peón se pone al día más tarde', () => {
+    // El defecto que destapó el QA: la mañana registrada 13:45 quedaba contada
+    // como mediodía, y la jornada seguía mostrándola pendiente.
+    const ahora = new Date('2026-09-08T16:45:00Z'); // 13:45 locales
+    const ocurrio = ocurrenciaDelMomento('manana', '2026-09-08', ahora);
+
+    expect(momentoDe(ocurrio)).toBe('manana');
+    expect(ocurrio).not.toBe(ahora.toISOString());
+  });
+
+  it('registrar un día anterior no toma la hora de hoy', () => {
+    const ahora = new Date('2026-09-08T12:00:00Z'); // mañana del 8
+    const ocurrio = ocurrenciaDelMomento('manana', '2026-09-07', ahora);
+
+    expect(ocurrio.slice(0, 10)).toBe('2026-09-07');
+    expect(momentoDe(ocurrio)).toBe('manana');
+  });
+
+  it('cada momento cae dentro de su propia franja', () => {
+    const ahora = new Date('2026-09-08T12:00:00Z');
+    for (const m of ['manana', 'mediodia', 'tarde'] as const) {
+      expect(momentoDe(ocurrenciaDelMomento(m, '2026-09-01', ahora))).toBe(m);
+    }
   });
 });
 
