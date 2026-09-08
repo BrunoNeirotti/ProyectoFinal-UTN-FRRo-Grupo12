@@ -6,7 +6,6 @@ import { CLAVES, CATALOGO, type Clave, type ValorParametro } from '@/lib/paramet
 import { llamador } from '@/lib/trpc/servidor';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 
-export type { ResultadoDeGuardado };
 
 /**
  * Acción de servidor del formulario de reglas.

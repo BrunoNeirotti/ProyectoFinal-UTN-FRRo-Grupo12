@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react';
 import type { Clave, ValorParametro } from '@/lib/parametros';
-import { guardarReglas, type ResultadoDeGuardado } from './acciones';
+import type { ResultadoDeGuardado } from '@/lib/formularios';
+import { guardarReglas } from './acciones';
 import { BotonEnviar } from '../botones';
 
 interface ParametroVisible {

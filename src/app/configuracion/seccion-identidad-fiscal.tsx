@@ -1,8 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
+import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { crearIdentidadFiscal } from './acciones-arca';
-import type { ResultadoDeGuardado } from './acciones';
 import { BotonEnviar } from '../botones';
 
 export interface IdentidadFiscalVisible {

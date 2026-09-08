@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { TRPCError } from '@trpc/server';
 import { llamador } from '@/lib/trpc/servidor';
-import type { ResultadoDeGuardado } from './acciones';
+import type { ResultadoDeGuardado } from '@/lib/formularios';
 
 function opcional(datos: FormData, clave: string): string | undefined {
   const v = String(datos.get(clave) ?? '').trim();

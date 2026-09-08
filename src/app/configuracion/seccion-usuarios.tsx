@@ -1,8 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
+import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { cambiarRolUsuario, desactivarUsuario, invitarUsuario } from './acciones-usuarios';
-import type { ResultadoDeGuardado } from './acciones';
 import { BotonEnviar } from '../botones';
 
 export interface UsuarioVisible {
