@@ -18,6 +18,10 @@ import { routerMensaje } from './mensaje';
 import { routerClase } from './clase';
 import { routerInscripcion } from './inscripcion';
 import { routerAsistencia } from './asistencia';
+import { routerPlanAlimentario } from './planAlimentario';
+import { routerRegistroCuidado } from './registroCuidado';
+import { routerEventoSanitario } from './eventoSanitario';
+import { routerInsumo } from './insumo';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -89,6 +93,14 @@ export const routerApp = crearRouter({
 
   // --- M8 ---
   asistencia: routerAsistencia,
+
+  // --- M9 ---
+  planAlimentario: routerPlanAlimentario,
+  registroCuidado: routerRegistroCuidado,
+  eventoSanitario: routerEventoSanitario,
+
+  // --- M10, adelantado sólo en su lectura: M9 lo necesita para imputar consumo ---
+  insumo: routerInsumo,
 });
 
 export type RouterApp = typeof routerApp;

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { TRPCError } from '@trpc/server';
 import { llamador } from '@/lib/trpc/servidor';
 import { FichaDeCaballo } from './ficha';
+import { BienestarDelCaballo } from './bienestar';
 
 export const metadata: Metadata = { title: 'Ficha de caballo' };
 
@@ -30,6 +31,7 @@ export default async function FichaCaballo({ params }: PageProps<'/caballos/[id]
         propietarios={clientes.map((c) => ({ id: c.id, nombre: c.nombre }))}
         instalaciones={instalaciones.map((i) => ({ id: i.id, nombre: i.nombre }))}
       />
+      <BienestarDelCaballo caballoId={id} />
     </div>
   );
 }

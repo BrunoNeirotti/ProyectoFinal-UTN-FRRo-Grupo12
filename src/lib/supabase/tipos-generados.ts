@@ -1496,6 +1496,7 @@ export type Database = {
           creado_en: string
           descripcion: string
           id: string
+          insumo_id: string | null
           momento: Database["public"]["Enums"]["momento_alimentacion"]
           vigente_desde: string
         }
@@ -1506,6 +1507,7 @@ export type Database = {
           creado_en?: string
           descripcion: string
           id?: string
+          insumo_id?: string | null
           momento: Database["public"]["Enums"]["momento_alimentacion"]
           vigente_desde: string
         }
@@ -1516,6 +1518,7 @@ export type Database = {
           creado_en?: string
           descripcion?: string
           id?: string
+          insumo_id?: string | null
           momento?: Database["public"]["Enums"]["momento_alimentacion"]
           vigente_desde?: string
         }
@@ -1525,6 +1528,13 @@ export type Database = {
             columns: ["caballo_id"]
             isOneToOne: false
             referencedRelation: "caballo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_alimentario_insumo_id_fkey"
+            columns: ["insumo_id"]
+            isOneToOne: false
+            referencedRelation: "insumo"
             referencedColumns: ["id"]
           },
         ]
@@ -1649,7 +1659,7 @@ export type Database = {
       registro_cuidado: {
         Row: {
           actualizado_en: string
-          caballo_id: string
+          caballo_id: string | null
           creado_en: string
           id: string
           instalacion_id: string | null
@@ -1662,7 +1672,7 @@ export type Database = {
         }
         Insert: {
           actualizado_en?: string
-          caballo_id: string
+          caballo_id?: string | null
           creado_en?: string
           id: string
           instalacion_id?: string | null
@@ -1675,7 +1685,7 @@ export type Database = {
         }
         Update: {
           actualizado_en?: string
-          caballo_id?: string
+          caballo_id?: string | null
           creado_en?: string
           id?: string
           instalacion_id?: string | null

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, type Icon } from '@phosphor-icons/react';
+import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, FirstAidKit, SunHorizon, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
 import { Logotipo } from './marca';
 
@@ -41,7 +41,13 @@ const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
   },
   {
     titulo: 'Bienestar animal',
-    enlaces: [{ area: 'bienestar', href: '/caballos', texto: 'Caballos', icono: Horse }],
+    enlaces: [
+      // «Mi jornada» es el inicio del peón y del instructor (`INICIO_POR_ROL`),
+      // así que va primero: para esos dos roles es la pantalla de todos los días.
+      { area: 'bienestar', href: '/campo/hoy', texto: 'Mi jornada', icono: SunHorizon },
+      { area: 'bienestar', href: '/caballos', texto: 'Caballos', icono: Horse },
+      { area: 'bienestar', href: '/sanidad', texto: 'Sanidad', icono: FirstAidKit },
+    ],
   },
 ];
 

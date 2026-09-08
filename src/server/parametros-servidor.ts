@@ -81,3 +81,23 @@ export async function umbralDeRiesgoDeAsistencia(
 
   return data ? ((convertir(data.valor, data.tipo) as number) ?? 25) : 25;
 }
+
+/**
+ * Con cuánta antelación se avisa un vencimiento sanitario, en días
+ * (`dias_aviso_vencimiento_sanitario`).
+ *
+ * Mismo criterio que los anteriores: el respaldo es el que sembró la migración
+ * de M9. Lo leen el tablero de sanidad y la ficha del caballo, que tienen que
+ * pintar de rojo exactamente los mismos animales.
+ */
+export async function antelacionDeAvisoSanitario(
+  supabase: SupabaseClient<Database>,
+): Promise<number> {
+  const { data } = await supabase
+    .from('parametro')
+    .select('valor, tipo')
+    .eq('clave', 'dias_aviso_vencimiento_sanitario')
+    .maybeSingle();
+
+  return data ? ((convertir(data.valor, data.tipo) as number) ?? 30) : 30;
+}

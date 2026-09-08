@@ -156,7 +156,7 @@ const INSTRUCTOR = await crearUsuario({
   telefono: '+5493412345678',
   nacimiento: '1975-04-18',
 });
-await crearUsuario({
+const PEON = await crearUsuario({
   nombre: 'Ceferino',
   apellido: 'Duarte',
   documento: '31204776',
@@ -334,14 +334,6 @@ console.log(`contratos: ${contratos.length}`);
 // -----------------------------------------------------------------------------
 // 6 · Bienestar animal: planes, sanidad e inventario
 // -----------------------------------------------------------------------------
-await insertar(
-  'plan_alimentario',
-  caballos.flatMap((c) => [
-    { caballo_id: c.id, momento: 'manana', descripcion: 'Balanceado de mantenimiento y heno', cantidad_kg: 3.0, vigente_desde: '2026-01-01' },
-    { caballo_id: c.id, momento: 'tarde', descripcion: 'Avena y alfalfa', cantidad_kg: 2.5, vigente_desde: '2026-01-01' },
-  ]),
-);
-
 const loSanitario = (d) => ({
   producto: null,
   dosis: null,
@@ -377,6 +369,18 @@ const insumos = await insertar('insumo', [
 ]);
 const ins = Object.fromEntries(insumos.map((i) => [i.nombre, i.id]));
 
+// El plan nombra el insumo del que sale la ración: es lo que permite que servir
+// la toma descuente la existencia sin adivinar nada desde un texto libre. La
+// alfalfa de la tarde va sin insumo a propósito, para que quede a la vista el
+// caso legítimo de la ración que no descuenta stock.
+await insertar(
+  'plan_alimentario',
+  caballos.flatMap((c) => [
+    { caballo_id: c.id, momento: 'manana', descripcion: 'Balanceado de mantenimiento y heno', cantidad_kg: 3.0, insumo_id: ins['Balanceado equino'], vigente_desde: '2026-01-01' },
+    { caballo_id: c.id, momento: 'tarde', descripcion: 'Avena y alfalfa', cantidad_kg: 2.5, insumo_id: ins['Avena'], vigente_desde: '2026-01-01' },
+  ]),
+);
+
 const elMovimiento = (d) => ({ registro_cuidado_id: null, orden_compra_id: null, ...d });
 
 // El stock es derivado: se carga con movimientos, no escribiendo `stock_actual`.
@@ -394,7 +398,125 @@ await insertar('movimiento_stock', [
   elMovimiento({ insumo_id: ins['Ivermectina 1 %'], tipo: 'egreso', cantidad: 27, motivo: 'Ciclo de desparasitación de junio', ocurrido_en: enFunes('2026-06-15', '09:00') }),
   elMovimiento({ insumo_id: ins['Alambre de piquete'], tipo: 'ingreso', cantidad: 500, motivo: 'Compra de mantenimiento', ocurrido_en: enFunes('2026-07-02', '11:00') }),
   elMovimiento({ insumo_id: ins['Alambre de piquete'], tipo: 'egreso', cantidad: 180, motivo: 'Reparación del piquete norte', ocurrido_en: enFunes('2026-07-20', '15:00') }),
+  // Reposición de septiembre. Está para que el consumo diario que siembra el
+  // bloque de cuidados no deje al balanceado y a la avena bajo el mínimo: el
+  // insumo que tiene que verse en rojo es la viruta, y uno solo.
+  elMovimiento({ insumo_id: ins['Balanceado equino'], tipo: 'ingreso', cantidad: 600, motivo: 'Compra de septiembre', ocurrido_en: enFunes('2026-09-01', '09:00') }),
+  elMovimiento({ insumo_id: ins['Avena'], tipo: 'ingreso', cantidad: 400, motivo: 'Compra de septiembre', ocurrido_en: enFunes('2026-09-01', '09:00') }),
 ]);
+
+// ---------------------------------------------------------------------------
+// El trabajo del peón de los últimos días.
+//
+// Es lo que hace que la jornada, la ficha del caballo y la última reposición de
+// cama tengan algo que mostrar. Cada registro nace con identificador propio
+// (decisión 1.6) y el consumo cuelga de él (decisión 1.7): son las dos
+// propiedades que M14 va a necesitar intactas cuando enganche la cola.
+// ---------------------------------------------------------------------------
+const DIAS_DE_CUIDADO = ['2026-09-03', '2026-09-04', '2026-09-05'];
+
+const elCuidado = (d) => ({
+  instalacion_id: null,
+  observaciones: null,
+  sincronizado_en: d.ocurrido_en,
+  registrado_en: d.ocurrido_en,
+  usuario_id: PEON,
+  ...d,
+});
+
+const cuidados = [];
+const consumos = [];
+
+for (const dia of DIAS_DE_CUIDADO) {
+  for (const [momento, hora, insumo, kilos] of [
+    ['manana', '07:30', 'Balanceado equino', 3.0],
+    ['tarde', '17:30', 'Avena', 2.5],
+  ]) {
+    for (const c of caballos) {
+      const id = crypto.randomUUID();
+      const ocurrido = enFunes(dia, hora);
+
+      cuidados.push(
+        elCuidado({
+          id,
+          caballo_id: c.id,
+          instalacion_id: c.instalacion_id,
+          tipo: 'alimentacion',
+          ocurrido_en: ocurrido,
+          // Una novedad real, para que el campo de observaciones no se vea vacío
+          // en todas las filas: Nube está en tratamiento y come menos.
+          observaciones:
+            c.nombre === 'Nube' && momento === 'manana' && dia === '2026-09-05'
+              ? 'Dejó la mitad de la ración. Sigue en reposo por la claudicación.'
+              : null,
+        }),
+      );
+
+      consumos.push(
+        elMovimiento({
+          insumo_id: ins[insumo],
+          tipo: 'egreso',
+          cantidad: kilos,
+          motivo: 'Ración servida',
+          registro_cuidado_id: id,
+          ocurrido_en: ocurrido,
+        }),
+      );
+    }
+  }
+}
+
+// Higiene: los boxes ocupados en distintos días, para que «última reposición»
+// muestre antigüedades distintas y no una columna toda igual. El Box 8 está
+// desocupado y va SIN caballo: es el camino 2.a del CUS03, y el que prueba que
+// la restricción nueva de la base deja pasar exactamente ese caso.
+const BOXES_OCUPADOS = ['Gambeta', 'Malbec', 'Lucero', 'Pampa', 'Rayo', 'Tormenta', 'Sultán'];
+
+for (const [i, nombre] of BOXES_OCUPADOS.entries()) {
+  const dia = DIAS_DE_CUIDADO[i % DIAS_DE_CUIDADO.length];
+  const id = crypto.randomUUID();
+  const ocurrido = enFunes(dia, '09:00');
+  const caballo = caballos.find((c) => c.nombre === nombre);
+  const repone = i < 2; // sólo dos repusieron cama: el resto fue limpieza sola
+
+  cuidados.push(
+    elCuidado({
+      id,
+      caballo_id: caballo.id,
+      instalacion_id: caballo.instalacion_id,
+      tipo: 'higiene',
+      ocurrido_en: ocurrido,
+      observaciones: i === 3 ? 'Filtración en el ángulo sur del box.' : null,
+    }),
+  );
+
+  if (repone) {
+    consumos.push(
+      elMovimiento({
+        insumo_id: ins['Viruta de pino'],
+        tipo: 'egreso',
+        cantidad: 2,
+        motivo: 'Material repuesto',
+        registro_cuidado_id: id,
+        ocurrido_en: ocurrido,
+      }),
+    );
+  }
+}
+
+cuidados.push(
+  elCuidado({
+    id: crypto.randomUUID(),
+    caballo_id: null,
+    instalacion_id: inst['Box 8'],
+    tipo: 'higiene',
+    ocurrido_en: enFunes('2026-09-04', '09:30'),
+    observaciones: 'Box desocupado: limpieza general antes de recibir un pupilo.',
+  }),
+);
+
+await insertar('registro_cuidado', cuidados);
+await insertar('movimiento_stock', consumos, 'movimiento_stock (consumo del cuidado)');
 
 const orden = await uno('orden_compra', {
   proveedor_id: proveedores[0].id,
@@ -405,7 +527,10 @@ await insertar('detalle_orden_compra', [
   { orden_compra_id: orden.id, insumo_id: ins['Viruta de pino'], cantidad: 120, precio_unitario: 9800, cantidad_recibida: null },
   { orden_compra_id: orden.id, insumo_id: ins['Balanceado equino'], cantidad: 1000, precio_unitario: 1450, cantidad_recibida: null },
 ]);
-console.log(`bienestar animal: planes de ${caballos.length} caballos, sanidad, ${insumos.length} insumos y una orden de compra`);
+console.log(
+  `bienestar animal: planes de ${caballos.length} caballos, sanidad, ${insumos.length} insumos, ` +
+    `${cuidados.length} registros de cuidado (uno sobre box desocupado) y una orden de compra`,
+);
 
 // -----------------------------------------------------------------------------
 // 7 · Agenda: la semana tipo, repetida de junio a mediados de septiembre

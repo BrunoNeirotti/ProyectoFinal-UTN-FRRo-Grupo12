@@ -19,7 +19,8 @@ describe('catálogo de parámetros', () => {
     // Esta prueba es la que impide que se desincronicen en silencio.
     // Se leen TODAS las migraciones y no sólo la configuración inicial: cada
     // módulo nuevo puede sumar su parámetro, y `riesgo_asistencia_puntos` (M8)
-    // es el primero que llega por esa vía.
+    // fue el primero que llegó por esa vía; `dias_aviso_vencimiento_sanitario`
+    // (M9) es el segundo.
     const migraciones = join(import.meta.dirname, '..', '..', 'supabase', 'migrations');
     const sql = readdirSync(migraciones)
       .filter((archivo) => archivo.endsWith('.sql'))
@@ -146,8 +147,8 @@ describe('proponeIntereses', () => {
 });
 
 describe('cobertura del catálogo', () => {
-  it('declara las diez claves y ninguna de más', () => {
-    expect(CLAVES).toHaveLength(10);
+  it('declara las once claves y ninguna de más', () => {
+    expect(CLAVES).toHaveLength(11);
     for (const clave of CLAVES) {
       expect(CATALOGO[clave as Clave]).toBeDefined();
     }

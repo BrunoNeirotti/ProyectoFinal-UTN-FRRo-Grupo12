@@ -24,6 +24,7 @@ export const CLAVES = [
   'mensajes_ventana_desde',
   'mensajes_ventana_hasta',
   'riesgo_asistencia_puntos',
+  'dias_aviso_vencimiento_sanitario',
 ] as const;
 
 export type Clave = (typeof CLAVES)[number];
@@ -70,6 +71,15 @@ export const CATALOGO: Record<Clave, Declaracion> = {
   // riesgo. El tope de 100 no es decorativo: con 100 la marca no se enciende
   // nunca, que es la forma de apagar el aviso sin sacar la columna.
   riesgo_asistencia_puntos: { tipo: 'entero', esquema: z.int().min(1).max(100), admiteVacio: false },
+
+  // M9. Con cuánta antelación se marca un vencimiento sanitario. El mínimo es 1
+  // y no 0 porque avisar el día del vencimiento es no avisar: para entonces ya
+  // no hay margen para conseguir la droga ni para coordinar al profesional.
+  dias_aviso_vencimiento_sanitario: {
+    tipo: 'entero',
+    esquema: z.int().min(1).max(180),
+    admiteVacio: false,
+  },
 };
 
 export type ValorParametro = number | boolean | string | null;
