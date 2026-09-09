@@ -176,11 +176,16 @@ export function FormularioRecepcion({
 
       <div className="mt-4 space-y-2">
         {renglones.map((r) => (
-          // `.label` es `display:block`, así que la fila necesita su propio
-          // `flex`: con sólo `flex-row` el rótulo queda arriba y el casillero
-          // ocupa el ancho entero, y seis renglones se vuelven una página.
-          <label key={r.id} className="label flex items-center gap-3">
-            <span className="flex-1 text-sm">
+          // Sin `.label`, y no por gusto: las clases de componente de
+          // `globals.css` están FUERA de capa y las utilidades de Tailwind
+          // adentro de `@layer utilities`, así que `.label { display: block }`
+          // le gana a `.flex` por más específica que parezca la utilidad. Una
+          // fila que es una fila se arma sola; pelearle a `.label` no.
+          //
+          // De paso el nombre del insumo deja de ir en versalitas: son seis
+          // renglones seguidos y en mayúsculas se leen como un cartel.
+          <label key={r.id} className="flex items-center gap-3 text-sm">
+            <span className="flex-1">
               {r.nombre}
               <span className="ml-1 text-xs text-muted">
                 {r.falta > 0
@@ -188,9 +193,8 @@ export function FormularioRecepcion({
                   : '· completo'}
               </span>
             </span>
-            {/* El ancho va en el envoltorio: `.input` declara `width: 100%` y
-                le gana a la utilidad, así que fijarlo en el propio campo no
-                tiene efecto. */}
+            {/* Mismo motivo: `.input` declara `width: 100%` y le gana a `w-28`,
+                así que el ancho va en el envoltorio. */}
             <span className="w-28 shrink-0">
               <input
                 className="input"

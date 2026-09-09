@@ -197,7 +197,14 @@ body {
 .cli[aria-current="true"] { background: var(--accent-soft); border-left-color: var(--accent); }
 .cli-dot { height: .5rem; width: .5rem; border-radius: 999px; margin-top: .45rem; flex-shrink: 0; }
 
-/* --- Formularios. Label siempre visible, helper persistente. --- */
+/* --- Formularios. Label siempre visible, helper persistente. ---
+   OJO con sobreescribir estas clases desde una utilidad de Tailwind: el
+   `@import "tailwindcss"` de arriba mete las utilidades en `@layer utilities`, y
+   todo lo que se declara acá queda FUERA de capa. El CSS sin capa le gana a
+   cualquier capa, así que `.label { display: block }` vence a `.flex` y
+   `.input { width: 100% }` vence a `.w-28`, por más específica que parezca la
+   utilidad. Cuando un componente necesita otra caja, se arma sin la clase; no
+   se le agrega una utilidad esperando que gane. */
 .label {
   display: block; font-size: .75rem; font-weight: 500;
   text-transform: uppercase; letter-spacing: .06em;
