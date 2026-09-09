@@ -90,7 +90,7 @@ function FilaServicio({ servicio: s }: { servicio: ServicioVisible }) {
 function FormularioEditarServicio({ servicio: s }: { servicio: ServicioVisible }) {
   const [resultado, enviar] = useActionState(modificarServicio, inicial);
   return (
-    <form action={enviar} className="card mt-2 space-y-3 p-3">
+    <form action={enviar} className="card panel-en-celda space-y-3 p-3">
       <input type="hidden" name="servicioId" value={s.id} />
       <label className="block">
         <span className="label">Nombre</span>

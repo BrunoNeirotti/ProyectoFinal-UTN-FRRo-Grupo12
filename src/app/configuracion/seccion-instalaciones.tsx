@@ -92,7 +92,7 @@ function FilaInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }
 function FormularioEditarInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }) {
   const [resultado, enviar] = useActionState(modificarInstalacion, inicial);
   return (
-    <form action={enviar} className="card mt-2 space-y-3 p-3">
+    <form action={enviar} className="card panel-en-celda space-y-3 p-3">
       <input type="hidden" name="instalacionId" value={i.id} />
       <label className="block">
         <span className="label">Nombre</span>

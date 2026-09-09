@@ -59,7 +59,7 @@ function FormularioEditar({ alumno: a }: { alumno: Alumno }) {
   const [resultadoBaja, enviarBaja] = useActionState(desactivarAlumno, inicial);
 
   return (
-    <div className="card mt-2 space-y-3 p-3">
+    <div className="card panel-en-celda space-y-3 p-3">
       <form action={enviar} className="space-y-3">
         <input type="hidden" name="alumnoId" value={a.id} />
         <input type="hidden" name="responsableId" value={a.responsable?.id ?? ''} />
