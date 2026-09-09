@@ -52,6 +52,3 @@ supabase/.temp/
 
 # Certificados de ARCA (clave privada y CSR/CRT): nunca al repositorio
 .arca/
-
-# Grafo de conocimiento (derivado, se regenera con /graphify)
-/graphify-out/
