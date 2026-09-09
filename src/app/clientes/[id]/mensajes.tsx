@@ -6,7 +6,7 @@ import type { inferRouterOutputs } from '@trpc/server';
 import type { RouterApp } from '@/server/routers/_app';
 import { enviarMensaje } from '../acciones-mensaje';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
-import { variablesDe } from '@/lib/mensajeria';
+import { rotuloDeVariable, variablesDe } from '@/lib/mensajeria';
 import { BotonEnviar } from '../../botones';
 
 type Salidas = inferRouterOutputs<RouterApp>;
@@ -145,7 +145,7 @@ function FormularioEnvio({ clienteId, plantillas }: { clienteId: string; plantil
 
       {variables.map((v) => (
         <label key={v} className="block">
-          <span className="label">{v}</span>
+          <span className="label">{rotuloDeVariable(v)}</span>
           <input
             required
             value={valores[v] ?? ''}

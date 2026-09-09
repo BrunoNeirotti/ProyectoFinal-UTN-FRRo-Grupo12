@@ -46,6 +46,38 @@ export function variablesDe(cuerpo: string): string[] {
   return [...new Set(encontradas)];
 }
 
+/**
+ * Cómo se rotula una variable en pantalla: `tasa_mora` es el nombre técnico que
+ * viaja dentro del texto, no una etiqueta de formulario. «TASA_MORA» le pide al
+ * usuario que lea código.
+ *
+ * Las que tienen un nombre propio se declaran; el resto se arma reemplazando el
+ * guión bajo y poniendo la primera en mayúscula, que alcanza para las que
+ * lleguen después sin tener que volver acá.
+ */
+const ROTULOS: Record<string, string> = {
+  cliente: 'Cliente',
+  periodo: 'Período',
+  importe: 'Importe',
+  vencimiento: 'Vencimiento',
+  tasa_mora: 'Tasa de mora',
+  firmante: 'Firmante',
+  alumno: 'Alumno',
+  caballo: 'Caballo',
+  fecha: 'Fecha',
+  hora: 'Hora',
+  instructor: 'Instructor',
+  instalacion: 'Instalación',
+  motivo: 'Motivo',
+  monto: 'Monto',
+};
+
+export function rotuloDeVariable(nombre: string): string {
+  if (ROTULOS[nombre]) return ROTULOS[nombre];
+  const conEspacios = nombre.replace(/_/g, ' ');
+  return conEspacios.charAt(0).toUpperCase() + conEspacios.slice(1);
+}
+
 /** Sustituye `{{variable}}` por su valor. Sin datos para una variable, la deja vacía y lo señala. */
 export function aplicarPlantilla(
   cuerpo: string,

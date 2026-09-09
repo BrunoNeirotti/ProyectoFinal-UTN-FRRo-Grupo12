@@ -9,6 +9,7 @@ import {
   insumosAReponer,
   ventanaDeConsumo,
 } from '@/lib/inventario';
+import { mensajeDeError } from '../errores';
 
 /**
  * M10 · Órdenes de compra (CUS06).
@@ -72,7 +73,7 @@ export const routerOrdenCompra = crearRouter({
       }
 
       const { data, error } = await consulta;
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return data ?? [];
     }),
 
@@ -99,7 +100,7 @@ export const routerOrdenCompra = crearRouter({
         .order('ocurrido_en', { ascending: false }),
     ]);
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     if (!orden) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa orden.' });
 
     return { orden, detalle: detalle ?? [], entregas: ingresos ?? [] };
@@ -131,7 +132,7 @@ export const routerOrdenCompra = crearRouter({
         .select('id, anio, numero')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       if (input.renglones.length > 0) {
         const { error: errorDetalle } = await ctx.supabase.from('detalle_orden_compra').insert(
@@ -150,7 +151,7 @@ export const routerOrdenCompra = crearRouter({
         );
 
         if (errorDetalle) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorDetalle.message });
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorDetalle) });
         }
       }
 
@@ -226,7 +227,7 @@ export const routerOrdenCompra = crearRouter({
         .select('id, anio, numero')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const { error: errorDetalle } = await ctx.supabase.from('detalle_orden_compra').insert(
         aReponer.map((r) => ({
@@ -239,7 +240,7 @@ export const routerOrdenCompra = crearRouter({
       );
 
       if (errorDetalle) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorDetalle.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorDetalle) });
       }
 
       return {
@@ -276,7 +277,7 @@ export const routerOrdenCompra = crearRouter({
       if (error) {
         // El disparador `trg_detalle_segun_estado` es el que se planta cuando la
         // orden ya salió, y su mensaje ya explica el motivo.
-        throw new TRPCError({ code: 'BAD_REQUEST', message: error.message });
+        throw new TRPCError({ code: 'BAD_REQUEST', message: mensajeDeError(error) });
       }
       return { ok: true as const };
     }),
@@ -289,7 +290,7 @@ export const routerOrdenCompra = crearRouter({
         .delete()
         .eq('id', input.detalleId);
 
-      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error.message });
+      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -316,7 +317,7 @@ export const routerOrdenCompra = crearRouter({
         .eq('estado', 'borrador')
         .select('id');
 
-      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error.message });
+      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: mensajeDeError(error) });
       if (!data?.length) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Esa orden ya había salido.' });
       }
@@ -374,7 +375,7 @@ export const routerOrdenCompra = crearRouter({
         .select('id, insumo_id, cantidad, cantidad_recibida')
         .eq('orden_compra_id', input.ordenId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const porId = new Map((detalle ?? []).map((d) => [d.id, d]));
       const ocurridoEn = input.ocurridoEn ?? new Date().toISOString();
@@ -396,7 +397,7 @@ export const routerOrdenCompra = crearRouter({
           .eq('id', d.id);
 
         if (errorDetalle) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: errorDetalle.message });
+          throw new TRPCError({ code: 'BAD_REQUEST', message: mensajeDeError(errorDetalle) });
         }
 
         const { error: errorStock } = await ctx.supabase.from('movimiento_stock').insert({
@@ -410,7 +411,7 @@ export const routerOrdenCompra = crearRouter({
         });
 
         if (errorStock) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorStock.message });
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorStock) });
         }
       }
 
@@ -440,7 +441,7 @@ export const routerOrdenCompra = crearRouter({
         .neq('estado', 'anulada')
         .select('id');
 
-      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error.message });
+      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: mensajeDeError(error) });
       if (!data?.length) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Esa orden ya estaba anulada.' });
       }
@@ -458,7 +459,7 @@ export const routerOrdenCompra = crearRouter({
         .eq('estado', 'borrador')
         .select('id');
 
-      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: error.message });
+      if (error) throw new TRPCError({ code: 'BAD_REQUEST', message: mensajeDeError(error) });
       if (!data?.length) {
         throw new TRPCError({
           code: 'BAD_REQUEST',

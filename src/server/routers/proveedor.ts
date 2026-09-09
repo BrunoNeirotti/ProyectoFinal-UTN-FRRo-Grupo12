@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin } from '../trpc';
+import { mensajeDeError } from '../errores';
 
 /**
  * M10 · Proveedores.
@@ -69,7 +70,7 @@ export const routerProveedor = crearRouter({
       if (!input?.incluirInactivos) consulta = consulta.eq('activo', true);
 
       const { data, error } = await consulta;
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return data ?? [];
     }),
 
@@ -80,7 +81,7 @@ export const routerProveedor = crearRouter({
       .select('id')
       .single();
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return { id: data.id };
   }),
 
@@ -92,7 +93,7 @@ export const routerProveedor = crearRouter({
         .update({ ...aFila(input), actualizado_en: new Date().toISOString() })
         .eq('id', input.proveedorId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -110,7 +111,7 @@ export const routerProveedor = crearRouter({
         .update({ activo: input.activo, actualizado_en: new Date().toISOString() })
         .eq('id', input.proveedorId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

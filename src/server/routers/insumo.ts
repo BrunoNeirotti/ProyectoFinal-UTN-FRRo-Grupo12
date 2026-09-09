@@ -10,6 +10,7 @@ import {
   insumosAReponer,
   ventanaDeConsumo,
 } from '@/lib/inventario';
+import { mensajeDeError } from '../errores';
 
 /**
  * M10 · Insumos y existencias.
@@ -62,7 +63,7 @@ export const routerInsumo = crearRouter({
       if (input?.categoria) consulta = consulta.eq('categoria', input.categoria);
 
       const { data, error } = await consulta;
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       // `bajoMinimo` se deriva y no se guarda, igual que todo lo que M8 informa:
       // una marca almacenada obliga a un proceso que la recalcule, y el día que
@@ -103,7 +104,7 @@ export const routerInsumo = crearRouter({
         diasDeCoberturaDeCompra(ctx.supabase),
       ]);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const porInsumo = new Map<string, MovimientoComputable[]>();
       for (const m of movimientos ?? []) {
@@ -151,7 +152,7 @@ export const routerInsumo = crearRouter({
         .order('ocurrido_en', { ascending: false })
         .limit(input.limite);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return data ?? [];
     }),
 
@@ -173,7 +174,7 @@ export const routerInsumo = crearRouter({
       if (error.code === '23505') {
         throw new TRPCError({ code: 'CONFLICT', message: 'Ya existe un insumo con ese nombre.' });
       }
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     }
     return { id: data.id };
   }),
@@ -200,7 +201,7 @@ export const routerInsumo = crearRouter({
         if (error.code === '23505') {
           throw new TRPCError({ code: 'CONFLICT', message: 'Ya existe un insumo con ese nombre.' });
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       }
       return { ok: true as const };
     }),
@@ -220,7 +221,7 @@ export const routerInsumo = crearRouter({
         .update({ activo: input.activo, actualizado_en: new Date().toISOString() })
         .eq('id', input.insumoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -259,7 +260,7 @@ export const routerInsumo = crearRouter({
         .maybeSingle();
 
       if (errorInsumo) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorInsumo.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorInsumo) });
       }
       if (!insumo) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe ese insumo.' });
 
@@ -279,7 +280,7 @@ export const routerInsumo = crearRouter({
         ocurrido_en: input.ocurridoEn ?? new Date().toISOString(),
       });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return { ajustado: true as const, diferencia, stockAnterior: insumo.stock_actual };
     }),
@@ -312,7 +313,7 @@ export const routerInsumo = crearRouter({
         ocurrido_en: input.ocurridoEn ?? new Date().toISOString(),
       });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

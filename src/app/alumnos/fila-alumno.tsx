@@ -9,6 +9,7 @@ import { desactivarAlumno, modificarAlumno } from './acciones';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { edadEn } from '@/lib/personas';
 import { BotonEnviar } from '../botones';
+import { Modal } from '../modal';
 
 type Alumno = inferRouterOutputs<RouterApp>['alumno']['listar'][number];
 
@@ -45,10 +46,11 @@ export function FilaAlumno({ alumno: a }: { alumno: Alumno }) {
         ) : (
           <span className="badge">No requiere</span>
         )}
-        <details className="mt-1.5">
-          <summary className="btn btn-gho btn-sm">Editar</summary>
-          <FormularioEditar alumno={a} />
-        </details>
+        <div className="mt-1.5">
+          <Modal etiqueta="Editar" titulo={`${a.persona?.apellido}, ${a.persona?.nombre}`}>
+            <FormularioEditar alumno={a} />
+          </Modal>
+        </div>
       </td>
     </tr>
   );
@@ -59,7 +61,7 @@ function FormularioEditar({ alumno: a }: { alumno: Alumno }) {
   const [resultadoBaja, enviarBaja] = useActionState(desactivarAlumno, inicial);
 
   return (
-    <div className="card panel-en-celda space-y-3 p-3">
+    <div className="space-y-3">
       <form action={enviar} className="space-y-3">
         <input type="hidden" name="alumnoId" value={a.id} />
         <input type="hidden" name="responsableId" value={a.responsable?.id ?? ''} />

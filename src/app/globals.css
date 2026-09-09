@@ -224,6 +224,12 @@ body {
 }
 /* Un botón al lado de un campo tiene que medir lo mismo: sin esto queda un par
    de píxeles más bajo y la fila se ve desprolija. */
+/* Cuando el `.label` ENVUELVE al campo, su `margin-bottom` queda por debajo del
+   campo, no entre el rótulo y el campo. En una fila con un botón al lado, eso
+   sube el campo esos milímetros y descalza el par. El margen sólo tiene sentido
+   cuando el rótulo es un elemento suelto y el campo va aparte. */
+.label:has(.input), .label:has(input), .label:has(select), .label:has(textarea) { margin-bottom: 0; }
+
 .input, .btn { min-height: var(--control-h); }
 .btn-sm { min-height: 2rem; }
 .btn-lg { min-height: 2.75rem; }
@@ -363,14 +369,28 @@ details > summary::before {
 }
 details[open] > summary::before { transform: rotate(45deg); }
 
-/* Un desplegable que vive en una celda ensancha su columna al abrirse y
-   reacomoda la tabla entera. El panel sale del flujo y se ancla a la celda. */
-.tbl td { position: relative; }
-.panel-en-celda {
-  position: absolute; right: 1rem; z-index: 20;
-  width: 17rem; margin-top: .35rem;
-  box-shadow: var(--shadow-md);
+/* --- Modales ---
+   Un formulario de edición que se abría dentro de una celda deformaba la tabla
+   entera y dejaba el contenido en una columna angosta. Va en un diálogo: es lo
+   que el navegador ya sabe hacer -foco atrapado, Esc para cerrar, fondo inerte-
+   sin una sola línea de JavaScript propio para el comportamiento. */
+dialog.modal {
+  border: none; padding: 0; background: transparent;
+  width: min(34rem, calc(100vw - 2rem)); max-height: calc(100vh - 4rem);
+  color: var(--text);
 }
+dialog.modal::backdrop { background: rgba(42, 24, 18, .5); }
+.modal-caja {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--r-2xl); box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column; max-height: calc(100vh - 4rem);
+}
+.modal-encabezado {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--surface-border);
+}
+.modal-cuerpo { padding: 1.25rem; overflow-y: auto; }
 
 /* --- Navegación --- */
 .sidebar {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Scales, ShoppingCart, WarningCircle } from '@phosphor-icons/react/dist/ssr';
+import { ShoppingCart, WarningCircle } from '@phosphor-icons/react/dist/ssr';
 import { llamador } from '@/lib/trpc/servidor';
 import {
   CATEGORIA_TEXTO,
@@ -12,6 +12,7 @@ import {
   numeroDeOrden,
 } from '@/lib/inventario';
 import { FormularioAjuste, FormularioNuevaOrden, FormularioNuevoInsumo } from './formularios';
+import { Modal } from '../modal';
 
 export const metadata: Metadata = { title: 'Inventario' };
 
@@ -78,7 +79,13 @@ export default async function Inventario() {
             disponibilidad, calculados sobre los últimos {panel.ventana.dias} días.
           </p>
         </div>
-        <div className="shrink-0">
+        <div className="flex shrink-0 flex-wrap items-end gap-2">
+          <Modal etiqueta="Conteo físico" titulo="Registrar un conteo físico" variante="sec">
+            <FormularioAjuste insumos={panel.insumos} />
+          </Modal>
+          <Modal etiqueta="Nuevo insumo" titulo="Nuevo insumo" variante="sec">
+            <FormularioNuevoInsumo />
+          </Modal>
           <FormularioNuevaOrden proveedores={proveedores} hayQueReponer={panel.aReponer.length > 0} />
         </div>
       </div>
@@ -140,8 +147,8 @@ export default async function Inventario() {
         </section>
       )}
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
-        <section className="card overflow-hidden lg:col-span-2" aria-labelledby="h-insumos">
+      <div className="mt-6 space-y-6">
+        <section className="card overflow-hidden" aria-labelledby="h-insumos">
           <div className="border-b border-surface-border px-4 py-3">
             <h2 id="h-insumos" className="font-serif text-lg">
               Insumos
@@ -218,67 +225,45 @@ export default async function Inventario() {
           </p>
         </section>
 
-        <div className="space-y-6">
-          <section className="card overflow-hidden" aria-labelledby="h-ordenes">
-            <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
-              <h2 id="h-ordenes" className="font-serif text-lg">
-                Órdenes de compra
-              </h2>
-              <Link href="/inventario/proveedores" className="link text-xs">
-                Proveedores
-              </Link>
-            </div>
-            {ordenes.length === 0 ? (
-              <p className="p-4 text-sm text-muted">No hay órdenes de compra registradas.</p>
-            ) : (
-              <ul className="divide-y divide-surface-border">
-                {ordenes.map((o) => (
-                  <li key={o.id} className={`p-4 ${o.estado === 'anulada' ? 'opacity-60' : ''}`}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <Link
-                          href={`/inventario/ordenes/${o.id}`}
-                          className="link text-sm font-medium"
-                        >
-                          {o.proveedor?.razon_social ?? 'Sin proveedor'}
-                        </Link>
-                        <p className="tnum text-xs text-muted">
-                          {numeroDeOrden(o.anio, o.numero)} · {fechaCorta(o.fecha_emision)}
-                        </p>
-                      </div>
-                      <span className={CLASE_DE_TONO[TONO_DE_ESTADO[o.estado]]}>
-                        {ESTADO_ORDEN_TEXTO[o.estado]}
-                      </span>
+      <section className="card overflow-hidden" aria-labelledby="h-ordenes">
+          <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
+            <h2 id="h-ordenes" className="font-serif text-lg">
+              Órdenes de compra
+            </h2>
+            <Link href="/inventario/proveedores" className="link text-xs">
+              Proveedores
+            </Link>
+          </div>
+          {ordenes.length === 0 ? (
+            <p className="p-4 text-sm text-muted">No hay órdenes de compra registradas.</p>
+          ) : (
+            <ul className="divide-y divide-surface-border">
+              {ordenes.map((o) => (
+                <li key={o.id} className={`p-4 ${o.estado === 'anulada' ? 'opacity-60' : ''}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Link
+                        href={`/inventario/ordenes/${o.id}`}
+                        className="link text-sm font-medium"
+                      >
+                        {o.proveedor?.razon_social ?? 'Sin proveedor'}
+                      </Link>
+                      <p className="tnum text-xs text-muted">
+                        {numeroDeOrden(o.anio, o.numero)} · {fechaCorta(o.fecha_emision)}
+                      </p>
                     </div>
-                    <p className="tnum mt-2 text-sm">{pesos(o.total)}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+                    <span className={CLASE_DE_TONO[TONO_DE_ESTADO[o.estado]]}>
+                      {ESTADO_ORDEN_TEXTO[o.estado]}
+                    </span>
+                  </div>
+                  <p className="tnum mt-2 text-sm">{pesos(o.total)}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-          <section className="card-feature on-feature p-5" aria-labelledby="h-conteo">
-            <div className="mb-2 flex items-center gap-2">
-              <Scales size={20} className="text-accent" aria-hidden="true" />
-              <h2 id="h-conteo" className="font-serif text-lg">
-                Conteo físico
-              </h2>
-            </div>
-            <p className="text-sm text-feature-muted">
-              Registro de la existencia relevada en depósito. El sistema calcula la diferencia contra
-              lo registrado y la asienta como ajuste, con autor, fecha y motivo.
-            </p>
-            <FormularioAjuste insumos={panel.insumos} />
-          </section>
-        </div>
       </div>
-
-      <section className="mt-8" aria-labelledby="h-nuevo">
-        <h2 id="h-nuevo" className="sr-only">
-          Alta de insumo
-        </h2>
-        <FormularioNuevoInsumo />
-      </section>
 
       {panel.aReponer.length > 0 && proveedores.length === 0 && (
         <p className="helper mt-4 flex items-center gap-1.5">

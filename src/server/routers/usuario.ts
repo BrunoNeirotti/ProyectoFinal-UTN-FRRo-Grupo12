@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { ROLES } from '@/lib/roles';
 import { clienteDeServicio } from '@/lib/supabase/servidor';
+import { mensajeDeError } from '../errores';
 
 /**
  * M1 · Usuarios y roles.
@@ -24,7 +25,7 @@ export const routerUsuario = crearRouter({
       .select('id, rol, activo, ultimo_acceso_en, persona:persona_id (nombre, apellido, email)')
       .order('activo', { ascending: false });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -46,7 +47,7 @@ export const routerUsuario = crearRouter({
       .in('rol', ['instructor', 'administrador'])
       .eq('activo', true);
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     return (data ?? [])
       .map((u) => ({
@@ -128,7 +129,7 @@ export const routerUsuario = crearRouter({
       });
 
       if (errorUsuario) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorUsuario.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorUsuario) });
       }
 
       return { usuarioId: credencial.user.id, personaId: persona.id };
@@ -166,7 +167,7 @@ export const routerUsuario = crearRouter({
         .update({ rol: input.rol })
         .eq('id', input.usuarioId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -191,7 +192,7 @@ export const routerUsuario = crearRouter({
         .update({ activo: false })
         .eq('id', input.usuarioId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

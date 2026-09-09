@@ -12,6 +12,7 @@ import {
   semanaDe,
 } from '@/lib/agenda';
 import { antelacionMinimaDeCancelacion } from '../parametros-servidor';
+import { mensajeDeError } from '../errores';
 
 /**
  * M7 · Agenda de clases.
@@ -69,7 +70,7 @@ async function inscriptosPorClase(
     .in('clase_id', [...claseIds])
     .eq('estado', 'inscripto');
 
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
   const conteo = new Map<string, number>();
   for (const i of data ?? []) {
@@ -110,7 +111,7 @@ async function conflictosDe(
   if (excluirClaseId) consulta = consulta.neq('id', excluirClaseId);
 
   const { data, error } = await consulta;
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
   return (data ?? []).map((c) => {
     const pisaInstalacion = c.instalacion_id === intervalo.instalacionId;
@@ -155,7 +156,7 @@ async function modalidadDelServicio(supabase: SupabaseClient<Database>, servicio
     .eq('id', servicioId)
     .maybeSingle();
 
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
   if (!data) throw new TRPCError({ code: 'BAD_REQUEST', message: 'El servicio indicado no existe.' });
   if (!data.modalidad) {
     throw new TRPCError({
@@ -200,7 +201,7 @@ export const routerClase = crearRouter({
       if (input.instructorId) consulta = consulta.eq('instructor_id', input.instructorId);
 
       const { data, error } = await consulta;
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const clases = data ?? [];
       const inscriptos = await inscriptosPorClase(ctx.supabase, clases.map((c) => c.id));
@@ -231,7 +232,7 @@ export const routerClase = crearRouter({
         .eq('id', input.claseId)
         .maybeSingle();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       if (!clase) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa clase.' });
 
       const { data: inscripciones, error: errorInscripciones } = await ctx.supabase
@@ -243,7 +244,7 @@ export const routerClase = crearRouter({
         .order('inscripto_en');
 
       if (errorInscripciones) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorInscripciones.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorInscripciones) });
       }
 
       const anotados = inscripciones ?? [];
@@ -337,7 +338,7 @@ export const routerClase = crearRouter({
         .lt('inicia_en', hasta.toISOString())
         .order('inicia_en');
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const clases = data ?? [];
       const inscriptos = await inscriptosPorClase(ctx.supabase, clases.map((c) => c.id));
@@ -396,7 +397,7 @@ export const routerClase = crearRouter({
         .gte('inicia_en', instanteDesdeLocal(input.desde, '00:00').toISOString())
         .lt('inicia_en', new Date(instanteDesdeLocal(input.hasta, '00:00').getTime() + 86_400_000).toISOString());
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return ocupacionDeInstalaciones(
         (data ?? [])
@@ -460,7 +461,7 @@ export const routerClase = crearRouter({
             message: 'Alguien tomó ese horario mientras se cargaba la clase. Conviene revisar la agenda y volver a intentar.',
           });
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       }
 
       return { claseId: data.id as string };
@@ -496,7 +497,7 @@ export const routerClase = crearRouter({
         .eq('id', input.claseId)
         .maybeSingle();
 
-      if (errorActual) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorActual.message });
+      if (errorActual) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorActual) });
       if (!actual) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa clase.' });
       if (actual.estado !== 'programada') {
         throw new TRPCError({
@@ -553,7 +554,7 @@ export const routerClase = crearRouter({
             message: 'Alguien tomó ese horario mientras se guardaba el cambio. Conviene revisar la agenda y volver a intentar.',
           });
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       }
 
       return { ok: true as const };
@@ -582,7 +583,7 @@ export const routerClase = crearRouter({
         .eq('id', input.claseId)
         .maybeSingle();
 
-      if (errorActual) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorActual.message });
+      if (errorActual) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorActual) });
       if (!actual) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa clase.' });
       if (actual.estado === 'dictada') {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'La clase ya se dictó: no se puede suspender.' });
@@ -596,7 +597,7 @@ export const routerClase = crearRouter({
         .update({ estado: 'cancelada', motivo_suspension: input.motivo })
         .eq('id', input.claseId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

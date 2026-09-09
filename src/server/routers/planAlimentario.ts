@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { MOMENTOS, planesVigentesEn } from '@/lib/bienestar';
+import { mensajeDeError } from '../errores';
 
 /**
  * M9 · Plan alimentario.
@@ -37,7 +38,7 @@ export const routerPlanAlimentario = crearRouter({
         .eq('caballo_id', input.caballoId)
         .order('vigente_desde', { ascending: false });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const planes = data ?? [];
       const vigentes = planesVigentesEn(
@@ -96,7 +97,7 @@ export const routerPlanAlimentario = crearRouter({
           message: 'Ya hay un plan para ese momento con esa misma fecha de vigencia.',
         });
       }
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return { planId: data.id as string };
     }),
@@ -121,7 +122,7 @@ export const routerPlanAlimentario = crearRouter({
         })
         .eq('id', input.planId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

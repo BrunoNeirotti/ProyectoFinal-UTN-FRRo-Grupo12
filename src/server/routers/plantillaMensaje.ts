@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoAutenticado } from '../trpc';
 import { verificarLimitesWhatsapp } from '@/lib/mensajeria';
+import { mensajeDeError } from '../errores';
 
 /**
  * M5 · Plantillas de mensajes.
@@ -25,7 +26,7 @@ export const routerPlantillaMensaje = crearRouter({
       )
       .order('codigo');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -115,7 +116,7 @@ export const routerPlantillaMensaje = crearRouter({
         })
         .eq('id', input.plantillaId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -147,7 +148,7 @@ export const routerPlantillaMensaje = crearRouter({
         })
         .eq('id', input.plantillaId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

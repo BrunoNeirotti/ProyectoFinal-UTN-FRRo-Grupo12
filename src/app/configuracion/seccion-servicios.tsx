@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { crearServicio, crearTarifa, modificarServicio } from './acciones-servicios';
 import { BotonEnviar } from '../botones';
+import { Modal } from '../modal';
 
 export interface ServicioVisible {
   id: string;
@@ -78,10 +79,11 @@ function FilaServicio({ servicio: s }: { servicio: ServicioVisible }) {
       <td className="text-fg-muted">{s.tarifaVigente?.vigenteDesde ?? '—'}</td>
       <td>
         <span className={`badge ${s.activo ? 'badge-ok' : ''}`}>{s.activo ? 'Activo' : 'Inactivo'}</span>
-        <details className="mt-1.5">
-          <summary className="btn btn-gho btn-sm">Editar</summary>
-          <FormularioEditarServicio servicio={s} />
-        </details>
+        <div className="mt-1.5">
+          <Modal etiqueta="Editar" titulo={s.nombre}>
+            <FormularioEditarServicio servicio={s} />
+          </Modal>
+        </div>
       </td>
     </tr>
   );
@@ -90,7 +92,7 @@ function FilaServicio({ servicio: s }: { servicio: ServicioVisible }) {
 function FormularioEditarServicio({ servicio: s }: { servicio: ServicioVisible }) {
   const [resultado, enviar] = useActionState(modificarServicio, inicial);
   return (
-    <form action={enviar} className="card panel-en-celda space-y-3 p-3">
+    <form action={enviar} className="space-y-3">
       <input type="hidden" name="servicioId" value={s.id} />
       <label className="block">
         <span className="label">Nombre</span>

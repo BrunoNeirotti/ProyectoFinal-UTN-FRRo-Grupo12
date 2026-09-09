@@ -17,6 +17,7 @@ import {
   rangoDelPeriodo,
 } from '@/lib/asistencia';
 import { umbralDeRiesgoDeAsistencia } from '../parametros-servidor';
+import { mensajeDeError } from '../errores';
 
 /**
  * M8 · Asistencia y progreso.
@@ -86,7 +87,7 @@ async function asistenciasEntre(
     .gte('clase.inicia_en', desde.toISOString())
     .lt('clase.inicia_en', hasta.toISOString());
 
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
   return (data ?? [])
     .filter((f) => f.clase != null)
@@ -145,7 +146,7 @@ export const routerAsistencia = crearRouter({
         .eq('id', input.claseId)
         .maybeSingle();
 
-      if (errorClase) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorClase.message });
+      if (errorClase) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorClase) });
       if (!clase) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa clase.' });
 
       const [inscripciones, asistencias, caballos] = await Promise.all([
@@ -254,7 +255,7 @@ export const routerAsistencia = crearRouter({
         .eq('id', input.claseId)
         .maybeSingle();
 
-      if (errorClase) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorClase.message });
+      if (errorClase) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorClase) });
       if (!clase) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa clase.' });
       if (clase.estado === 'cancelada') {
         throw new TRPCError({
@@ -270,7 +271,7 @@ export const routerAsistencia = crearRouter({
         .eq('estado', 'inscripto');
 
       if (errorInscriptos) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorInscriptos.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorInscriptos) });
       }
 
       // La base ya lo impide (`trg_asistencia_inscripto`), pero el mensaje de un
@@ -302,7 +303,7 @@ export const routerAsistencia = crearRouter({
         { onConflict: 'clase_id,alumno_id' },
       );
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const planilla = estadoDePlanilla(
         [...anotados].map((alumnoId) => ({ alumnoId })),
@@ -327,7 +328,7 @@ export const routerAsistencia = crearRouter({
         .eq('id', input.claseId);
 
       if (errorCierre) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorCierre.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorCierre) });
       }
 
       return { cerrada: true as const, planilla };
@@ -359,7 +360,7 @@ export const routerAsistencia = crearRouter({
         .eq('id', input.asistenciaId)
         .maybeSingle();
 
-      if (errorPrevia) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorPrevia.message });
+      if (errorPrevia) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorPrevia) });
       if (!previa) {
         throw new TRPCError({
           code: 'NOT_FOUND',
@@ -376,7 +377,7 @@ export const routerAsistencia = crearRouter({
         })
         .eq('id', input.asistenciaId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const, claseId: previa.clase_id as string };
     }),
 
@@ -407,7 +408,7 @@ export const routerAsistencia = crearRouter({
         .eq('id', input.alumnoId)
         .maybeSingle();
 
-      if (errorAlumno) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorAlumno.message });
+      if (errorAlumno) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorAlumno) });
       if (!alumno) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe ese alumno.' });
 
       const { data, error } = await ctx.supabase
@@ -417,7 +418,7 @@ export const routerAsistencia = crearRouter({
         .gte('clase.inicia_en', rangoDelPeriodo(desde).desde.toISOString())
         .lt('clase.inicia_en', rangoDelPeriodo(hasta).hasta.toISOString());
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       // De la más nueva a la más vieja, que es como se lee un antecedente. El
       // orden va acá por lo mismo que en `asistenciasEntre`.
@@ -488,7 +489,7 @@ export const routerAsistencia = crearRouter({
         .gte('inicia_en', desde.toISOString())
         .lt('inicia_en', hasta.toISOString());
 
-      if (errorClases) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorClases.message });
+      if (errorClases) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorClases) });
 
       const utiles = filas.filter((f) => f.alumno != null);
       const delPeriodo = utiles.filter((f) => periodoDe(f.clase!.inicia_en) === periodo);

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { crearRouter, procedimientoDeArea } from '../trpc';
 import { cancelacionEnTermino, cupoDeClase } from '@/lib/agenda';
 import { antelacionMinimaDeCancelacion } from '../parametros-servidor';
+import { mensajeDeError } from '../errores';
 
 /**
  * M7 · Inscripciones a una clase.
@@ -41,7 +42,7 @@ export const routerInscripcion = crearRouter({
         .eq('id', input.claseId)
         .maybeSingle();
 
-      if (errorClase) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorClase.message });
+      if (errorClase) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorClase) });
       if (!clase) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa clase.' });
       if (clase.estado === 'cancelada') {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'La clase está suspendida: no admite inscripciones.' });
@@ -55,7 +56,7 @@ export const routerInscripcion = crearRouter({
         .select('id, alumno_id, estado')
         .eq('clase_id', input.claseId);
 
-      if (errorAnotados) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorAnotados.message });
+      if (errorAnotados) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorAnotados) });
 
       const activos = (anotados ?? []).filter((i) => i.estado === 'inscripto');
       const cupo = cupoDeClase(clase.servicio?.modalidad ?? null, clase.cupo, activos.length);
@@ -101,7 +102,7 @@ export const routerInscripcion = crearRouter({
             caballo_id: input.caballoId,
           });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return {
         ok: true as const,
@@ -128,7 +129,7 @@ export const routerInscripcion = crearRouter({
         .maybeSingle();
 
       if (errorInscripcion) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorInscripcion.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorInscripcion) });
       }
       if (!inscripcion) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe esa inscripción.' });
       if (inscripcion.estado === 'cancelado') {
@@ -152,7 +153,7 @@ export const routerInscripcion = crearRouter({
         .update({ estado: 'cancelado', cancelado_en: ahora.toISOString() })
         .eq('id', input.inscripcionId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return { ok: true as const, enTermino, diasMinimos };
     }),

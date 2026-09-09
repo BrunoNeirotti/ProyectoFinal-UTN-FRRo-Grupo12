@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoDeArea } from '../trpc';
+import { mensajeDeError } from '../errores';
 
 /**
  * M2 · Contratos.
@@ -68,7 +69,7 @@ export const routerContrato = crearRouter({
         .select('id')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { contratoId: data.id as string };
     }),
 
@@ -91,7 +92,7 @@ export const routerContrato = crearRouter({
         })
         .eq('id', input.contratoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -103,7 +104,7 @@ export const routerContrato = crearRouter({
         .update({ estado: 'finalizado', fecha_fin: new Date().toISOString().slice(0, 10) })
         .eq('id', input.contratoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -132,7 +133,7 @@ export const routerContrato = crearRouter({
         .lte('fecha_fin', limite.toISOString().slice(0, 10))
         .order('fecha_fin');
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return data ?? [];
     }),
 });

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { cuentaDeCliente, nombreDeCliente } from './cuentaCorriente';
 import { primerDiaDelMes } from '@/lib/cobranza';
+import { mensajeDeError } from '../errores';
 
 /**
  * M4 · Pagos.
@@ -48,7 +49,7 @@ export const routerPago = crearRouter({
         .lte('creado_en', finDeMes.toISOString())
         .order('creado_en', { ascending: false });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       // Sólo para saber si ya corresponde ofrecer "Imputar": la fuente de verdad
       // de qué está imputado sigue siendo `movimiento_cuenta.pago_id`.
@@ -96,7 +97,7 @@ export const routerPago = crearRouter({
       .eq('estado', 'acreditado')
       .order('acreditado_en', { ascending: true });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     const { data: imputados } = await ctx.supabase
       .from('movimiento_cuenta')
@@ -141,7 +142,7 @@ export const routerPago = crearRouter({
         if (error.code === '23505') {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'Ya existe un pago registrado con esa referencia.' });
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       }
       return { pagoId: data.id as string };
     }),
@@ -243,7 +244,7 @@ export const routerPago = crearRouter({
       importe: -Number(pago.importe),
       pago_id: pago.id,
     });
-    if (errorInsert) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorInsert.message });
+    if (errorInsert) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorInsert) });
     return { ok: true as const };
   }),
 
@@ -268,7 +269,7 @@ export const routerPago = crearRouter({
       }
 
       const { error: errorDelete } = await ctx.supabase.from('movimiento_cuenta').delete().eq('id', input.movimientoId);
-      if (errorDelete) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorDelete.message });
+      if (errorDelete) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorDelete) });
       return { ok: true as const };
     }),
 });

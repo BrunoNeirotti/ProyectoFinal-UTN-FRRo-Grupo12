@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { alertasSanitarias, rotacionDeDroga } from '@/lib/bienestar';
 import { antelacionDeAvisoSanitario } from '../parametros-servidor';
+import { mensajeDeError } from '../errores';
 
 /**
  * M9 · Eventos sanitarios.
@@ -50,7 +51,7 @@ export const routerEventoSanitario = crearRouter({
         .eq('caballo_id', input.caballoId)
         .order('fecha', { ascending: false });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const eventos = data ?? [];
 
@@ -80,7 +81,7 @@ export const routerEventoSanitario = crearRouter({
       .select('caballo_id, tipo, estado, proxima_fecha, caballo:caballo_id (id, nombre, estado)')
       .not('proxima_fecha', 'is', null);
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     const filas = data ?? [];
     const hoy = new Date().toISOString().slice(0, 10);
@@ -116,7 +117,7 @@ export const routerEventoSanitario = crearRouter({
       .eq('estado', 'previsto')
       .order('fecha');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -150,7 +151,7 @@ export const routerEventoSanitario = crearRouter({
         .select('id')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { eventoId: data.id as string };
     }),
 
@@ -192,7 +193,7 @@ export const routerEventoSanitario = crearRouter({
 
       const { data, error } = await ctx.supabase.from('evento_sanitario').insert(filas).select('id');
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { programados: data?.length ?? 0 };
     }),
 
@@ -222,7 +223,7 @@ export const routerEventoSanitario = crearRouter({
         .eq('estado', 'previsto') // no se reabre lo ya cerrado
         .select('id');
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       if (!data?.length) {
         throw new TRPCError({
           code: 'CONFLICT',
@@ -254,7 +255,7 @@ export const routerEventoSanitario = crearRouter({
         .eq('estado', 'previsto')
         .select('id');
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       if (!data?.length) {
         throw new TRPCError({
           code: 'CONFLICT',

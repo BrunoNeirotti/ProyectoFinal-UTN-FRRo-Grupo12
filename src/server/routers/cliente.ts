@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { crearRouter, procedimientoDeArea } from '../trpc';
 import { validarDatosFiscales } from '@/lib/clientes';
 import type { Database } from '@/lib/supabase/tipos-generados';
+import { mensajeDeError } from '../errores';
 
 /**
  * M2 · Clientes.
@@ -80,7 +81,7 @@ async function personaIdempotente(
     .select('id')
     .single();
 
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
   return nueva.id as string;
 }
 
@@ -94,7 +95,7 @@ export const routerCliente = crearRouter({
       )
       .order('activo', { ascending: false });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     return (data ?? []).map((c) => ({
       id: c.id,
@@ -123,7 +124,7 @@ export const routerCliente = crearRouter({
       .eq('id', input.clienteId)
       .maybeSingle();
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     if (!cliente) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe ese cliente.' });
 
     const { data: contratos } = await ctx.supabase
@@ -182,7 +183,7 @@ export const routerCliente = crearRouter({
         .select('id')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       // Todo cliente tiene cuenta corriente desde que existe (decisión 1.5):
       // M3 posta los cargos ahí, y sin esto no habría dónde.
@@ -190,7 +191,7 @@ export const routerCliente = crearRouter({
         .from('cuenta_corriente')
         .insert({ cliente_id: data.id });
       if (errorCuenta) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorCuenta.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorCuenta) });
       }
 
       return { clienteId: data.id as string };
@@ -218,7 +219,7 @@ export const routerCliente = crearRouter({
         })
         .eq('id', input.clienteId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -230,7 +231,7 @@ export const routerCliente = crearRouter({
         .update({ activo: false })
         .eq('id', input.clienteId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -247,7 +248,7 @@ export const routerCliente = crearRouter({
         })
         .eq('id', input.clienteId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -259,7 +260,7 @@ export const routerCliente = crearRouter({
         .update({ consentimiento_revocado_en: new Date().toISOString() })
         .eq('id', input.clienteId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

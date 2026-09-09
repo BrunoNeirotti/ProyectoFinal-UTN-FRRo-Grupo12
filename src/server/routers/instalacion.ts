@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
+import { mensajeDeError } from '../errores';
 
 /**
  * M1 · Boxes, piquetes, pistas y picaderos.
@@ -18,7 +19,7 @@ export const routerInstalacion = crearRouter({
       .order('tipo')
       .order('nombre');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -69,7 +70,7 @@ export const routerInstalacion = crearRouter({
         })
         .eq('id', input.instalacionId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

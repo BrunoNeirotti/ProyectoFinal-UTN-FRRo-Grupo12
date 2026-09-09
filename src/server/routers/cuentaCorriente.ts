@@ -7,6 +7,7 @@ import { tarifaVigenteEn } from '@/lib/tarifas';
 import { fechaDeVencimiento, primerDiaDelMes, comienzoDelDia, clasificarEstadoCartera, saldosPendientesFifo, bucketsDeAntiguedad } from '@/lib/cobranza';
 import { calcularMora, diasDeAtraso } from '@/lib/mora';
 import type { Database } from '@/lib/supabase/tipos-generados';
+import { mensajeDeError } from '../errores';
 
 /**
  * M3 · Cuentas corrientes y cobranza.
@@ -41,7 +42,7 @@ export async function cuentaDeCliente(supabase: SupabaseClient<Database>, client
     .insert({ cliente_id: clienteId })
     .select('id')
     .single();
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
   return nueva.id;
 }
 
@@ -67,7 +68,7 @@ export const routerCuentaCorriente = crearRouter({
       ctx.supabase.from('movimiento_cuenta').select('cuenta_corriente_id, tipo, importe, vence_en, creado_en'),
       obtenerParametrosDeCobranza(ctx.supabase),
     ]);
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     const hoy = comienzoDelDia(new Date());
     return (cuentas ?? [])
@@ -117,7 +118,7 @@ export const routerCuentaCorriente = crearRouter({
         .eq('cuenta_corriente_id', cuentaId)
         .order('creado_en', { ascending: false });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const { data: cuenta } = await ctx.supabase
         .from('cuenta_corriente')
@@ -212,7 +213,7 @@ export const routerCuentaCorriente = crearRouter({
         .lte('fecha_inicio', finDeMes.toISOString().slice(0, 10))
         .or(`fecha_fin.is.null,fecha_fin.gte.${periodoIso}`);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const mensuales = (contratos ?? []).filter((c) => c.servicio?.unidad === 'mensual');
 
@@ -266,7 +267,7 @@ export const routerCuentaCorriente = crearRouter({
         // El índice único puede rechazar una carrera entre dos clics; no es un
         // error real, es la protección haciendo su trabajo.
         if (errorInsert && errorInsert.code !== '23505') {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorInsert.message });
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorInsert) });
         }
         if (!errorInsert) generados++;
       }
@@ -292,7 +293,7 @@ export const routerCuentaCorriente = crearRouter({
         importe: input.importe,
         aplicado_por: ctx.sesion.usuarioId,
       });
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -358,7 +359,7 @@ export const routerCuentaCorriente = crearRouter({
         mora_dias: input.dias,
         aplicado_por: ctx.sesion.usuarioId,
       });
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -386,7 +387,7 @@ export const routerCuentaCorriente = crearRouter({
         importe: -Number(original.importe),
         aplicado_por: ctx.sesion.usuarioId,
       });
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -405,7 +406,7 @@ export const routerCuentaCorriente = crearRouter({
       .eq('tipo', 'cargo')
       .order('creado_en', { ascending: false });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     return (data ?? []).filter(
       (m) => m.cuenta?.cliente?.requiere_factura && (!m.comprobante_id || m.comprobante?.estado === 'rechazado'),

@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoAutenticado } from '../trpc';
 import { tarifaVigenteEn } from '@/lib/tarifas';
+import { mensajeDeError } from '../errores';
 
 /**
  * M1 · Catálogo de servicios y sus tarifas.
@@ -19,7 +20,7 @@ export const routerServicio = crearRouter({
       .select('id, nombre, unidad, aplica_a, modalidad, activo, tarifa(importe, vigente_desde)')
       .order('nombre');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     return (data ?? []).map((s) => {
       const vigente = tarifaVigenteEn(
@@ -76,7 +77,7 @@ export const routerServicio = crearRouter({
       });
 
       if (errorTarifa) {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorTarifa.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorTarifa) });
       }
 
       return { servicioId: servicio.id as string };
@@ -105,7 +106,7 @@ export const routerServicio = crearRouter({
         })
         .eq('id', input.servicioId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

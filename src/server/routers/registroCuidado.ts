@@ -11,6 +11,7 @@ import {
   momentoDe,
   tareasDeAlimentacion,
 } from '@/lib/bienestar';
+import { mensajeDeError } from '../errores';
 
 /**
  * M9 · Registro de cuidado.
@@ -98,7 +99,7 @@ async function persistir(
     .upsert(filas, { onConflict: 'id', ignoreDuplicates: true })
     .select('id');
 
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
   const nuevos = new Set((data ?? []).map((f) => f.id as string));
 
@@ -119,7 +120,7 @@ async function persistir(
   if (consumos.length > 0) {
     const { error: errorStock } = await supabase.from('movimiento_stock').insert(consumos);
     if (errorStock) {
-      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorStock.message });
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorStock) });
     }
   }
 
@@ -158,7 +159,7 @@ export const routerRegistroCuidado = crearRouter({
           .lt('ocurrido_en', `${fecha}T23:59:59.999-03:00`),
       ]);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const porCaballo = new Map<string, PlanComputable[]>();
       const insumoDePlan = new Map<string, { nombre: string; unidad: string } | null>();
@@ -235,7 +236,7 @@ export const routerRegistroCuidado = crearRouter({
         .limit(500),
     ]);
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     const caballoDeBox = new Map((alojados ?? []).map((c) => [c.instalacion_id!, c]));
 
@@ -291,7 +292,7 @@ export const routerRegistroCuidado = crearRouter({
       if (input.tipo) consulta = consulta.eq('tipo', input.tipo);
 
       const { data, error } = await consulta;
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return data ?? [];
     }),
 
@@ -344,7 +345,7 @@ export const routerRegistroCuidado = crearRouter({
         .eq('id', input.registroId)
         .select('id');
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       if (!data?.length) {
         throw new TRPCError({
           code: 'FORBIDDEN',
@@ -362,7 +363,7 @@ export const routerRegistroCuidado = crearRouter({
         .delete()
         .eq('id', input.registroId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { cambiarRolUsuario, desactivarUsuario, invitarUsuario } from './acciones-usuarios';
 import { BotonEnviar } from '../botones';
+import { Modal } from '../modal';
 
 export interface UsuarioVisible {
   id: string;
@@ -75,13 +76,14 @@ function FilaUsuario({ usuario: u }: { usuario: UsuarioVisible }) {
       <td className="text-xs">{u.ultimoAccesoEn ? new Date(u.ultimoAccesoEn).toLocaleString('es-AR') : 'Nunca'}</td>
       <td>
         <span className={`badge ${u.activo ? 'badge-ok' : ''}`}>{u.activo ? 'Activo' : 'Desactivado'}</span>
-        <details className="mt-1.5">
-          <summary className="btn btn-gho btn-sm">Editar</summary>
-          <div className="card panel-en-celda space-y-3 p-3">
-            <FormularioRol usuario={u} />
-            {u.activo && <FormularioDesactivar usuarioId={u.id} />}
-          </div>
-        </details>
+        <div className="mt-1.5">
+          <Modal etiqueta="Editar" titulo={`${u.persona?.apellido ?? ''}, ${u.persona?.nombre ?? ''}`}>
+            <div className="space-y-3">
+              <FormularioRol usuario={u} />
+              {u.activo && <FormularioDesactivar usuarioId={u.id} />}
+            </div>
+          </Modal>
+        </div>
       </td>
     </tr>
   );

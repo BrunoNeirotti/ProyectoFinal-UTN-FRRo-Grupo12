@@ -16,6 +16,7 @@ import {
   type TipoDocumento,
 } from '@/lib/arca';
 import type { Database } from '@/lib/supabase/tipos-generados';
+import { mensajeDeError } from '../errores';
 
 /**
  * M6 · Facturación electrónica.
@@ -41,7 +42,7 @@ async function identidadFiscalVigenteOFallar(supabase: SupabaseCtx) {
   const { data, error } = await supabase
     .from('identidad_fiscal')
     .select('id, razon_social, cuit, condicion_iva, vigente_desde, domicilio_fiscal, ingresos_brutos, inicio_actividades');
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
   const vigente = identidadFiscalVigenteEn(
     (data ?? []).map((i) => ({
@@ -212,7 +213,7 @@ async function emitirParaCliente(
       'id',
       cargos.map((c) => c.id),
     );
-  if (errorVincular) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorVincular.message });
+  if (errorVincular) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorVincular) });
 
   return {
     comprobanteId: comprobante.id as string,
@@ -232,7 +233,7 @@ export const routerComprobante = crearRouter({
         .select('id, concepto, importe, periodo, vence_en, comprobante_id, comprobante:comprobante_id (estado), cuenta:cuenta_corriente_id (cliente:cliente_id (id))')
         .eq('tipo', 'cargo')
         .order('periodo', { ascending: true });
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return (data ?? []).filter((m) => m.cuenta?.cliente?.id === input.clienteId && sinComprobanteAutorizado(m));
     }),
@@ -248,7 +249,7 @@ export const routerComprobante = crearRouter({
         .select(SELECT_CARGO_PARA_FACTURAR)
         .in('id', input.movimientoIds)
         .eq('tipo', 'cargo');
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       if (!cargos || cargos.length !== input.movimientoIds.length || !cargos.every(sinComprobanteAutorizado)) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Alguno de los cargos ya tiene comprobante autorizado o no existe.' });
       }
@@ -270,7 +271,7 @@ export const routerComprobante = crearRouter({
         .from('movimiento_cuenta')
         .select(SELECT_CARGO_PARA_FACTURAR)
         .eq('tipo', 'cargo');
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const pendientes = (data ?? []).filter(
         (m) => m.cuenta?.cliente?.requiere_factura && sinComprobanteAutorizado(m),
@@ -312,7 +313,7 @@ export const routerComprobante = crearRouter({
         .from('movimiento_cuenta')
         .select(SELECT_CARGO_PARA_FACTURAR)
         .eq('comprobante_id', input.comprobanteId);
-      if (errorCargos) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: errorCargos.message });
+      if (errorCargos) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(errorCargos) });
       if (!cargos || cargos.length === 0) {
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'El comprobante rechazado no tiene cargos asociados.' });
       }
@@ -332,7 +333,7 @@ export const routerComprobante = crearRouter({
         .gte('fecha_emision', input.desde)
         .lte('fecha_emision', input.hasta)
         .order('fecha_emision', { ascending: false });
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       return (data ?? []).map((c) => ({ ...c, nombreCliente: c.cliente ? nombreDeCliente(c.cliente) : '—' }));
     }),
@@ -383,7 +384,7 @@ export const routerComprobante = crearRouter({
         .select('tipo, estado, total')
         .gte('fecha_emision', input.desde)
         .lte('fecha_emision', input.hasta);
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const porEstado: Record<string, number> = {};
       let totalAutorizado = 0;

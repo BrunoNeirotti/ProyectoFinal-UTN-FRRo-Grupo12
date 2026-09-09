@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { crearRouter, procedimientoDeArea } from '../trpc';
 import { esMenorDeEdad } from '@/lib/personas';
 import type { Database } from '@/lib/supabase/tipos-generados';
+import { mensajeDeError } from '../errores';
 
 /**
  * M2 · Alumnos.
@@ -54,7 +55,7 @@ async function personaIdempotente(
     .select('id')
     .single();
 
-  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+  if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
   return nueva.id as string;
 }
 
@@ -92,7 +93,7 @@ export const routerAlumno = crearRouter({
       )
       .order('activo', { ascending: false });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -164,7 +165,7 @@ export const routerAlumno = crearRouter({
         })
         .eq('id', input.alumnoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -176,7 +177,7 @@ export const routerAlumno = crearRouter({
         .update({ activo: false })
         .eq('id', input.alumnoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

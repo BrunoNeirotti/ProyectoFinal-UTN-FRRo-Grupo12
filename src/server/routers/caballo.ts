@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
+import { mensajeDeError } from '../errores';
 
 /**
  * M2 · Caballos.
@@ -29,7 +30,7 @@ export const routerCaballo = crearRouter({
       )
       .order('nombre');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -46,7 +47,7 @@ export const routerCaballo = crearRouter({
         .eq('id', input.caballoId)
         .maybeSingle();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       if (!caballo) throw new TRPCError({ code: 'NOT_FOUND', message: 'No existe ese caballo.' });
 
       const { data: contratos } = await ctx.supabase
@@ -89,7 +90,7 @@ export const routerCaballo = crearRouter({
         .select('id')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { caballoId: data.id as string };
     }),
 
@@ -122,7 +123,7 @@ export const routerCaballo = crearRouter({
         })
         .eq('id', input.caballoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 
@@ -134,7 +135,7 @@ export const routerCaballo = crearRouter({
         .update({ estado: 'retirado' })
         .eq('id', input.caballoId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

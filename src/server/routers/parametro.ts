@@ -11,6 +11,7 @@ import {
   validar,
   validarConjunto,
 } from '@/lib/parametros';
+import { mensajeDeError } from '../errores';
 
 const claveValida = z.enum(CLAVES);
 
@@ -30,7 +31,7 @@ export const routerParametro = crearRouter({
       .select('clave, valor, tipo, etiqueta, ayuda, actualizado_en')
       .order('clave');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     return (data ?? []).map((p) => ({
       clave: p.clave as Clave,
@@ -106,7 +107,7 @@ export const routerParametro = crearRouter({
           .update({ valor: aTexto(valor), actualizado_por: ctx.sesion.usuarioId })
           .eq('clave', clave);
 
-        if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+        if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       }
 
       return { guardados: validados.size };

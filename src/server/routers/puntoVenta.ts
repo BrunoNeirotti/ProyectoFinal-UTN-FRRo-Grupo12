@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
+import { mensajeDeError } from '../errores';
 
 /**
  * M6 · Puntos de venta (RN-03).
@@ -20,7 +21,7 @@ export const routerPuntoVenta = crearRouter({
       .select('id, numero, descripcion, modo, activo')
       .order('numero', { ascending: true });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -52,7 +53,7 @@ export const routerPuntoVenta = crearRouter({
   /** Baja lógica: un punto de venta no se borra (la numeración de ARCA lo recuerda igual). */
   desactivar: procedimientoAdmin.input(z.object({ id: z.uuid() })).mutation(async ({ ctx, input }) => {
     const { error } = await ctx.supabase.from('punto_venta').update({ activo: false }).eq('id', input.id);
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return { ok: true as const };
   }),
 });

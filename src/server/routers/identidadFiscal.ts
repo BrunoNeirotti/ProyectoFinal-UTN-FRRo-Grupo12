@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { identidadFiscalVigenteEn } from '@/lib/arca';
+import { mensajeDeError } from '../errores';
 
 /**
  * M6 · Identidad fiscal del emisor (RN-01, RN-04).
@@ -22,7 +23,7 @@ export const routerIdentidadFiscal = crearRouter({
       .select('id, razon_social, cuit, condicion_iva, vigente_desde, domicilio_fiscal, ingresos_brutos, inicio_actividades')
       .order('vigente_desde', { ascending: false });
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
     return data ?? [];
   }),
 
@@ -32,7 +33,7 @@ export const routerIdentidadFiscal = crearRouter({
       .from('identidad_fiscal')
       .select('id, razon_social, cuit, condicion_iva, vigente_desde, domicilio_fiscal, ingresos_brutos, inicio_actividades');
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
     return identidadFiscalVigenteEn(
       (data ?? []).map((i) => ({
@@ -72,7 +73,7 @@ export const routerIdentidadFiscal = crearRouter({
         inicio_actividades: input.inicioActividades,
       });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

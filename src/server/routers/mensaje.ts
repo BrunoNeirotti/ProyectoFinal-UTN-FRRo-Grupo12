@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { crearRouter, procedimientoAdmin } from '../trpc';
 import { aplicarPlantilla } from '@/lib/mensajeria';
+import { mensajeDeError } from '../errores';
 
 /**
  * M5 · Envío y trazabilidad de mensajes.
@@ -33,7 +34,7 @@ export const routerMensaje = crearRouter({
         .eq('cliente_id', input.clienteId)
         .order('creado_en', { ascending: false });
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return data ?? [];
     }),
 
@@ -49,7 +50,7 @@ export const routerMensaje = crearRouter({
         .select('canal, estado')
         .gte('creado_en', desde.toISOString());
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
 
       const conteo: Record<string, number> = {};
       for (const m of data ?? []) {
@@ -142,7 +143,7 @@ export const routerMensaje = crearRouter({
         .select('id')
         .single();
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { mensajeId: data.id as string };
     }),
 
@@ -165,7 +166,7 @@ export const routerMensaje = crearRouter({
         })
         .eq('id', input.mensajeId);
 
-      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+      if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: mensajeDeError(error) });
       return { ok: true as const };
     }),
 });

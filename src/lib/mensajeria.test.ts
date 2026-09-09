@@ -5,6 +5,7 @@ import {
   proximoMomentoHabil,
   variablesDe,
   verificarLimitesWhatsapp,
+  rotuloDeVariable,
 } from './mensajeria';
 
 describe('dentroDeLaVentana', () => {
@@ -103,5 +104,17 @@ describe('verificarLimitesWhatsapp', () => {
     const pie = 'Soy Sofía, de la administración del Haras Las Lechuzas, gracias'; // 63
     const problemas = verificarLimitesWhatsapp('cuerpo corto', pie);
     expect(problemas).toEqual([{ campo: 'pie', motivo: expect.stringContaining('63') }]);
+  });
+});
+
+describe('rotuloDeVariable', () => {
+  it('usa el nombre declarado cuando lo hay', () => {
+    expect(rotuloDeVariable('tasa_mora')).toBe('Tasa de mora');
+    expect(rotuloDeVariable('periodo')).toBe('Período');
+  });
+
+  it('arma uno legible para las que no están declaradas', () => {
+    expect(rotuloDeVariable('nombre_del_haras')).toBe('Nombre del haras');
+    expect(rotuloDeVariable('saldo')).toBe('Saldo');
   });
 });

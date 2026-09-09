@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { crearInstalacion, modificarInstalacion } from './acciones-instalaciones';
 import { BotonEnviar } from '../botones';
+import { Modal } from '../modal';
 
 export interface InstalacionVisible {
   id: string;
@@ -80,10 +81,11 @@ function FilaInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }
       <td className="num">{i.capacidad}</td>
       <td>
         <span className={`badge ${i.activo ? 'badge-ok' : ''}`}>{i.activo ? 'Activa' : 'Inactiva'}</span>
-        <details className="mt-1.5">
-          <summary className="btn btn-gho btn-sm">Editar</summary>
-          <FormularioEditarInstalacion instalacion={i} />
-        </details>
+        <div className="mt-1.5">
+          <Modal etiqueta="Editar" titulo={i.nombre}>
+            <FormularioEditarInstalacion instalacion={i} />
+          </Modal>
+        </div>
       </td>
     </tr>
   );
@@ -92,7 +94,7 @@ function FilaInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }
 function FormularioEditarInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }) {
   const [resultado, enviar] = useActionState(modificarInstalacion, inicial);
   return (
-    <form action={enviar} className="card panel-en-celda space-y-3 p-3">
+    <form action={enviar} className="space-y-3">
       <input type="hidden" name="instalacionId" value={i.id} />
       <label className="block">
         <span className="label">Nombre</span>
