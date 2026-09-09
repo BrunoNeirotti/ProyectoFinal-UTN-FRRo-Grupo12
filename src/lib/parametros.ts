@@ -25,6 +25,7 @@ export const CLAVES = [
   'mensajes_ventana_hasta',
   'riesgo_asistencia_puntos',
   'dias_aviso_vencimiento_sanitario',
+  'inventario_dias_cobertura',
 ] as const;
 
 export type Clave = (typeof CLAVES)[number];
@@ -80,6 +81,11 @@ export const CATALOGO: Record<Clave, Declaracion> = {
     esquema: z.int().min(1).max(180),
     admiteVacio: false,
   },
+
+  // M10. Para cuántos días compra una orden sugerida. El piso de 7 evita la
+  // orden que llega y ya vuelve a hacer falta; el techo de 180 evita inmovilizar
+  // en forraje una compra que después se apolilla en el depósito.
+  inventario_dias_cobertura: { tipo: 'entero', esquema: z.int().min(7).max(180), admiteVacio: false },
 };
 
 export type ValorParametro = number | boolean | string | null;

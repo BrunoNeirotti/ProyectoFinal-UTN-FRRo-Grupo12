@@ -22,6 +22,8 @@ import { routerPlanAlimentario } from './planAlimentario';
 import { routerRegistroCuidado } from './registroCuidado';
 import { routerEventoSanitario } from './eventoSanitario';
 import { routerInsumo } from './insumo';
+import { routerProveedor } from './proveedor';
+import { routerOrdenCompra } from './ordenCompra';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -99,8 +101,10 @@ export const routerApp = crearRouter({
   registroCuidado: routerRegistroCuidado,
   eventoSanitario: routerEventoSanitario,
 
-  // --- M10, adelantado sólo en su lectura: M9 lo necesita para imputar consumo ---
+  // --- M10 ---
   insumo: routerInsumo,
+  proveedor: routerProveedor,
+  ordenCompra: routerOrdenCompra,
 });
 
 export type RouterApp = typeof routerApp;

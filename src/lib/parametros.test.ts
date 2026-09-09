@@ -147,8 +147,8 @@ describe('proponeIntereses', () => {
 });
 
 describe('cobertura del catálogo', () => {
-  it('declara las once claves y ninguna de más', () => {
-    expect(CLAVES).toHaveLength(11);
+  it('declara las doce claves y ninguna de más', () => {
+    expect(CLAVES).toHaveLength(12);
     for (const clave of CLAVES) {
       expect(CATALOGO[clave as Clave]).toBeDefined();
     }

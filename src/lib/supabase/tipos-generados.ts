@@ -1320,28 +1320,34 @@ export type Database = {
       orden_compra: {
         Row: {
           actualizado_en: string
+          anio: number
           creado_en: string
           estado: Database["public"]["Enums"]["estado_orden_compra"]
           fecha_emision: string
           id: string
+          numero: number
           proveedor_id: string
           total: number
         }
         Insert: {
           actualizado_en?: string
+          anio?: number
           creado_en?: string
           estado?: Database["public"]["Enums"]["estado_orden_compra"]
           fecha_emision?: string
           id?: string
+          numero?: number
           proveedor_id: string
           total?: number
         }
         Update: {
           actualizado_en?: string
+          anio?: number
           creado_en?: string
           estado?: Database["public"]["Enums"]["estado_orden_compra"]
           fecha_emision?: string
           id?: string
+          numero?: number
           proveedor_id?: string
           total?: number
         }

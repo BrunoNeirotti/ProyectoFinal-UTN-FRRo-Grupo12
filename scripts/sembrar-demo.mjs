@@ -1,7 +1,7 @@
 /**
  * RIENDA · Datos de demostración del Haras Las Lechuzas.
  *
- * Arma un establecimiento completo y coherente para poder recorrer M1 a M8 con
+ * Arma un establecimiento completo y coherente para poder recorrer M1 a M10 con
  * algo real adelante: instalaciones, personal, clientes, alumnos, caballos,
  * contratos, tarifas versionadas, cuentas corrientes con la cartera en los tres
  * estados del semáforo, tres meses y medio de clases dictadas con su asistencia
@@ -74,7 +74,10 @@ const PERSONAS_QUE_QUEDAN = [
 for (const tabla of [
   'asistencia', 'inscripcion', 'clase', 'inscripcion_evento', 'evento', 'mensaje',
   'movimiento_cuenta', 'pago', 'comprobante', 'estado_cuenta', 'cuenta_corriente', 'contrato',
-  'movimiento_stock', 'detalle_orden_compra', 'orden_compra', 'proveedor',
+  // `detalle_orden_compra` NO se borra por su cuenta: M10 no deja sacarle un
+  // renglón a una orden que ya salió, y con razón. Se va por la cascada al
+  // borrar la orden, que es el único caso en que quitarlo tiene sentido.
+  'movimiento_stock', 'orden_compra', 'proveedor',
   // `plan_alimentario` va antes que `insumo`: el plan nombra de qué existencia
   // sale la ración, así que borrar el insumo primero choca con esa clave ajena.
   'evento_sanitario', 'registro_cuidado', 'plan_alimentario', 'insumo',
@@ -387,9 +390,10 @@ const elMovimiento = (d) => ({ registro_cuidado_id: null, orden_compra_id: null,
 
 // El stock es derivado: se carga con movimientos, no escribiendo `stock_actual`.
 await insertar('movimiento_stock', [
-  elMovimiento({ insumo_id: ins['Balanceado equino'], tipo: 'ingreso', cantidad: 1000, motivo: 'Compra mensual', ocurrido_en: enFunes('2026-08-05', '09:00') }),
+  // El balanceado y la avena de agosto no entran acá: los trae la orden de
+  // compra 2026-001, más abajo, con su recepción. Un ingreso suelto que en
+  // realidad vino de una orden esconde justamente el vínculo que M10 agrega.
   elMovimiento({ insumo_id: ins['Balanceado equino'], tipo: 'egreso', cantidad: 820, motivo: 'Consumo de agosto', ocurrido_en: enFunes('2026-08-31', '18:00') }),
-  elMovimiento({ insumo_id: ins['Avena'], tipo: 'ingreso', cantidad: 600, motivo: 'Compra mensual', ocurrido_en: enFunes('2026-08-05', '09:00') }),
   elMovimiento({ insumo_id: ins['Avena'], tipo: 'egreso', cantidad: 480, motivo: 'Consumo de agosto', ocurrido_en: enFunes('2026-08-31', '18:00') }),
   // La viruta queda por debajo del mínimo a propósito: es la alerta de reposición.
   elMovimiento({ insumo_id: ins['Viruta de pino'], tipo: 'ingreso', cantidad: 120, motivo: 'Compra mensual', ocurrido_en: enFunes('2026-08-05', '09:00') }),
@@ -406,6 +410,90 @@ await insertar('movimiento_stock', [
   elMovimiento({ insumo_id: ins['Balanceado equino'], tipo: 'ingreso', cantidad: 600, motivo: 'Compra de septiembre', ocurrido_en: enFunes('2026-09-01', '09:00') }),
   elMovimiento({ insumo_id: ins['Avena'], tipo: 'ingreso', cantidad: 400, motivo: 'Compra de septiembre', ocurrido_en: enFunes('2026-09-01', '09:00') }),
 ]);
+
+// ---------------------------------------------------------------------------
+// Compras. Tres órdenes en tres estados distintos, que son los tres que se
+// miran: una recibida y cerrada, una que llegó a medias -el caso que la
+// decisión 1.11 agregó al modelo y que sin datos no se ve nunca-, y un borrador
+// sin enviar. Los ingresos de las dos primeras entran como movimientos con su
+// `orden_compra_id`, así que la existencia que muestran los insumos incluye lo
+// que efectivamente llegó y la ficha de cada uno explica de dónde salió.
+// ---------------------------------------------------------------------------
+
+// Las órdenes se arman como las arma el sistema y no de un saque: nacen en
+// borrador, se les cargan los renglones, salen, y recién ahí se informa lo
+// recibido. Los disparadores de M10 no admiten otro orden -un renglón no nace
+// recibido, una orden que salió no admite renglones nuevos-, así que sembrar
+// esto es además la prueba de que esos invariantes están puestos.
+const emitir = async (proveedorId, fechaEmision, renglones) => {
+  const orden = await uno('orden_compra', { proveedor_id: proveedorId, fecha_emision: fechaEmision });
+
+  await insertar(
+    'detalle_orden_compra',
+    renglones.map((r) => ({
+      orden_compra_id: orden.id,
+      insumo_id: r.insumoId,
+      cantidad: r.cantidad,
+      cantidad_recibida: null,
+      precio_unitario: r.precio,
+    })),
+  );
+
+  revisar('enviar orden', await db.from('orden_compra').update({ estado: 'enviada' }).eq('id', orden.id));
+  return orden;
+};
+
+/** Informa una entrega igual que la pantalla: acumula y asienta el ingreso. */
+const recibir = async (ordenId, insumoId, cantidad, cuando) => {
+  const detalle = revisar(
+    'detalle a recibir',
+    await db.from('detalle_orden_compra').select('id, cantidad_recibida').eq('orden_compra_id', ordenId).eq('insumo_id', insumoId).single(),
+  );
+
+  revisar(
+    'recibir',
+    await db.from('detalle_orden_compra').update({ cantidad_recibida: (detalle.cantidad_recibida ?? 0) + cantidad }).eq('id', detalle.id),
+  );
+
+  await insertar('movimiento_stock', [
+    elMovimiento({ insumo_id: insumoId, tipo: 'ingreso', cantidad, motivo: 'Recepción de orden de compra', orden_compra_id: ordenId, ocurrido_en: cuando }),
+  ]);
+};
+
+// Una orden cerrada: llegó todo y el disparador la dejó en `recibida`.
+const ordenCerrada = await emitir(proveedores[0].id, '2026-08-04', [
+  { insumoId: ins['Balanceado equino'], cantidad: 1000, precio: 980 },
+  { insumoId: ins['Avena'], cantidad: 600, precio: 720 },
+]);
+await recibir(ordenCerrada.id, ins['Balanceado equino'], 1000, enFunes('2026-08-05', '09:00'));
+await recibir(ordenCerrada.id, ins['Avena'], 600, enFunes('2026-08-05', '09:00'));
+
+// Una orden a medias: llegó la alfalfa y no la viruta. Es el caso que la
+// decisión 1.11 agregó al modelo y que sin datos no se ve nunca; es además el
+// motivo por el que la viruta queda bajo mínimo y en rojo en la pantalla.
+const ordenParcial = await emitir(proveedores[0].id, '2026-09-02', [
+  { insumoId: ins['Fardo de alfalfa'], cantidad: 100, precio: 4200 },
+  { insumoId: ins['Viruta de pino'], cantidad: 150, precio: 3100 },
+]);
+await recibir(ordenParcial.id, ins['Fardo de alfalfa'], 100, enFunes('2026-09-03', '10:00'));
+
+// Un borrador sin enviar, para que se vea el estado en que nace una orden.
+const ordenBorrador = await uno('orden_compra', { proveedor_id: proveedores[1].id, fecha_emision: HOY });
+await insertar('detalle_orden_compra', [
+  { orden_compra_id: ordenBorrador.id, insumo_id: ins['Ivermectina 1 %'], cantidad: 60, cantidad_recibida: null, precio_unitario: 2400 },
+]);
+
+// Un conteo físico que dio de menos: el ajuste con signo negativo que hasta M10
+// el modelo no podía representar, y el que explica por qué la viruta no coincide
+// con la cuenta de ingresos y egresos.
+await insertar('movimiento_stock', [
+  elMovimiento({ insumo_id: ins['Viruta de pino'], tipo: 'ajuste', cantidad: -6, motivo: 'Rotura de bolsas en el depósito', ocurrido_en: enFunes('2026-09-04', '17:00') }),
+]);
+
+console.log(
+  `compras: ${proveedores.length} proveedores y 3 órdenes ` +
+    `(${ordenCerrada.numero} recibida, ${ordenParcial.numero} parcial, ${ordenBorrador.numero} en borrador)`,
+);
 
 // ---------------------------------------------------------------------------
 // El trabajo del peón de los últimos días.
@@ -520,18 +608,13 @@ cuidados.push(
 await insertar('registro_cuidado', cuidados);
 await insertar('movimiento_stock', consumos, 'movimiento_stock (consumo del cuidado)');
 
-const orden = await uno('orden_compra', {
-  proveedor_id: proveedores[0].id,
-  fecha_emision: '2026-09-02',
-  estado: 'enviada',
-});
-await insertar('detalle_orden_compra', [
-  { orden_compra_id: orden.id, insumo_id: ins['Viruta de pino'], cantidad: 120, precio_unitario: 9800, cantidad_recibida: null },
-  { orden_compra_id: orden.id, insumo_id: ins['Balanceado equino'], cantidad: 1000, precio_unitario: 1450, cantidad_recibida: null },
-]);
+// La orden de compra que M9 sembraba acá se fue al bloque de compras, que las
+// arma recorriendo el ciclo completo. Ésta nacía directamente en `enviada` con
+// sus renglones cargados después, y M10 ya no lo permite: una orden que salió no
+// admite renglones nuevos. El dato no se pierde, se arma bien.
 console.log(
-  `bienestar animal: planes de ${caballos.length} caballos, sanidad, ${insumos.length} insumos, ` +
-    `${cuidados.length} registros de cuidado (uno sobre box desocupado) y una orden de compra`,
+  `bienestar animal: planes de ${caballos.length} caballos, sanidad, ${insumos.length} insumos ` +
+    `y ${cuidados.length} registros de cuidado (uno sobre box desocupado)`,
 );
 
 // -----------------------------------------------------------------------------

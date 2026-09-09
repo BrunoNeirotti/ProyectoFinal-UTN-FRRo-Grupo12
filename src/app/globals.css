@@ -302,6 +302,19 @@ input[type="checkbox"], input[type="radio"] {
 .tbl th[aria-sort="ascending"]::after { content: " ↑"; color: var(--accent-ink); }
 .tbl th[aria-sort="descending"]::after { content: " ↓"; color: var(--accent-ink); }
 
+/* --- Barra de nivel ---
+   Portada de `fase2/inventario.html`, donde estaba declarada local a esa
+   pantalla con la nota de promoverla si aparecía en otra. Apareció: la usan la
+   tabla de insumos y la ficha de cada uno, así que vive acá y no duplicada.
+   La marca (`b`) es lo que la convierte en una decisión y no en un adorno:
+   señala dónde queda el mínimo, y por debajo de ella hay que comprar. */
+.nivel {
+  height: .5rem; border-radius: 999px;
+  background: var(--hover-veil); overflow: hidden; position: relative;
+}
+.nivel > i { display: block; height: 100%; border-radius: 999px; }
+.nivel > b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text-muted); }
+
 /* --- Navegación --- */
 .sidebar {
   width: 14rem; flex-shrink: 0;

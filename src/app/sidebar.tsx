@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, FirstAidKit, SunHorizon, type Icon } from '@phosphor-icons/react';
+import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, FirstAidKit, SunHorizon, Package, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
 import { Logotipo } from './marca';
 
@@ -47,6 +47,10 @@ const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
       { area: 'bienestar', href: '/campo/hoy', texto: 'Mi jornada', icono: SunHorizon },
       { area: 'bienestar', href: '/caballos', texto: 'Caballos', icono: Horse },
       { area: 'bienestar', href: '/sanidad', texto: 'Sanidad', icono: FirstAidKit },
+      // Inventario es de Bienestar por el sitemap -es lo que se le da de comer y
+      // con qué se lo cuida-, pero escribe sólo el dueño: la lectura la habilita
+      // el área y la escritura, las políticas `insumo_escritura` y `orden_admin`.
+      { area: 'bienestar', href: '/inventario', texto: 'Inventario', icono: Package },
     ],
   },
 ];

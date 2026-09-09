@@ -101,3 +101,24 @@ export async function antelacionDeAvisoSanitario(
 
   return data ? ((convertir(data.valor, data.tipo) as number) ?? 30) : 30;
 }
+
+/**
+ * Para cuántos días de existencia compra una orden sugerida
+ * (`inventario_dias_cobertura`).
+ *
+ * Mismo criterio que los anteriores: el respaldo es el que sembró la migración
+ * de M10. Lo leen la pantalla de Inventario, que muestra la propuesta, y el
+ * armado de la orden sugerida, que la escribe; si difirieran, el borrador
+ * traería una cantidad distinta de la que el dueño acaba de ver.
+ */
+export async function diasDeCoberturaDeCompra(
+  supabase: SupabaseClient<Database>,
+): Promise<number> {
+  const { data } = await supabase
+    .from('parametro')
+    .select('valor, tipo')
+    .eq('clave', 'inventario_dias_cobertura')
+    .maybeSingle();
+
+  return data ? ((convertir(data.valor, data.tipo) as number) ?? 30) : 30;
+}
