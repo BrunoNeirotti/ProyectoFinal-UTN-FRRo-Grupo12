@@ -60,7 +60,11 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
   const insumos = await api.insumo.listar();
 
   const esBorrador = orden.estado === 'borrador';
-  const seRecibe = orden.estado === 'enviada' || orden.estado === 'parcialmente_recibida';
+  // También en `recibida`: el router lo permite y la pantalla lo dice -«una
+  // entrega de más se puede seguir informando igual»-. Esconder el formulario
+  // apenas se completa la orden convertía esa frase en mentira, y dejaba sin
+  // registrar la mercadería de sobra que el proveedor efectivamente mandó.
+  const seRecibe = orden.estado !== 'borrador' && orden.estado !== 'anulada';
   const pendientes = detalle.filter(
     (d) => pendienteDeRecibir({ cantidad: d.cantidad, cantidadRecibida: d.cantidad_recibida }) > 0,
   );
