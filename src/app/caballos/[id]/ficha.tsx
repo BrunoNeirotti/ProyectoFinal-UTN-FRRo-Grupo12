@@ -2,13 +2,14 @@
 
 import { useActionState } from 'react';
 import Link from 'next/link';
-import { PencilSimple, Horse } from '@phosphor-icons/react';
+import { Horse } from '@phosphor-icons/react';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { RouterApp } from '@/server/routers/_app';
 import { darDeBajaCaballo, modificarCaballo } from '../acciones';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { edadEn } from '@/lib/personas';
 import { BotonEnviar } from '../../botones';
+import { Modal } from '../../modal';
 
 type Salidas = inferRouterOutputs<RouterApp>;
 type Ficha = Salidas['caballo']['ficha'];
@@ -49,13 +50,9 @@ export function FichaDeCaballo({
               <span className={`badge mt-1.5 ${ESTADO_BADGE[caballo.estado]}`}>{ESTADOS[caballo.estado]}</span>
             </div>
           </div>
-          <details>
-            <summary className="btn btn-sec btn-sm cursor-pointer">
-              <PencilSimple size={14} aria-hidden="true" />
-              Editar
-            </summary>
+          <Modal etiqueta="Editar" titulo={caballo.nombre} variante="sec" tamano="sm">
             <FormularioEditar caballo={caballo} propietarios={propietarios} instalaciones={instalaciones} />
-          </details>
+          </Modal>
         </div>
 
         <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
@@ -114,10 +111,9 @@ export function FichaDeCaballo({
       </section>
 
       {caballo.estado !== 'retirado' && (
-        <details>
-          <summary className="cursor-pointer text-sm text-bad">Dar de baja</summary>
+        <Modal etiqueta="Dar de baja" titulo={`Dar de baja a ${caballo.nombre}`}>
           <FormularioBaja caballoId={caballo.id} />
-        </details>
+        </Modal>
       )}
     </div>
   );

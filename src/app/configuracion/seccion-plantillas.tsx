@@ -5,6 +5,7 @@ import { WhatsappLogo, Envelope } from '@phosphor-icons/react';
 import { crearPlantilla, modificarPlantilla, registrarRevisionMeta } from './acciones-plantillas';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { BotonEnviar } from '../botones';
+import { Modal } from '../modal';
 
 export interface PlantillaVisible {
   id: string;
@@ -106,12 +107,12 @@ function FilaPlantilla({ plantilla: p }: { plantilla: PlantillaVisible }) {
         <span className={`badge ${ESTADO_BADGE[p.estadoAprobacion]}`}>{ESTADO_TEXTO[p.estadoAprobacion]}</span>
       </td>
       <td>
-        <details>
-          <summary className="cursor-pointer">
-            <span className={`badge ${p.activa ? 'badge-ok' : ''}`}>{p.activa ? 'Sí' : 'No'}</span>
-          </summary>
-          <FormularioEditarPlantilla plantilla={p} />
-        </details>
+        <span className={`badge ${p.activa ? 'badge-ok' : ''}`}>{p.activa ? 'Sí' : 'No'}</span>
+        <div className="mt-1.5">
+          <Modal etiqueta="Editar" titulo={p.codigo} tamano="sm">
+            <FormularioEditarPlantilla plantilla={p} />
+          </Modal>
+        </div>
       </td>
     </tr>
   );

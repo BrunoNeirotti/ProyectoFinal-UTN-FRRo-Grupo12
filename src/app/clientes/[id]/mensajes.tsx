@@ -8,6 +8,7 @@ import { enviarMensaje } from '../acciones-mensaje';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { rotuloDeVariable, variablesDe } from '@/lib/mensajeria';
 import { BotonEnviar } from '../../botones';
+import { Modal } from '../../modal';
 
 type Salidas = inferRouterOutputs<RouterApp>;
 type Mensaje = Salidas['mensaje']['historialDeCliente'][number];
@@ -97,10 +98,11 @@ export function SeccionMensajes({
         </table>
       </div>
 
-      <details className="mt-4">
-        <summary className="cursor-pointer text-sm text-accent-ink">Enviar un mensaje</summary>
-        <FormularioEnvio clienteId={clienteId} plantillas={enviables} />
-      </details>
+      <div className="mt-4">
+        <Modal etiqueta="Enviar un mensaje" titulo="Enviar un mensaje" variante="sec">
+          <FormularioEnvio clienteId={clienteId} plantillas={enviables} />
+        </Modal>
+      </div>
     </section>
   );
 }

@@ -118,10 +118,9 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
         </section>
       </div>
 
-      <details>
-        <summary className="cursor-pointer text-sm text-bad">Desactivar cliente</summary>
+      <Modal etiqueta="Desactivar cliente" titulo={`Desactivar a ${nombreCliente(cliente)}`}>
         <FormularioDesactivar clienteId={cliente.id} />
-      </details>
+      </Modal>
     </div>
   );
 }
@@ -286,15 +285,16 @@ function SeccionContratos({
         </table>
       </div>
 
-      <details className="mt-4">
-        <summary className="cursor-pointer text-sm text-accent-ink">Nuevo contrato</summary>
-        <FormularioNuevoContrato
-          clienteId={clienteId}
-          servicios={servicios}
-          caballos={caballos}
-          alumnos={alumnos}
-        />
-      </details>
+      <div className="mt-4">
+        <Modal etiqueta="Nuevo contrato" titulo="Nuevo contrato" variante="sec">
+          <FormularioNuevoContrato
+            clienteId={clienteId}
+            servicios={servicios}
+            caballos={caballos}
+            alumnos={alumnos}
+          />
+        </Modal>
+      </div>
     </section>
   );
 }
