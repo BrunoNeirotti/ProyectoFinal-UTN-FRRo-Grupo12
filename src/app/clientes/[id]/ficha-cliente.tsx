@@ -9,6 +9,7 @@ import { desactivarCliente, modificarCliente, registrarConsentimiento, revocarCo
 import { crearContrato, darDeBajaContrato, modificarContrato } from '../acciones-contrato';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { BotonEnviar } from '../../botones';
+import { Modal } from '../../modal';
 
 type Salidas = inferRouterOutputs<RouterApp>;
 type Ficha = Salidas['cliente']['ficha'];
@@ -41,13 +42,9 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
             <Link href={`/cobranza/${cliente.id}`} className="btn btn-sec btn-sm">
               Cuenta corriente
             </Link>
-            <details>
-              <summary className="btn btn-sec btn-sm cursor-pointer">
-                <PencilSimple size={14} aria-hidden="true" />
-                Editar
-              </summary>
+            <Modal etiqueta="Editar" titulo={nombreCliente(cliente)} variante="sec">
               <FormularioEditar cliente={cliente} />
-            </details>
+            </Modal>
           </div>
         </div>
 
@@ -311,12 +308,12 @@ function FilaContrato({ contrato: c, clienteId }: { contrato: Ficha['contratos']
       <td>{c.fecha_inicio}</td>
       <td className="num">{c.importe_pactado ? `$${Number(c.importe_pactado).toLocaleString('es-AR')}` : '—'}</td>
       <td>
-        <details>
-          <summary className="cursor-pointer">
-            <span className={`badge ${ESTADO_CONTRATO_BADGE[c.estado]}`}>{c.estado}</span>
-          </summary>
-          <FormularioEditarContrato contrato={c} clienteId={clienteId} />
-        </details>
+        <span className={`badge ${ESTADO_CONTRATO_BADGE[c.estado]}`}>{c.estado}</span>
+        <div className="mt-1.5">
+          <Modal etiqueta="Editar" titulo={c.servicio?.nombre ?? 'Contrato'}>
+            <FormularioEditarContrato contrato={c} clienteId={clienteId} />
+          </Modal>
+        </div>
       </td>
     </tr>
   );
