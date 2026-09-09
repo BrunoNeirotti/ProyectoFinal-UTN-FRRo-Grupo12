@@ -78,9 +78,8 @@ export default async function Configuracion() {
         <div className="card-accent mt-6 flex items-start gap-2 p-4 text-sm text-warn">
           <WarningCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
           <p>
-            <strong className="font-semibold">La tasa de mora no está definida.</strong> Mientras
-            siga vacía, el sistema no propone intereses en la cobranza. No es un error de
-            configuración: es el estado que se relevó.
+            <strong className="font-semibold">La tasa de mora no está definida.</strong> Sin este
+            valor, el sistema no calcula ni propone intereses por mora en la cobranza.
           </p>
         </div>
       )}
