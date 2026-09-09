@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { PencilSimple, Horse, Student, CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { Horse, Student, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { RouterApp } from '@/server/routers/_app';
 import { desactivarCliente, modificarCliente, registrarConsentimiento, revocarConsentimiento } from '../acciones';
