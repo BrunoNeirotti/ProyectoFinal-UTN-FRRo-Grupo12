@@ -80,7 +80,7 @@ function FilaServicio({ servicio: s }: { servicio: ServicioVisible }) {
       <td>
         <span className={`badge ${s.activo ? 'badge-ok' : ''}`}>{s.activo ? 'Activo' : 'Inactivo'}</span>
         <div className="mt-1.5">
-          <Modal etiqueta="Editar" titulo={s.nombre}>
+          <Modal etiqueta="Editar" titulo={s.nombre} tamano="sm">
             <FormularioEditarServicio servicio={s} />
           </Modal>
         </div>

@@ -26,7 +26,7 @@ export function Modal({
   titulo,
   children,
   variante = 'gho',
-  tamano = 'sm',
+  tamano,
 }: {
   /** Texto del botón que lo abre. */
   etiqueta: string;
@@ -34,6 +34,7 @@ export function Modal({
   titulo: string;
   children: React.ReactNode;
   variante?: 'pri' | 'sec' | 'gho';
+  /** Sin valor, el botón mide como cualquier otro control de la fila. */
   tamano?: 'sm';
 }) {
   const dialogo = useRef<HTMLDialogElement>(null);

@@ -82,7 +82,7 @@ function FilaInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }
       <td>
         <span className={`badge ${i.activo ? 'badge-ok' : ''}`}>{i.activo ? 'Activa' : 'Inactiva'}</span>
         <div className="mt-1.5">
-          <Modal etiqueta="Editar" titulo={i.nombre}>
+          <Modal etiqueta="Editar" titulo={i.nombre} tamano="sm">
             <FormularioEditarInstalacion instalacion={i} />
           </Modal>
         </div>

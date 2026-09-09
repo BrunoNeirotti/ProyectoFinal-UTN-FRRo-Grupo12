@@ -44,7 +44,7 @@ export function FormularioNuevaOrden({
   if (proveedores.length === 0) return null;
 
   return (
-    <form action={accion} className="flex flex-wrap items-end gap-2">
+    <form action={accion} className="space-y-3">
       <label className="label">
         Proveedor
         <select className="input" name="proveedorId" required>
@@ -55,13 +55,19 @@ export function FormularioNuevaOrden({
           ))}
         </select>
       </label>
-      <BotonEnviar texto="Orden vacía" variante="sec" name="sugerir" value="false" />
+      <div className="flex flex-wrap gap-2">
+        <BotonEnviar texto="Orden vacía" variante="sec" name="sugerir" value="false" />
+        {hayQueReponer && (
+          <BotonEnviar texto="Con lo que falta" name="sugerir" value="true" cargando="Armando…" />
+        )}
+      </div>
       {hayQueReponer && (
-        <BotonEnviar texto="Orden con lo que falta" name="sugerir" value="true" cargando="Armando…" />
+        <p className="helper">
+          «Con lo que falta» carga los insumos por debajo del mínimo o próximos a agotarse, con la
+          cantidad sugerida para cada uno.
+        </p>
       )}
-      {resultado.estado === 'error' && (
-        <p className="error basis-full">{resultado.mensaje}</p>
-      )}
+      {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
     </form>
   );
 }

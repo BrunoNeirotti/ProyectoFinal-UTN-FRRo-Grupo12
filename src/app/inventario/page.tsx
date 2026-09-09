@@ -79,14 +79,21 @@ export default async function Inventario() {
             disponibilidad, calculados sobre los últimos {panel.ventana.dias} días.
           </p>
         </div>
-        <div className="flex shrink-0 flex-wrap items-end gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           <Modal etiqueta="Conteo físico" titulo="Registrar un conteo físico" variante="sec">
             <FormularioAjuste insumos={panel.insumos} />
           </Modal>
           <Modal etiqueta="Nuevo insumo" titulo="Nuevo insumo" variante="sec">
             <FormularioNuevoInsumo />
           </Modal>
-          <FormularioNuevaOrden proveedores={proveedores} hayQueReponer={panel.aReponer.length > 0} />
+          {proveedores.length > 0 && (
+            <Modal etiqueta="Nueva orden" titulo="Nueva orden de compra" variante="pri">
+              <FormularioNuevaOrden
+                proveedores={proveedores}
+                hayQueReponer={panel.aReponer.length > 0}
+              />
+            </Modal>
+          )}
         </div>
       </div>
 

@@ -77,7 +77,7 @@ function FilaUsuario({ usuario: u }: { usuario: UsuarioVisible }) {
       <td>
         <span className={`badge ${u.activo ? 'badge-ok' : ''}`}>{u.activo ? 'Activo' : 'Desactivado'}</span>
         <div className="mt-1.5">
-          <Modal etiqueta="Editar" titulo={`${u.persona?.apellido ?? ''}, ${u.persona?.nombre ?? ''}`}>
+          <Modal etiqueta="Editar" titulo={`${u.persona?.apellido ?? ''}, ${u.persona?.nombre ?? ''}`} tamano="sm">
             <div className="space-y-3">
               <FormularioRol usuario={u} />
               {u.activo && <FormularioDesactivar usuarioId={u.id} />}

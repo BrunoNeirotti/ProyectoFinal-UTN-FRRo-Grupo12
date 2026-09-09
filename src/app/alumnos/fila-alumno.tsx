@@ -47,7 +47,7 @@ export function FilaAlumno({ alumno: a }: { alumno: Alumno }) {
           <span className="badge">No requiere</span>
         )}
         <div className="mt-1.5">
-          <Modal etiqueta="Editar" titulo={`${a.persona?.apellido}, ${a.persona?.nombre}`}>
+          <Modal etiqueta="Editar" titulo={`${a.persona?.apellido}, ${a.persona?.nombre}`} tamano="sm">
             <FormularioEditar alumno={a} />
           </Modal>
         </div>

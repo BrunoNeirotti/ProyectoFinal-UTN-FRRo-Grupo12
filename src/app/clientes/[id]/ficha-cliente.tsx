@@ -42,7 +42,7 @@ export function FichaCliente({ ficha, servicios }: { ficha: Ficha; servicios: Se
             <Link href={`/cobranza/${cliente.id}`} className="btn btn-sec btn-sm">
               Cuenta corriente
             </Link>
-            <Modal etiqueta="Editar" titulo={nombreCliente(cliente)} variante="sec">
+            <Modal etiqueta="Editar" titulo={nombreCliente(cliente)} variante="sec" tamano="sm">
               <FormularioEditar cliente={cliente} />
             </Modal>
           </div>
@@ -310,7 +310,7 @@ function FilaContrato({ contrato: c, clienteId }: { contrato: Ficha['contratos']
       <td>
         <span className={`badge ${ESTADO_CONTRATO_BADGE[c.estado]}`}>{c.estado}</span>
         <div className="mt-1.5">
-          <Modal etiqueta="Editar" titulo={c.servicio?.nombre ?? 'Contrato'}>
+          <Modal etiqueta="Editar" titulo={c.servicio?.nombre ?? 'Contrato'} tamano="sm">
             <FormularioEditarContrato contrato={c} clienteId={clienteId} />
           </Modal>
         </div>
