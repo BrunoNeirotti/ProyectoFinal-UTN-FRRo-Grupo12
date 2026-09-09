@@ -376,6 +376,9 @@ details[open] > summary::before { transform: rotate(45deg); }
    sin una sola línea de JavaScript propio para el comportamiento. */
 dialog.modal {
   border: none; padding: 0; background: transparent;
+  /* `inset` y `margin: auto` explícitos: sin los dos el diálogo se ancla arriba
+     a la izquierda en lugar de centrarse. */
+  position: fixed; inset: 0; margin: auto;
   width: min(34rem, calc(100vw - 2rem)); max-height: calc(100vh - 4rem);
   color: var(--text);
 }
