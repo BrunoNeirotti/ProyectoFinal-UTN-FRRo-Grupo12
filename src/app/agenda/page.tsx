@@ -82,8 +82,7 @@ export default async function Agenda({ searchParams }: PageProps<'/agenda'>) {
       <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Enseñanza</p>
       <h1 className="font-serif text-3xl text-fg">Agenda de clases</h1>
       <p className="mt-1 text-fg-muted">
-        Una clase ocupa una pista y un instructor: la base impide programar dos en el mismo lugar y a
-        la misma hora, así que la grilla no puede mostrar un choque de recursos.
+        Grilla semanal de clases programadas, con su instalación, instructor y ocupación.
       </p>
 
       <div className="mt-6">
@@ -258,8 +257,8 @@ async function OcupacionDeLaSemana({ desde, hasta }: { desde: string; hasta: str
       <div className="border-b border-surface-border px-5 py-4">
         <h2 className="font-serif text-lg text-fg">Ocupación de instalaciones</h2>
         <p className="helper">
-          Minutos efectivamente tomados en la semana y cuánto pesa cada pista sobre el total. No es
-          un porcentaje de capacidad: el establecimiento no tiene declarado un horario de apertura.
+          Minutos ocupados por instalación en la semana y su participación sobre el total. No
+          representa un porcentaje de capacidad.
         </p>
       </div>
       <div className="overflow-x-auto">

@@ -57,8 +57,7 @@ export default async function Facturacion({ searchParams }: PageProps<'/facturac
       <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Gerencia</p>
       <h1 className="font-serif text-3xl text-fg">Facturación</h1>
       <p className="mt-1 text-fg-muted">
-        El tipo de comprobante se deriva de la condición fiscal del emisor y del receptor (RN-02): no
-        se elige acá.
+        Comprobantes electrónicos emitidos ante ARCA y cargos pendientes de facturar.
       </p>
 
       {!identidadVigente && (

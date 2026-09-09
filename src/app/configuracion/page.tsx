@@ -70,8 +70,8 @@ export default async function Configuracion() {
       <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Sistema</p>
       <h1 className="font-serif text-3xl text-fg">Configuración</h1>
       <p className="mt-1 text-fg-muted">
-        Lo que hace que el sistema sea de este haras y no genérico: sus reglas, sus precios, sus
-        boxes y su gente.
+        Parámetros del establecimiento: reglas de negocio, servicios y precios, instalaciones,
+        identidad fiscal, plantillas de mensajes y usuarios.
       </p>
 
       {tasa && !proponeIntereses(tasa.valor) && (

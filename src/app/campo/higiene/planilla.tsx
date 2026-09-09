@@ -66,7 +66,7 @@ export function PlanillaDeHigiene({
     });
 
   if (boxes.length === 0) {
-    return <p className="card mt-4 p-6 text-center text-muted">No hay boxes activos cargados.</p>;
+    return <p className="card mt-4 p-6 text-center text-muted">No hay boxes activos registrados.</p>;
   }
 
   return (

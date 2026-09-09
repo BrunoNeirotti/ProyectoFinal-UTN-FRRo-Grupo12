@@ -80,7 +80,7 @@ export function Planilla({
       <input type="hidden" name="alumnos" value={alumnos.map((a) => a.alumnoId).join(',')} />
 
       <p className="helper m-0">
-        Todos figuran presentes. Marcá sólo las ausencias. {marcados} de {alumnos.length} presentes.
+        Todos figuran presentes. Indicar únicamente las ausencias. {marcados} de {alumnos.length} presentes.
       </p>
 
       <ul className="space-y-2">
@@ -184,7 +184,7 @@ export function Planilla({
       </div>
       <p className="helper flex items-center gap-1.5">
         <CheckSquare size={14} aria-hidden="true" />
-        Hasta cerrarla, la clase no se factura.
+        La clase no se factura hasta su cierre.
       </p>
     </form>
   );
@@ -219,7 +219,7 @@ export function Correccion({
 
   return (
     <details>
-      <summary className="link cursor-pointer text-xs text-accent-ink">Corregir</summary>
+      <summary className="btn btn-gho btn-sm">Corregir</summary>
       <form action={enviar} className="mt-2 grid gap-2 sm:grid-cols-3">
         <input type="hidden" name="claseId" value={claseId} />
         <input type="hidden" name="asistenciaId" value={asistenciaId} />

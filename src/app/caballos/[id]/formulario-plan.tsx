@@ -72,8 +72,7 @@ export function FormularioPlan({
       </div>
 
       <p className="helper mt-1">
-        Sin insumo, la ración se registra pero no descuenta existencias: es el caso de la pastura de
-        piquete.
+        Sin insumo asociado, la ración se registra sin descontar existencias.
       </p>
 
       {resultado.estado === 'error' && <p className="error mt-2">{resultado.mensaje}</p>}

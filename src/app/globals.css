@@ -57,6 +57,7 @@
 
   /* --- Radios y sombras --- */
   --r-lg: .7rem; --r-xl: .75rem; --r-2xl: 1rem;
+  --control-h: 2.5rem;   /* alto común de campos y botones */
   --shadow-sm: 0 1px 2px rgba(42,24,18,.06), 0 1px 3px rgba(42,24,18,.04);
   --shadow-md: 0 8px 24px rgba(42,24,18,.08);
 }
@@ -136,8 +137,13 @@ body {
 }
 .btn-pri { background: var(--accent); color: var(--accent-text); }
 .btn-pri:hover { background: var(--accent-press); }
-.btn-sec { background: var(--surface); border-color: var(--accent); color: var(--accent-ink); }
-.btn-sec:hover { background: var(--accent-soft); }
+/* Relleno suave y no blanco: sobre crema, un secundario en `surface` con borde
+   fino se lee como un distintivo y no como un control. La jerarquía es
+   primario > secundario > fantasma, y las tres tienen que distinguirse de un
+   `.badge`, que nunca se puede apretar. */
+.btn-sec { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+.btn-sec:hover { background: var(--gold-100); }
+.dark .btn-sec:hover { background: var(--cacao-700); }
 .btn-gho { color: var(--text); background: transparent; }
 .btn-gho:hover { background: var(--hover-veil); }
 .btn-danger { background: var(--bad); color: #FFFFFF; }
@@ -216,6 +222,13 @@ body {
   padding: .6rem .75rem; font-size: .95rem; font-family: inherit;
   transition: border-color .15s ease;
 }
+/* Un botón al lado de un campo tiene que medir lo mismo: sin esto queda un par
+   de píxeles más bajo y la fila se ve desprolija. */
+.input, .btn { min-height: var(--control-h); }
+.btn-sm { min-height: 2rem; }
+.btn-lg { min-height: 2.75rem; }
+.btn-icon { min-height: 2.25rem; }
+
 .input::placeholder { color: var(--text-muted); }
 .input:focus-visible { border-color: var(--accent); }
 .input[aria-invalid="true"] { border-color: var(--bad); }
@@ -330,6 +343,34 @@ input[type="checkbox"], input[type="radio"] {
 }
 .nivel > i { display: block; height: 100%; border-radius: 999px; }
 .nivel > b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text-muted); }
+
+/* --- Desplegables (`<details>`) ---
+   El marcador por omisión del navegador es un triangulito que no pertenece ni a
+   esta tipografía ni a esta paleta. Se reemplaza por un chevron que gira al
+   abrir, que además dice hacia dónde se va a expandir. */
+details > summary {
+  list-style: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: .4rem;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before {
+  content: ''; flex-shrink: 0;
+  width: .42rem; height: .42rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform .15s ease;
+}
+details[open] > summary::before { transform: rotate(45deg); }
+
+/* Un desplegable que vive en una celda ensancha su columna al abrirse y
+   reacomoda la tabla entera. El panel sale del flujo y se ancla a la celda. */
+.tbl td { position: relative; }
+.panel-en-celda {
+  position: absolute; right: 1rem; z-index: 20;
+  width: 17rem; margin-top: .35rem;
+  box-shadow: var(--shadow-md);
+}
 
 /* --- Navegación --- */
 .sidebar {

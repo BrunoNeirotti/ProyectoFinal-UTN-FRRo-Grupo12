@@ -74,7 +74,7 @@ export function SeccionPlantillas({ plantillas }: { plantillas: PlantillaVisible
             {plantillas.length === 0 && (
               <tr>
                 <td colSpan={5} className="py-4 text-center text-fg-muted">
-                  Todavía no hay plantillas cargadas.
+                  No hay plantillas registradas.
                 </td>
               </tr>
             )}
@@ -159,7 +159,7 @@ function FormularioEditarPlantilla({ plantilla: p }: { plantilla: PlantillaVisib
           <input type="checkbox" name="activa" value="true" defaultChecked={p.activa} />
           Activa
         </label>
-        <p className="helper">Guardar vuelve la plantilla a borrador: un texto editado necesita nueva aprobación de Meta.</p>
+        <p className="helper">Al guardar, la plantilla vuelve a estado borrador y requiere nueva aprobación de Meta.</p>
         {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
         {resultado.estado === 'ok' && <p className="helper text-ok">Guardado.</p>}
         <BotonEnviar texto="Guardar" variante="sec" tamano="sm" />

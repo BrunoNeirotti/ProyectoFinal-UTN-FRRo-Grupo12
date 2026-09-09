@@ -90,8 +90,8 @@ export default async function HistorialDeAlumno({ params }: PageProps<'/asistenc
         <div className="border-b border-surface-border px-5 py-4">
           <h2 className="font-serif text-lg text-fg">Clase por clase</h2>
           <p className="helper">
-            Sólo figuran las clases dictadas en las que estaba inscripto. Las que canceló en término
-            no llegan a generar asistencia, y por eso no aparecen acá como ausencias.
+            Sólo figuran las clases dictadas en las que el alumno estaba inscripto. Las canceladas
+            en término no generan asistencia.
           </p>
         </div>
         <div className="overflow-x-auto">

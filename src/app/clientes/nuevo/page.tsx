@@ -8,8 +8,7 @@ export default function NuevoCliente() {
     <div className="mx-auto max-w-3xl p-6 md:p-10">
       <h1 className="font-serif text-3xl text-fg">Nuevo cliente</h1>
       <p className="mt-1 text-fg-muted">
-        La unidad de facturación: quien tiene cuenta corriente. No es lo mismo que el alumno que
-        monta ni que el caballo que se aloja.
+        Alta de cliente. Es la unidad de facturación y titular de la cuenta corriente.
       </p>
       <div className="mt-6">
         <FormularioNuevoCliente />

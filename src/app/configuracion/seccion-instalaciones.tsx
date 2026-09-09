@@ -79,10 +79,9 @@ function FilaInstalacion({ instalacion: i }: { instalacion: InstalacionVisible }
       <td>{TIPOS[i.tipo]}</td>
       <td className="num">{i.capacidad}</td>
       <td>
-        <details>
-          <summary className="cursor-pointer">
-            <span className={`badge ${i.activo ? 'badge-ok' : ''}`}>{i.activo ? 'Activa' : 'Inactiva'}</span>
-          </summary>
+        <span className={`badge ${i.activo ? 'badge-ok' : ''}`}>{i.activo ? 'Activa' : 'Inactiva'}</span>
+        <details className="mt-1.5">
+          <summary className="btn btn-gho btn-sm">Editar</summary>
           <FormularioEditarInstalacion instalacion={i} />
         </details>
       </td>

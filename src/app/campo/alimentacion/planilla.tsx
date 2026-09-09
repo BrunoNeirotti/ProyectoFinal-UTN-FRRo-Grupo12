@@ -169,7 +169,7 @@ export function PlanillaDeAlimentacion({
               )}
 
               {!salteado && tarea.insumoNombre === null && tarea.insumoId === null && (
-                <p className="helper mt-1">Sin insumo asociado: se registra el suministro y no descuenta existencias.</p>
+                <p className="helper mt-1">Sin insumo asociado: el suministro se registra sin descontar existencias.</p>
               )}
             </li>
           );

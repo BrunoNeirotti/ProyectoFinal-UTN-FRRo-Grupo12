@@ -20,7 +20,7 @@ export default async function Clientes() {
           <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Clientes</p>
           <h1 className="font-serif text-3xl text-fg">Clientes y contratos</h1>
           <p className="mt-1 text-fg-muted">
-            El origen de todos los cargos. Un cliente sin contratos vigentes no genera ni un cargo.
+            Clientes con cuenta corriente y sus contratos vigentes.
           </p>
         </div>
         <Link href="/clientes/nuevo" className="btn btn-pri">

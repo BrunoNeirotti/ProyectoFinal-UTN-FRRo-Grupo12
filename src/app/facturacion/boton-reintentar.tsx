@@ -11,7 +11,7 @@ export function BotonReintentar({ comprobanteId }: { comprobanteId: string }) {
   return (
     <form action={enviar}>
       <input type="hidden" name="comprobanteId" value={comprobanteId} />
-      <button type="submit" className="link text-xs text-accent-ink">Reintentar</button>
+      <button type="submit" className="btn btn-sec btn-sm">Reintentar</button>
       {resultado.estado === 'error' && <p className="error text-xs">{resultado.mensaje}</p>}
     </form>
   );

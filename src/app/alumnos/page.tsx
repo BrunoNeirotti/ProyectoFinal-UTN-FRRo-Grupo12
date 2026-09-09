@@ -22,7 +22,7 @@ export default async function Alumnos() {
           <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Enseñanza</p>
           <h1 className="font-serif text-3xl text-fg">Alumnos</h1>
           <p className="mt-1 text-fg-muted">
-            Padrón con su nivel, quién paga por ellos y quién es su responsable legal.
+            Padrón de alumnos con su nivel, responsable legal y cliente que factura.
           </p>
         </div>
         <Link href="/alumnos/nuevo" className="btn btn-pri">

@@ -46,7 +46,7 @@ export function FilaAlumno({ alumno: a }: { alumno: Alumno }) {
           <span className="badge">No requiere</span>
         )}
         <details className="mt-1.5">
-          <summary className="cursor-pointer text-xs text-accent-ink">editar</summary>
+          <summary className="btn btn-gho btn-sm">Editar</summary>
           <FormularioEditar alumno={a} />
         </details>
       </td>
@@ -89,7 +89,7 @@ function FormularioEditar({ alumno: a }: { alumno: Alumno }) {
       {a.activo && (
         <form action={enviarBaja}>
           <input type="hidden" name="alumnoId" value={a.id} />
-          <button type="submit" className="link text-xs text-bad">Desactivar</button>
+          <button type="submit" className="btn btn-gho btn-sm text-bad">Desactivar</button>
           {resultadoBaja.estado === 'error' && <p className="error">{resultadoBaja.mensaje}</p>}
         </form>
       )}

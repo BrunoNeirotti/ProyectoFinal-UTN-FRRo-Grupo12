@@ -72,7 +72,7 @@ export function FormularioDeClase({
           </select>
           {servicios.length === 0 && (
             <p className="helper">
-              No hay servicios de clase con modalidad declarada. Se cargan en Configuración.
+              No hay servicios de clase con modalidad declarada. Se registran en Configuración.
             </p>
           )}
         </label>
@@ -147,7 +147,7 @@ export function FormularioDeClase({
               <option key={n.valor} value={n.valor}>{n.texto}</option>
             ))}
           </select>
-          <p className="helper">Orienta a quién inscribir; no restringe (RN-15).</p>
+          <p className="helper">Orienta la inscripción; no la restringe (RN-15).</p>
         </label>
 
         {resultado.estado === 'libre' && (

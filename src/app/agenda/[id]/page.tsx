@@ -144,8 +144,8 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
         <div className="border-b border-surface-border px-5 py-4">
           <h2 className="font-serif text-lg text-fg">Inscriptos</h2>
           <p className="helper">
-            El caballo que figura acá es el <strong>previsto</strong>. Con cuál montó cada uno se
-            registra al tomar asistencia.
+            El caballo indicado es el <strong>previsto</strong> al inscribir. El efectivamente
+            montado se registra al tomar asistencia.
           </p>
         </div>
         <div className="overflow-x-auto">
@@ -208,8 +208,8 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
           <div className="border-b border-surface-border px-5 py-4">
             <h2 className="font-serif text-lg text-fg">Cancelaciones</h2>
             <p className="helper">
-              Se conservan porque la antelación con que se avisó es lo que después define cómo se
-              imputa la clase. El establecimiento pide avisar con {detalle.diasMinimos} días.
+              Se conservan para evaluar la antelación del aviso, que define la imputación de la
+              clase. El establecimiento requiere avisar con {detalle.diasMinimos} días.
             </p>
           </div>
           <div className="overflow-x-auto">

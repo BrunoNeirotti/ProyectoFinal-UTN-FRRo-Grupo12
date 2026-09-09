@@ -43,8 +43,8 @@ export function FormularioProgramar({ caballos }: { caballos: CaballoOpcion[] })
     <form action={accion} className="card p-5">
       <h2 className="font-serif text-lg">Programar un ciclo</h2>
       <p className="helper mt-1">
-        Queda previsto hasta que se registre la aplicación. Un ciclo previsto no dispara alertas de
-        vencimiento: ya está agendado.
+        El ciclo queda en estado previsto hasta que se registre su aplicación. Un ciclo previsto no
+        genera avisos de vencimiento.
       </p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">

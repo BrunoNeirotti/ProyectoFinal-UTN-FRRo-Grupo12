@@ -126,8 +126,8 @@ export default async function AsistenciaDeClase({ params }: PageProps<'/agenda/[
           <div className="border-b border-surface-border px-5 py-4">
             <h2 className="font-serif text-lg text-fg">Asistencia registrada</h2>
             <p className="helper">
-              La clase está cerrada y disponible para liquidar. Una corrección queda asentada en la
-              traza de auditoría con quién la hizo.
+              La clase está cerrada y disponible para liquidar. Toda corrección queda asentada en
+              la auditoría con su autor.
             </p>
           </div>
           <ul className="divide-y divide-surface-border">

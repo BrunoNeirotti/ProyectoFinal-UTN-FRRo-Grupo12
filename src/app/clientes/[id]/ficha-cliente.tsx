@@ -238,7 +238,7 @@ function FormularioDesactivar({ clienteId }: { clienteId: string }) {
   return (
     <form action={enviar} className="mt-2">
       <input type="hidden" name="clienteId" value={clienteId} />
-      <p className="helper">No borra nada: el cliente queda inactivo pero su historial se conserva.</p>
+      <p className="helper">El cliente queda inactivo y conserva su historial.</p>
       <div className="mt-2">
         <BotonEnviar texto="Confirmar baja" variante="sec" tamano="sm" />
       </div>
@@ -359,7 +359,7 @@ function FormularioEditarContrato({
       <form action={enviarBaja}>
         <input type="hidden" name="contratoId" value={c.id} />
         <input type="hidden" name="clienteId" value={clienteId} />
-        <button type="submit" className="link text-xs text-bad">Dar de baja ahora</button>
+        <button type="submit" className="btn btn-gho btn-sm text-bad">Dar de baja ahora</button>
         {resultadoBaja.estado === 'error' && <p className="error">{resultadoBaja.mensaje}</p>}
       </form>
     </div>

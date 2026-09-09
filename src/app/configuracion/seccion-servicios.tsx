@@ -77,10 +77,9 @@ function FilaServicio({ servicio: s }: { servicio: ServicioVisible }) {
       </td>
       <td className="text-fg-muted">{s.tarifaVigente?.vigenteDesde ?? '—'}</td>
       <td>
-        <details>
-          <summary className="cursor-pointer">
-            <span className={`badge ${s.activo ? 'badge-ok' : ''}`}>{s.activo ? 'Activo' : 'Inactivo'}</span>
-          </summary>
+        <span className={`badge ${s.activo ? 'badge-ok' : ''}`}>{s.activo ? 'Activo' : 'Inactivo'}</span>
+        <details className="mt-1.5">
+          <summary className="btn btn-gho btn-sm">Editar</summary>
           <FormularioEditarServicio servicio={s} />
         </details>
       </td>
@@ -179,7 +178,7 @@ function FormularioNuevaTarifa({ servicios }: { servicios: ServicioVisible[] }) 
   return (
     <form action={enviar} className="card space-y-3 p-4">
       <h3 className="text-sm font-medium text-fg">Nueva tarifa</h3>
-      <p className="helper mt-0">Actualiza el precio de un servicio existente sin pisar la vigencia anterior.</p>
+      <p className="helper mt-0">Registra un precio nuevo para el servicio y conserva la vigencia anterior.</p>
       <label className="block">
         <span className="label">Servicio</span>
         <select name="servicioId" required className="input">

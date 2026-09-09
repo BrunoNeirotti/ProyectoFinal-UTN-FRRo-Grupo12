@@ -74,8 +74,8 @@ export default async function Inventario() {
         <div>
           <h1 className="font-serif text-2xl">Inventario</h1>
           <p className="mt-1 max-w-xl text-sm text-muted">
-            La existencia baja sola con cada registro de cuidado y con cada recepción. La cobertura
-            son días estimados según el consumo de los últimos {panel.ventana.dias} días.
+            Listado de insumos con su existencia, consumo promedio y días estimados de
+            disponibilidad, calculados sobre los últimos {panel.ventana.dias} días.
           </p>
         </div>
         <div className="shrink-0">
@@ -132,8 +132,8 @@ export default async function Inventario() {
                 {panel.aReponer.length > 4 ? ', y otros más.' : '.'}
               </p>
               <p className="helper mt-1">
-                Las cantidades cubren {panel.diasDeCobertura} días de consumo. La orden que se genera
-                queda en borrador: se edita antes de enviarla.
+                Las cantidades sugeridas cubren {panel.diasDeCobertura} días de consumo. La orden se
+                genera en estado borrador y admite edición antes del envío.
               </p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default async function Inventario() {
 
           {panel.insumos.length === 0 ? (
             <p className="p-5 text-sm text-muted">
-              Todavía no hay insumos cargados. El primero se da de alta abajo.
+              No hay insumos registrados. El alta se realiza en el formulario inferior.
             </p>
           ) : (
             <div className="overflow-x-auto">
@@ -212,8 +212,8 @@ export default async function Inventario() {
 
           <p className="helper m-0 flex items-start gap-1.5 border-t border-surface-border px-4 py-3">
             <span>
-              La marca gris de la barra es dónde queda el mínimo. Un insumo puede estar bajo mínimo y
-              tener semanas por delante: el que decide la compra es el semáforo de cobertura.
+              La marca de la barra señala el mínimo declarado. La cobertura estima los días de
+              disponibilidad según el consumo promedio del período.
             </span>
           </p>
         </section>
@@ -229,7 +229,7 @@ export default async function Inventario() {
               </Link>
             </div>
             {ordenes.length === 0 ? (
-              <p className="p-4 text-sm text-muted">Todavía no se emitió ninguna orden.</p>
+              <p className="p-4 text-sm text-muted">No hay órdenes de compra registradas.</p>
             ) : (
               <ul className="divide-y divide-surface-border">
                 {ordenes.map((o) => (
@@ -265,9 +265,8 @@ export default async function Inventario() {
               </h2>
             </div>
             <p className="text-sm text-feature-muted">
-              Los conteos nunca coinciden: se rompe una bolsa, se usa de más, alguien se olvida de
-              registrar. Se anota lo contado y el sistema calcula la diferencia contra lo registrado.
-              Queda auditado con autor, fecha y motivo.
+              Registro de la existencia relevada en depósito. El sistema calcula la diferencia contra
+              lo registrado y la asienta como ajuste, con autor, fecha y motivo.
             </p>
             <FormularioAjuste insumos={panel.insumos} />
           </section>
@@ -284,7 +283,7 @@ export default async function Inventario() {
       {panel.aReponer.length > 0 && proveedores.length === 0 && (
         <p className="helper mt-4 flex items-center gap-1.5">
           <ShoppingCart size={14} aria-hidden="true" />
-          Para generar la orden hace falta al menos un proveedor cargado.
+          Se requiere al menos un proveedor registrado para generar una orden.
         </p>
       )}
     </div>

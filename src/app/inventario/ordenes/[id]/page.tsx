@@ -109,7 +109,8 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
 
         {detalle.length === 0 ? (
           <p className="p-5 text-sm text-muted">
-            La orden todavía no tiene renglones. Se agregan abajo; sin renglones no se puede enviar.
+            La orden no tiene renglones. Se agregan en el formulario inferior; el envío requiere al
+            menos uno.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -182,13 +183,13 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
             Registrar una entrega
           </h2>
           <p className="helper mt-1">
-            Se anota lo que llegó en <b>esta</b> entrega, no el total acumulado. Los renglones que no
-            vinieron se dejan vacíos.
+            Indicar la cantidad recibida en <b>esta</b> entrega, no el acumulado. Los renglones no
+            recibidos se dejan vacíos.
           </p>
           {pendientes.length === 0 ? (
             <p className="card mt-2 p-5 text-sm text-muted">
-              Ya llegó todo lo pedido. Una entrega de más se puede seguir informando igual, si el
-              proveedor mandó de sobra.
+              La orden está completa. Se admite informar una entrega adicional si el proveedor
+              remitió cantidades por encima de lo pedido.
             </p>
           ) : null}
           <FormularioRecepcion
@@ -212,7 +213,7 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
             Entregas
           </h2>
           <p className="helper mt-1">
-            Una fila por remito, fechada el día en que la mercadería entró al depósito.
+            Una fila por remito, con la fecha de ingreso al depósito.
           </p>
           <table className="tbl mt-2">
             <thead>
@@ -248,8 +249,8 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
           />
           <p className="helper mt-1">
             {esBorrador
-              ? 'Un borrador se borra: todavía no es un documento.'
-              : 'Anular cierra la orden y no revierte lo ya recibido: esa mercadería entró al depósito.'}
+              ? 'Un borrador se elimina definitivamente; no constituye un documento emitido.'
+              : 'La anulación cierra la orden y no revierte las recepciones ya registradas.'}
           </p>
         </div>
       )}

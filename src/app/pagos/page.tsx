@@ -40,8 +40,7 @@ export default async function Pagos({ searchParams }: PageProps<'/pagos'>) {
       <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Gerencia</p>
       <h1 className="font-serif text-3xl text-fg">Pagos</h1>
       <p className="mt-1 text-fg-muted">
-        Un pago existe apenas se registra o se acredita; imputarlo a una cuenta corriente es un paso
-        propio, distinto y deliberado.
+        Pagos registrados con su estado y su imputación a las cuentas corrientes.
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -118,7 +117,7 @@ export default async function Pagos({ searchParams }: PageProps<'/pagos'>) {
       <section className="card mt-6 overflow-hidden">
         <div className="border-b border-surface-border px-5 py-4">
           <h2 className="font-serif text-lg text-fg">Conciliación: pagos acreditados sin imputar</h2>
-          <p className="helper">De todos los períodos, no sólo el de arriba: un pago puede llegar acreditado mucho antes de que alguien lo aplique.</p>
+          <p className="helper">Incluye todos los períodos, no sólo el seleccionado.</p>
         </div>
         <div className="overflow-x-auto">
           <table className="tbl">

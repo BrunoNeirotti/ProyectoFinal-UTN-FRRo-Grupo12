@@ -34,8 +34,7 @@ export default async function Proveedores() {
 
       <h1 className="mt-2 font-serif text-2xl">Proveedores</h1>
       <p className="mt-1 text-sm text-muted">
-        A quién se le compra. El CUIT es opcional: el haras le compra forraje a productores de la
-        zona que facturan cuando facturan.
+        Proveedores habilitados para emitir órdenes de compra. El CUIT es opcional.
       </p>
 
       <section className="mt-6" aria-labelledby="h-activos">
@@ -44,7 +43,7 @@ export default async function Proveedores() {
         </h2>
         {activos.length === 0 ? (
           <p className="card mt-2 p-5 text-sm text-muted">
-            Todavía no hay proveedores. Sin al menos uno no se puede emitir una orden de compra.
+            No hay proveedores registrados. Se requiere al menos uno para emitir órdenes de compra.
           </p>
         ) : (
           <table className="tbl mt-2">
@@ -81,8 +80,7 @@ export default async function Proveedores() {
             Inactivos
           </h2>
           <p className="helper mt-1">
-            No se ofrecen para una orden nueva. Las órdenes viejas siguen diciendo a quién se le
-            compró.
+            No se ofrecen al emitir una orden nueva. Las órdenes anteriores conservan su proveedor.
           </p>
           <table className="tbl mt-2 opacity-70">
             <thead>

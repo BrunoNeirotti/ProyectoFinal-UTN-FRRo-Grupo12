@@ -12,7 +12,8 @@ export default async function NuevoAlumno() {
     <div className="mx-auto max-w-3xl p-6 md:p-10">
       <h1 className="font-serif text-3xl text-fg">Nuevo alumno</h1>
       <p className="mt-1 text-fg-muted">
-        Quien monta puede no ser quien paga: el cliente que se elige acá es quién factura por él.
+        Alta de alumno. El cliente indicado es el que recibe la facturación, que puede no ser el
+        propio alumno.
       </p>
       <div className="mt-6">
         <FormularioNuevoAlumno clientes={clientes.map((c) => ({ id: c.id, nombre: c.nombre }))} />

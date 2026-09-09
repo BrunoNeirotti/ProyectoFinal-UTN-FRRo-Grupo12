@@ -139,7 +139,7 @@ export function FormularioSuspender({ claseId }: { claseId: string }) {
             placeholder="Lluvia, pista anegada, instructor ausente…"
             className="input"
           />
-          <p className="helper">Queda registrado en la clase y es lo que se le informa al cliente.</p>
+          <p className="helper">Queda registrado en la clase y se informa al cliente.</p>
         </label>
 
         {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}

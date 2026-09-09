@@ -42,8 +42,8 @@ export default async function Sanidad() {
     <div className="mx-auto max-w-4xl p-6 md:p-10">
       <h1 className="font-serif text-2xl">Sanidad</h1>
       <p className="mt-1 text-sm text-muted">
-        Vencimientos, ciclos agendados y programación. Los avisos salen con{' '}
-        {sanidad.diasDeAviso} días de anticipación, configurables en Configuración.
+        Vencimientos sanitarios, ciclos programados y registro de aplicaciones. El aviso se
+        anticipa {sanidad.diasDeAviso} días, configurables en Configuración.
       </p>
 
       <section className="mt-8">

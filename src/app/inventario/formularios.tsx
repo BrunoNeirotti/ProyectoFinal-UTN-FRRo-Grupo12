@@ -136,7 +136,7 @@ export function FormularioAjuste({ insumos }: { insumos: InsumoConCobertura[] })
       {resultado.estado === 'ok' && (
         <p className="mt-2 text-sm text-ok">
           {resultado.guardados === 0
-            ? 'El conteo coincidió con lo registrado: no hizo falta ajustar nada.'
+            ? 'El conteo coincide con la existencia registrada; no se generó ajuste.'
             : 'Ajuste registrado.'}
         </p>
       )}
@@ -152,8 +152,8 @@ export function FormularioNuevoInsumo() {
     <form action={accion} className="card p-5">
       <h2 className="font-serif text-lg">Nuevo insumo</h2>
       <p className="helper mt-1">
-        La existencia no se carga acá: arranca en cero y se mueve con una recepción, un consumo o un
-        conteo físico. Un número escrito a mano no dice de dónde salió.
+        La existencia inicial es cero y se modifica mediante recepciones, consumos o conteos
+        físicos.
       </p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-4">

@@ -19,7 +19,9 @@ export default async function Caballos() {
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Bienestar animal</p>
           <h1 className="font-serif text-3xl text-fg">Caballos</h1>
-          <p className="mt-1 text-fg-muted">Padrón con su alojamiento y su propietario.</p>
+          <p className="mt-1 text-fg-muted">
+            Padrón de caballos con su alojamiento, propietario y estado.
+          </p>
         </div>
         <Link href="/caballos/nuevo" className="btn btn-pri">
           <Plus size={16} aria-hidden="true" />

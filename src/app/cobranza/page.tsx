@@ -25,8 +25,7 @@ export default async function Cobranza() {
       <p className="text-xs uppercase tracking-[0.18em] text-accent-ink">Gerencia</p>
       <h1 className="font-serif text-3xl text-fg">Cobranza</h1>
       <p className="mt-1 text-fg-muted">
-        El saldo de cada cuenta es derivado: nadie lo escribe a mano, sólo se recalcula al
-        insertar un movimiento.
+        Estado de la cartera por cliente: saldo, próximo vencimiento y situación.
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

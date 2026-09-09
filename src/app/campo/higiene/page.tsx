@@ -30,14 +30,14 @@ export default async function Higiene() {
 
       <h1 className="mt-2 font-serif text-2xl">Higiene de boxes</h1>
       <p className="mt-1 text-sm text-muted">
-        {boxes.length} {boxes.length === 1 ? 'box activo' : 'boxes activos'}. Se marcan los
-        atendidos.
+        {boxes.length} {boxes.length === 1 ? 'box activo' : 'boxes activos'} con su última higiene
+        registrada. Seleccionar los boxes higienizados.
       </p>
 
       {insumos.length === 0 && (
         <p className="helper mt-3">
-          No hay material de cama cargado como insumo, así que la reposición se puede registrar pero
-          no descontar de ninguna existencia. El alta de insumos llega con Inventario.
+          No hay material de cama registrado como insumo: la reposición se registra sin descontar
+          existencias. Los insumos se dan de alta en Inventario.
         </p>
       )}
 

@@ -34,8 +34,8 @@ export function FormularioRenglon({
   if (insumos.length === 0) {
     return (
       <p className="helper">
-        Todos los insumos activos ya están en la orden. Para pedir más de uno, se corrige su
-        cantidad.
+        Todos los insumos activos figuran en la orden. Para pedir mayor cantidad, corregir el
+        renglón existente.
       </p>
     );
   }
@@ -71,9 +71,7 @@ export function FormularioRenglon({
             defaultValue="0"
             required
           />
-          <span className="helper">
-            Queda congelado al momento de la compra: no se lee de ninguna lista vigente.
-          </span>
+          <span className="helper">Se registra el precio acordado en esta compra.</span>
         </label>
       </div>
 

@@ -120,7 +120,7 @@ function WidgetDeMora({ clienteId, mora }: { clienteId: string; mora: MoraPropue
       <p className="font-medium text-fg">
         Interés propuesto: {formatoDinero(mora.importe)} ({mora.dias} días sobre {formatoDinero(mora.base)} al {mora.tasaMensual}% mensual)
       </p>
-      <p className="helper">Ningún interés se imputa sin confirmación (RN-09). Se aplica como movimiento propio, nunca dentro del cargo.</p>
+      <p className="helper">Los intereses requieren confirmación y se imputan como movimiento independiente (RN-09).</p>
       <form action={enviar} className="mt-2">
         <input type="hidden" name="clienteId" value={clienteId} />
         <input type="hidden" name="base" value={mora.base} />
@@ -140,7 +140,7 @@ function FormularioCondonar({ clienteId, movimientoId }: { clienteId: string; mo
     <form action={enviar}>
       <input type="hidden" name="clienteId" value={clienteId} />
       <input type="hidden" name="movimientoId" value={movimientoId} />
-      <button type="submit" className="link text-xs text-bad">Condonar</button>
+      <button type="submit" className="btn btn-gho btn-sm text-bad">Condonar</button>
       {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
     </form>
   );

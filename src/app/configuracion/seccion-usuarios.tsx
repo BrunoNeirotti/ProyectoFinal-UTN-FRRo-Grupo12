@@ -74,11 +74,10 @@ function FilaUsuario({ usuario: u }: { usuario: UsuarioVisible }) {
       <td>{ROLES[u.rol]}</td>
       <td className="text-xs">{u.ultimoAccesoEn ? new Date(u.ultimoAccesoEn).toLocaleString('es-AR') : 'Nunca'}</td>
       <td>
-        <details>
-          <summary className="cursor-pointer">
-            <span className={`badge ${u.activo ? 'badge-ok' : ''}`}>{u.activo ? 'Activo' : 'Desactivado'}</span>
-          </summary>
-          <div className="card mt-2 space-y-3 p-3">
+        <span className={`badge ${u.activo ? 'badge-ok' : ''}`}>{u.activo ? 'Activo' : 'Desactivado'}</span>
+        <details className="mt-1.5">
+          <summary className="btn btn-gho btn-sm">Editar</summary>
+          <div className="card panel-en-celda space-y-3 p-3">
             <FormularioRol usuario={u} />
             {u.activo && <FormularioDesactivar usuarioId={u.id} />}
           </div>
@@ -113,7 +112,7 @@ function FormularioDesactivar({ usuarioId }: { usuarioId: string }) {
   return (
     <form action={enviar}>
       <input type="hidden" name="usuarioId" value={usuarioId} />
-      <button type="submit" className="link text-xs text-bad">Desactivar</button>
+      <button type="submit" className="btn btn-gho btn-sm text-bad">Desactivar</button>
       {resultado.estado === 'error' && <p className="error">{resultado.mensaje}</p>}
     </form>
   );

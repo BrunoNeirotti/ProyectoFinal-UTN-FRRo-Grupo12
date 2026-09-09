@@ -69,7 +69,7 @@ export function FormularioInscribir({
             </option>
           ))}
         </select>
-        {candidatos.length === 0 && <p className="helper">No quedan alumnos activos por inscribir.</p>}
+        {candidatos.length === 0 && <p className="helper">No hay alumnos activos disponibles para inscribir.</p>}
       </label>
 
       <label className="block">
@@ -129,7 +129,7 @@ export function BotonCancelarInscripcion({
     <form action={enviar}>
       <input type="hidden" name="claseId" value={claseId} />
       <input type="hidden" name="inscripcionId" value={inscripcionId} />
-      <button type="submit" className="link text-xs text-accent-ink">Cancelar</button>
+      <button type="submit" className="btn btn-gho btn-sm">Cancelar</button>
 
       {resultado.estado === 'error' && <p className="error text-xs">{resultado.mensaje}</p>}
     </form>

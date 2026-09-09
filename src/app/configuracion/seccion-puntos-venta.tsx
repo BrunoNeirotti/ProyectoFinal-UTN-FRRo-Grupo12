@@ -76,7 +76,7 @@ function BotonDesactivar({ id }: { id: string }) {
   return (
     <form action={enviar}>
       <input type="hidden" name="id" value={id} />
-      <button type="submit" className="link text-xs text-bad">Desactivar</button>
+      <button type="submit" className="btn btn-gho btn-sm text-bad">Desactivar</button>
       {resultado.estado === 'error' && <p className="error text-xs">{resultado.mensaje}</p>}
     </form>
   );

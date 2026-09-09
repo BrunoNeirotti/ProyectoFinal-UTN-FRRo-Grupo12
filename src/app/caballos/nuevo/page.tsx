@@ -11,7 +11,9 @@ export default async function NuevoCaballo() {
   return (
     <div className="mx-auto max-w-3xl p-6 md:p-10">
       <h1 className="font-serif text-3xl text-fg">Nuevo caballo</h1>
-      <p className="mt-1 text-fg-muted">Sin propietario queda como caballo del haras.</p>
+      <p className="mt-1 text-fg-muted">
+        Alta de caballo. Sin propietario asignado se registra como caballo del establecimiento.
+      </p>
       <div className="mt-6">
         <FormularioNuevoCaballo
           propietarios={clientes.map((c) => ({ id: c.id, nombre: c.nombre }))}

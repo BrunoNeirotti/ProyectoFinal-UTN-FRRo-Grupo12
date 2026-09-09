@@ -12,7 +12,7 @@ export function BotonImputar({ pagoId }: { pagoId: string }) {
   return (
     <form action={enviar}>
       <input type="hidden" name="pagoId" value={pagoId} />
-      <button type="submit" className="link text-xs text-accent-ink">Imputar</button>
+      <button type="submit" className="btn btn-sec btn-sm">Imputar</button>
       {resultado.estado === 'error' && <p className="error text-xs">{resultado.mensaje}</p>}
     </form>
   );

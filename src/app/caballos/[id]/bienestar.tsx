@@ -51,7 +51,7 @@ export async function BienestarDelCaballo({ caballoId }: { caballoId: string }) 
         <h2 className="font-serif text-lg">Plan alimentario</h2>
         {planes.planes.length === 0 ? (
           <p className="card mt-2 p-5 text-sm text-muted">
-            Sin plan cargado. La toma se registra igual, con carga manual de la cantidad.
+            Sin plan alimentario cargado. La toma se registra indicando la cantidad manualmente.
           </p>
         ) : (
           <table className="tbl mt-2">

@@ -64,7 +64,7 @@ export default async function AsistenciaYProgreso({ searchParams }: PageProps<'/
           </p>
           <h1 className="font-serif text-3xl text-fg">Asistencia y progreso</h1>
           <p className="mt-1 max-w-xl text-fg-muted">
-            Qué se dictó realmente —que es lo que se factura— y cómo viene cada alumno.
+            Clases dictadas en el período y porcentaje de asistencia por alumno.
           </p>
         </div>
 
@@ -123,8 +123,8 @@ export default async function AsistenciaYProgreso({ searchParams }: PageProps<'/
           <div className="border-b border-surface-border px-5 py-4">
             <h2 className="font-serif text-lg text-fg">Por alumno</h2>
             <p className="helper">
-              Primero los que conviene mirar. El denominador es la cantidad de clases en las que
-              estaba inscripto y que efectivamente se dictaron.
+              Ordenado por menor asistencia. El porcentaje se calcula sobre las clases dictadas en
+              las que el alumno estaba inscripto.
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -228,9 +228,8 @@ export default async function AsistenciaYProgreso({ searchParams }: PageProps<'/
             </ul>
             {caballos.carga.some((c) => c.montadas !== c.previstas) && (
               <p className="helper">
-                Entre paréntesis, las veces que se lo había previsto al inscribir. La diferencia
-                puede ser una sustitución o un alumno que faltó; la sustitución repetida sobre el
-                mismo caballo es la que termina en sobrecarga.
+                Entre paréntesis, las veces previstas al inscribir. La diferencia corresponde a
+                sustituciones o ausencias.
               </p>
             )}
           </section>

@@ -76,11 +76,13 @@ export default async function Insumo({ params }: { params: Promise<{ id: string 
           Movimientos
         </h2>
         <p className="helper mt-1">
-          La existencia es la suma de estas filas. Nadie la escribe a mano.
+          Movimientos que componen la existencia actual.
         </p>
 
         {movimientos.length === 0 ? (
-          <p className="card mt-2 p-5 text-sm text-muted">Este insumo todavía no se movió.</p>
+          <p className="card mt-2 p-5 text-sm text-muted">
+            Este insumo no registra movimientos.
+          </p>
         ) : (
           <table className="tbl mt-2">
             <thead>
