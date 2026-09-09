@@ -166,7 +166,7 @@ export default async function DetalleDeClase({ params }: PageProps<'/agenda/[id]
                   <td className="font-medium text-fg">
                     {[i.alumno?.persona?.nombre, i.alumno?.persona?.apellido].filter(Boolean).join(' ')}
                     {!i.conContratoVigente && (
-                      <span className="badge badge-warn ml-2" title="La clase se dictaría sin respaldo contractual (CUS05, 4.b).">
+                      <span className="badge badge-warn ml-2" title="La clase se dictaría sin respaldo contractual.">
                         Sin contrato
                       </span>
                     )}

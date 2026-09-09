@@ -50,9 +50,8 @@ export function SeccionPlantillas({ plantillas }: { plantillas: PlantillaVisible
       <div className="border-b border-surface-border px-5 py-4">
         <h2 className="font-serif text-lg text-fg">Plantillas de mensajes</h2>
         <p className="mt-1 text-sm text-fg-muted">
-          Los textos que salen por WhatsApp y correo. WhatsApp exige que Meta apruebe cada
-          plantilla antes de poder enviarla (RN-18): el firmante va en el cuerpo, porque el pie no
-          admite variables.
+          Textos que se envían por WhatsApp y por correo. WhatsApp requiere la aprobación de Meta
+          para cada plantilla antes de habilitar su envío.
         </p>
       </div>
 

@@ -120,7 +120,7 @@ function WidgetDeMora({ clienteId, mora }: { clienteId: string; mora: MoraPropue
       <p className="font-medium text-fg">
         Interés propuesto: {formatoDinero(mora.importe)} ({mora.dias} días sobre {formatoDinero(mora.base)} al {mora.tasaMensual}% mensual)
       </p>
-      <p className="helper">Los intereses requieren confirmación y se imputan como movimiento independiente (RN-09).</p>
+      <p className="helper">Los intereses requieren confirmación y se imputan como movimiento independiente.</p>
       <form action={enviar} className="mt-2">
         <input type="hidden" name="clienteId" value={clienteId} />
         <input type="hidden" name="base" value={mora.base} />

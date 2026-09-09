@@ -134,7 +134,7 @@ export function FormularioDeClase({
           />
           <p className="helper">
             {esIndividual
-              ? 'La clase individual admite un solo alumno (RN-14).'
+              ? 'La clase individual admite un solo alumno.'
               : 'Vacío: sin control de cupo.'}
           </p>
         </label>
@@ -147,7 +147,7 @@ export function FormularioDeClase({
               <option key={n.valor} value={n.valor}>{n.texto}</option>
             ))}
           </select>
-          <p className="helper">Orienta la inscripción; no la restringe (RN-15).</p>
+          <p className="helper">Orienta la inscripción; no la restringe.</p>
         </label>
 
         {resultado.estado === 'libre' && (
