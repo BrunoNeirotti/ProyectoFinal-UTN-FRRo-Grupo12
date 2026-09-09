@@ -7,6 +7,8 @@ import {
   ESTADO_ORDEN_TEXTO,
   TONO_DE_ESTADO,
   type Tono,
+  conUnidad,
+  enDias,
   numeroDeOrden,
 } from '@/lib/inventario';
 import { FormularioAjuste, FormularioNuevaOrden, FormularioNuevoInsumo } from './formularios';
@@ -15,10 +17,6 @@ export const metadata: Metadata = { title: 'Inventario' };
 
 function pesos(n: number): string {
   return `$${n.toLocaleString('es-AR', { maximumFractionDigits: 0 })}`;
-}
-
-function cantidad(n: number, unidad: string): string {
-  return `${n.toLocaleString('es-AR', { maximumFractionDigits: 2 })} ${unidad}`;
 }
 
 function fechaCorta(iso: string): string {
@@ -80,7 +78,9 @@ export default async function Inventario() {
             son días estimados según el consumo de los últimos {panel.ventana.dias} días.
           </p>
         </div>
-        <FormularioNuevaOrden proveedores={proveedores} hayQueReponer={panel.aReponer.length > 0} />
+        <div className="shrink-0">
+          <FormularioNuevaOrden proveedores={proveedores} hayQueReponer={panel.aReponer.length > 0} />
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -104,7 +104,7 @@ export default async function Inventario() {
           <p className="text-xs text-muted">A reponer</p>
           <p className="font-serif text-2xl tnum mt-1">{panel.aReponer.length}</p>
           <p className="mt-1 text-xs text-muted">
-            para cubrir {panel.diasDeCobertura} días
+            para cubrir {enDias(panel.diasDeCobertura)}
           </p>
         </div>
         <div className="card p-4">
@@ -127,7 +127,7 @@ export default async function Inventario() {
               <p className="mt-1 text-sm text-muted">
                 {panel.aReponer
                   .slice(0, 4)
-                  .map((r) => `${r.insumo.nombre} (${cantidad(r.cantidad, r.insumo.unidad)})`)
+                  .map((r) => `${r.insumo.nombre} (${conUnidad(r.cantidad, r.insumo.unidad)})`)
                   .join(', ')}
                 {panel.aReponer.length > 4 ? ', y otros más.' : '.'}
               </p>
@@ -184,7 +184,7 @@ export default async function Inventario() {
                       </td>
                       <td className="text-xs text-muted">{CATEGORIA_TEXTO[i.categoria]}</td>
                       <td className={`num ${i.bajoMinimo ? 'text-bad' : ''}`}>
-                        {cantidad(i.stockActual, i.unidad)}
+                        {conUnidad(i.stockActual, i.unidad)}
                       </td>
                       <td className="num text-muted">{i.stockMinimo}</td>
                       <td className="num text-muted">
@@ -194,7 +194,7 @@ export default async function Inventario() {
                       </td>
                       <td>
                         <span className={CLASE_DE_TONO[i.tono]}>
-                          {i.coberturaDias === null ? 'sin consumo' : `${i.coberturaDias} días`}
+                          {i.coberturaDias === null ? 'sin consumo' : enDias(i.coberturaDias)}
                         </span>
                         <span className="nivel mt-1.5 block">
                           <i

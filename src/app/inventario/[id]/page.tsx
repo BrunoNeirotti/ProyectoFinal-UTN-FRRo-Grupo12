@@ -5,6 +5,8 @@ import { llamador } from '@/lib/trpc/servidor';
 import {
   CATEGORIA_TEXTO,
   TIPO_MOVIMIENTO_TEXTO,
+  conUnidad,
+  enDias,
   numeroDeOrden,
   saldoDelMovimiento,
 } from '@/lib/inventario';
@@ -58,13 +60,13 @@ export default async function Insumo({ params }: { params: Promise<{ id: string 
         </div>
         <div className="text-right">
           <p className={`font-serif text-2xl tnum ${insumo.bajoMinimo ? 'text-bad' : ''}`}>
-            {insumo.stockActual} {insumo.unidad}
+            {conUnidad(insumo.stockActual, insumo.unidad)}
           </p>
           <p className="text-xs text-muted">
             mínimo {insumo.stockMinimo} ·{' '}
             {insumo.coberturaDias === null
               ? 'sin consumo registrado'
-              : `alcanza ${insumo.coberturaDias} días`}
+              : `alcanza ${enDias(insumo.coberturaDias)}`}
           </p>
         </div>
       </div>

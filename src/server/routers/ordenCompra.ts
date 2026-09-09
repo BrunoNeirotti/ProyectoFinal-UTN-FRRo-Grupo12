@@ -83,7 +83,13 @@ export const routerOrdenCompra = crearRouter({
         .from('detalle_orden_compra')
         .select(SELECT_DETALLE)
         .eq('orden_compra_id', input.ordenId)
-        .order('creado_en'),
+        // `id` desempata: los renglones de una orden entran en una sola
+        // inserción, así que comparten `creado_en` al milisegundo y sin segundo
+        // criterio Postgres los devuelve en el orden que se le antoja. Se nota
+        // recién en el navegador, cuando las filas se reacomodan solas entre una
+        // recepción y la siguiente.
+        .order('creado_en')
+        .order('id'),
       // Las entregas, una por remito. Es lo que `cantidad_recibida` resume y lo
       // que permite reconstruir cuándo llegó cada cosa.
       ctx.supabase

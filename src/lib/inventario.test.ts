@@ -4,8 +4,10 @@ import {
   type InsumoConCobertura,
   type MovimientoComputable,
   coberturaEnDias,
+  conUnidad,
   consumoDiario,
   diasDeVentana,
+  enDias,
   estadoPorRecepcion,
   insumoConCobertura,
   insumosAReponer,
@@ -15,6 +17,7 @@ import {
   saldoDelMovimiento,
   sugerirReposicion,
   tonoDeCobertura,
+  unidadPlural,
   ventanaDeConsumo,
 } from './inventario';
 
@@ -346,5 +349,50 @@ describe('numeroDeOrden', () => {
 
   it('no recorta la serie cuando pasa de mil', () => {
     expect(numeroDeOrden(2026, 1042)).toBe('OC 2026-1042');
+  });
+});
+
+describe('unidadPlural', () => {
+  it('pluraliza lo que termina en vocal', () => {
+    expect(unidadPlural(2, 'bolsa')).toBe('bolsas');
+    expect(unidadPlural(128, 'fardo')).toBe('fardos');
+    expect(unidadPlural(320, 'metro')).toBe('metros');
+  });
+
+  it('deja en singular la cantidad uno, en los dos signos', () => {
+    expect(unidadPlural(1, 'bolsa')).toBe('bolsa');
+    expect(unidadPlural(-1, 'bolsa')).toBe('bolsa');
+  });
+
+  it('no toca las abreviaturas, que no pluralizan', () => {
+    expect(unidadPlural(40, 'kg')).toBe('kg');
+    expect(unidadPlural(500, 'ml')).toBe('ml');
+    expect(unidadPlural(3, 'l')).toBe('l');
+  });
+
+  it('deja igual lo que ya termina en s o en z', () => {
+    expect(unidadPlural(13, 'dosis')).toBe('dosis');
+    expect(unidadPlural(2, 'litros')).toBe('litros');
+  });
+
+  it('agrega «es» a lo que termina en consonante', () => {
+    expect(unidadPlural(4, 'tambor')).toBe('tambores');
+    expect(unidadPlural(0, 'unidad')).toBe('unidades');
+  });
+});
+
+describe('conUnidad', () => {
+  it('junta el número y la unidad como se lee', () => {
+    expect(conUnidad(40, 'bolsa')).toBe('40 bolsas');
+    expect(conUnidad(1, 'bolsa')).toBe('1 bolsa');
+    expect(conUnidad(452.5, 'kg')).toBe('452,5 kg');
+  });
+});
+
+describe('enDias', () => {
+  it('no dice «1 días»', () => {
+    expect(enDias(1)).toBe('1 día');
+    expect(enDias(41)).toBe('41 días');
+    expect(enDias(0)).toBe('0 días');
   });
 });

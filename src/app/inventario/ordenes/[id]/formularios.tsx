@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import { unidadPlural } from '@/lib/inventario';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { BotonEnviar } from '../../../botones';
 import {
@@ -175,22 +176,32 @@ export function FormularioRecepcion({
 
       <div className="mt-4 space-y-2">
         {renglones.map((r) => (
-          <label key={r.id} className="label flex-row items-center gap-3">
+          // `.label` es `display:block`, así que la fila necesita su propio
+          // `flex`: con sólo `flex-row` el rótulo queda arriba y el casillero
+          // ocupa el ancho entero, y seis renglones se vuelven una página.
+          <label key={r.id} className="label flex items-center gap-3">
             <span className="flex-1 text-sm">
               {r.nombre}
               <span className="ml-1 text-xs text-muted">
-                {r.falta > 0 ? `· faltan ${r.falta} ${r.unidad}` : '· completo'}
+                {r.falta > 0
+                  ? `· faltan ${r.falta} ${unidadPlural(r.falta, r.unidad)}`
+                  : '· completo'}
               </span>
             </span>
-            <input
-              className="input w-32"
-              type="number"
-              name={`recibido-${r.id}`}
-              min="0"
-              step="0.01"
-              placeholder="0"
-              aria-label={`Cantidad recibida de ${r.nombre}`}
-            />
+            {/* El ancho va en el envoltorio: `.input` declara `width: 100%` y
+                le gana a la utilidad, así que fijarlo en el propio campo no
+                tiene efecto. */}
+            <span className="w-28 shrink-0">
+              <input
+                className="input"
+                type="number"
+                name={`recibido-${r.id}`}
+                min="0"
+                step="0.01"
+                placeholder="0"
+                aria-label={`Cantidad recibida de ${r.nombre}`}
+              />
+            </span>
           </label>
         ))}
       </div>

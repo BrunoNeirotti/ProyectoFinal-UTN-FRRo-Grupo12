@@ -7,6 +7,7 @@ import {
   ESTADO_ORDEN_TEXTO,
   TONO_DE_ESTADO,
   type Tono,
+  conUnidad,
   numeroDeOrden,
   pendienteDeRecibir,
 } from '@/lib/inventario';
@@ -139,9 +140,7 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
                   return (
                     <tr key={d.id}>
                       <td className="font-medium">{d.insumo?.nombre ?? '—'}</td>
-                      <td className="num">
-                        {d.cantidad} {d.insumo?.unidad}
-                      </td>
+                      <td className="num">{conUnidad(d.cantidad, d.insumo?.unidad ?? '')}</td>
                       <td className={`num ${falta > 0 ? 'text-muted' : 'text-ok'}`}>
                         {d.cantidad_recibida ?? 0}
                         {falta > 0 && <span className="text-xs"> · faltan {falta}</span>}
@@ -228,9 +227,7 @@ export default async function Orden({ params }: { params: Promise<{ id: string }
                   <tr key={e.id}>
                     <td>{fechaLarga(e.ocurrido_en)}</td>
                     <td>{renglon?.insumo?.nombre ?? '—'}</td>
-                    <td className="num">
-                      {e.cantidad} {renglon?.insumo?.unidad ?? ''}
-                    </td>
+                    <td className="num">{conUnidad(e.cantidad, renglon?.insumo?.unidad ?? '')}</td>
                   </tr>
                 );
               })}

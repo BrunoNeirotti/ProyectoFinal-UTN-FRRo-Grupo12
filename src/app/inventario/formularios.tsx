@@ -1,7 +1,12 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { CATEGORIAS_INSUMO, CATEGORIA_TEXTO, type InsumoConCobertura } from '@/lib/inventario';
+import {
+  CATEGORIAS_INSUMO,
+  CATEGORIA_TEXTO,
+  type InsumoConCobertura,
+  conUnidad,
+} from '@/lib/inventario';
 import type { ResultadoDeGuardado } from '@/lib/formularios';
 import { BotonEnviar } from '../botones';
 import { ajustarInsumo, crearInsumo, crearOrden } from './acciones';
@@ -108,7 +113,7 @@ export function FormularioAjuste({ insumos }: { insumos: InsumoConCobertura[] })
         />
         {insumo && (
           <span className="helper">
-            El sistema tiene registradas {insumo.stockActual} {insumo.unidad}.
+            El sistema tiene registradas {conUnidad(insumo.stockActual, insumo.unidad)}.
           </span>
         )}
       </label>

@@ -219,6 +219,15 @@ input[type="checkbox"], input[type="radio"] {
 .helper { font-size: .75rem; color: var(--text-muted); margin-top: .3rem; }
 .error { font-size: .75rem; color: var(--bad); margin-top: .3rem; display: flex; align-items: center; gap: .3rem; }
 
+/* Un helper o un error ANIDADO en un `.label` no hereda sus versalitas.
+   El rótulo va en mayúsculas y espaciado porque es una etiqueta de dos palabras;
+   el helper es prosa -«el día en que entró la mercadería»- y así no se lee.
+   El prototipo nunca los anidó, así que la regla no estaba: los campos que
+   explican algo aparecieron recién en Inventario. */
+.label .helper, .label .error {
+  text-transform: none; letter-spacing: normal; font-weight: 400;
+}
+
 .tile {
   aspect-ratio: 1; border-radius: var(--r-2xl);
   display: grid; place-content: center; gap: .4rem; text-align: center;

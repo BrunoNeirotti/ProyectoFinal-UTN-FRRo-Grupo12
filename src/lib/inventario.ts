@@ -85,6 +85,38 @@ export function numeroDeOrden(anio: number, numero: number): string {
   return `OC ${anio}-${String(numero).padStart(3, '0')}`;
 }
 
+/**
+ * La unidad en plural cuando corresponde: «2 bolsas», «1 bolsa», «40 kg».
+ *
+ * `insumo.unidad` se carga en singular porque es como se nombra la unidad -«se
+ * mide en bolsa»-, y en pantalla casi siempre acompaña a un número distinto de
+ * uno. «2 bolsa» se lee como un error de carga del sistema, y no lo es.
+ *
+ * Las abreviaturas quedan afuera: kg, ml y l no pluralizan, y la regla de
+ * agregar «es» a lo que termina en consonante daría «kges». Se las reconoce por
+ * el largo, que para este catálogo alcanza y no obliga a mantener una lista.
+ * Lo que ya termina en s o en z tampoco se toca: «dosis» es igual en los dos
+ * números.
+ */
+export function unidadPlural(cantidad: number, unidad: string): string {
+  if (Math.abs(cantidad) === 1) return unidad;
+  if (unidad.length <= 2) return unidad;
+  if (/[sxz]$/i.test(unidad)) return unidad;
+  if (/[aeiouáéíóú]$/i.test(unidad)) return `${unidad}s`;
+  return `${unidad}es`;
+}
+
+/** «40 bolsas», con el número en formato local. */
+export function conUnidad(cantidad: number, unidad: string, decimales = 2): string {
+  const n = cantidad.toLocaleString('es-AR', { maximumFractionDigits: decimales });
+  return `${n} ${unidadPlural(cantidad, unidad)}`;
+}
+
+/** «1 día» / «41 días». Un día en plural delata que nadie leyó la pantalla. */
+export function enDias(dias: number): string {
+  return dias === 1 ? '1 día' : `${dias} días`;
+}
+
 /** Un asiento del libro de existencias, con lo mínimo para hacer cuentas. */
 export interface MovimientoComputable {
   tipo: TipoMovimiento;
