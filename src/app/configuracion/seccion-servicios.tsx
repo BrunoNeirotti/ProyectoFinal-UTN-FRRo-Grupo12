@@ -22,7 +22,7 @@ const inicial: ResultadoDeGuardado = { estado: 'inicial' };
 
 export function SeccionServicios({ servicios }: { servicios: ServicioVisible[] }) {
   return (
-    <section className="card overflow-hidden">
+    <section id="servicios" className="card overflow-hidden">
       <div className="border-b border-surface-border px-5 py-4">
         <h2 className="font-serif text-lg text-fg">Servicios y tarifas</h2>
         <p className="mt-1 text-sm text-fg-muted">

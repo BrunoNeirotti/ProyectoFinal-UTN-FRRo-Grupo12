@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, FirstAidKit, SunHorizon, Package, type Icon } from '@phosphor-icons/react';
+import { Horse, Student, UsersThree, GearSix, Wallet, CreditCard, Receipt, CalendarBlank, CheckSquare, FirstAidKit, SunHorizon, Package, House, ChartLineUp, type Icon } from '@phosphor-icons/react';
 import type { Area } from '@/lib/roles';
 import { Logotipo } from './marca';
 
@@ -18,6 +18,9 @@ interface Enlace {
  * aparece si el rol alcanza su área (mismo criterio que los guardas de tRPC) y
  * si la pantalla ya existe: el sitemap tiene 16 módulos y hoy hay 3.
  */
+/** «Inicio / Dashboard BI» del sitemap: va suelto, arriba de todo grupo. */
+const INICIO: Enlace = { area: 'gerencia', href: '/panel', texto: 'Inicio', icono: House };
+
 const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
   {
     titulo: 'Gerencia',
@@ -25,6 +28,7 @@ const GRUPOS: { titulo: string; enlaces: Enlace[] }[] = [
       { area: 'gerencia', href: '/cobranza', texto: 'Cobranza', icono: Wallet },
       { area: 'gerencia', href: '/pagos', texto: 'Pagos', icono: CreditCard },
       { area: 'gerencia', href: '/facturacion', texto: 'Facturación', icono: Receipt },
+      { area: 'gerencia', href: '/reportes', texto: 'Reportes', icono: ChartLineUp },
     ],
   },
   {
@@ -68,6 +72,8 @@ export function Sidebar({ areas }: { areas: readonly Area[] }) {
       </Link>
 
       <nav className="sidebar-nav" aria-label="Navegación principal">
+        {areas.includes(INICIO.area) && <ItemDeNav enlace={INICIO} actual={esActual(INICIO.href)} />}
+
         {GRUPOS.map((grupo) => {
           const visibles = grupo.enlaces.filter((e) => areas.includes(e.area));
           if (visibles.length === 0) return null;
