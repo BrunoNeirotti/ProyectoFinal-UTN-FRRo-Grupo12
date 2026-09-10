@@ -140,3 +140,68 @@ export function bucketsDeAntiguedad(movimientos: MovimientoVencido[], hoy: Date)
 
   return buckets;
 }
+
+export interface CuentaParaResumen {
+  cuentaId: string;
+  saldo: number;
+}
+
+export interface MovimientoParaResumen extends MovimientoParaAntiguedad {
+  cuentaCorrienteId: string;
+}
+
+export interface ResumenDeCartera {
+  saldoTotal: number;
+  vencido: number;
+  porVencer: number;
+  cuentasConSaldo: number;
+  /** Cuántas de esas cuentas tienen al menos un tramo ya vencido (M11: alerta de morosidad). */
+  cuentasVencidas: number;
+}
+
+/**
+ * Totales de toda la cartera (EO): cuánto se debe, cuánto de eso ya venció y
+ * cuántas cuentas están en cada situación.
+ *
+ * Vive acá y no en el router porque M3 (panel de cobranza) y M11 (KPI del
+ * tablero de gerencia) necesitan exactamente el mismo número: si cada uno
+ * hiciera su propia cuenta, un desvío de redondeo o de criterio entre los dos
+ * sería indetectable desde la pantalla.
+ */
+export function resumenDeCartera(
+  cuentas: readonly CuentaParaResumen[],
+  movimientos: readonly MovimientoParaResumen[],
+  hoy: Date,
+): ResumenDeCartera {
+  const porCuenta = new Map<string, MovimientoParaAntiguedad[]>();
+  for (const m of movimientos) {
+    const lista = porCuenta.get(m.cuentaCorrienteId) ?? [];
+    lista.push(m);
+    porCuenta.set(m.cuentaCorrienteId, lista);
+  }
+
+  let vencido = 0;
+  let porVencer = 0;
+  let cuentasVencidas = 0;
+  for (const lista of porCuenta.values()) {
+    const pendientes = saldosPendientesFifo(lista);
+    let tieneVencido = false;
+    for (const p of pendientes) {
+      if (new Date(`${p.venceEn}T00:00:00Z`) < hoy) {
+        vencido += p.importe;
+        tieneVencido = true;
+      } else {
+        porVencer += p.importe;
+      }
+    }
+    if (tieneVencido) cuentasVencidas++;
+  }
+
+  return {
+    saldoTotal: cuentas.reduce((acc, c) => acc + c.saldo, 0),
+    vencido,
+    porVencer,
+    cuentasConSaldo: cuentas.filter((c) => c.saldo > 0).length,
+    cuentasVencidas,
+  };
+}

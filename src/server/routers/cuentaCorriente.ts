@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { crearRouter, procedimientoAdmin, procedimientoDeArea } from '../trpc';
 import { obtenerParametrosDeCobranza } from '../parametros-servidor';
 import { tarifaVigenteEn } from '@/lib/tarifas';
-import { fechaDeVencimiento, primerDiaDelMes, comienzoDelDia, clasificarEstadoCartera, saldosPendientesFifo, bucketsDeAntiguedad } from '@/lib/cobranza';
+import { fechaDeVencimiento, primerDiaDelMes, comienzoDelDia, clasificarEstadoCartera, saldosPendientesFifo, bucketsDeAntiguedad, resumenDeCartera } from '@/lib/cobranza';
 import { calcularMora, diasDeAtraso } from '@/lib/mora';
 import type { Database } from '@/lib/supabase/tipos-generados';
 import { mensajeDeError } from '../errores';
@@ -153,38 +153,22 @@ export const routerCuentaCorriente = crearRouter({
 
   /** Resumen de la cartera del período (EO): totales para el panel de gerencia. */
   resumenCartera: procedimiento.query(async ({ ctx }) => {
-    const { data: cuentas } = await ctx.supabase.from('cuenta_corriente').select('saldo');
+    const { data: cuentas } = await ctx.supabase.from('cuenta_corriente').select('id, saldo');
     const { data: movimientos } = await ctx.supabase
       .from('movimiento_cuenta')
       .select('tipo, importe, vence_en, creado_en, cuenta_corriente_id');
 
-    const porCuenta = new Map<string, typeof movimientos>();
-    for (const m of movimientos ?? []) {
-      const lista = porCuenta.get(m.cuenta_corriente_id) ?? [];
-      lista.push(m);
-      porCuenta.set(m.cuenta_corriente_id, lista);
-    }
-
-    const hoy = comienzoDelDia(new Date());
-    let vencido = 0;
-    let porVencer = 0;
-    for (const lista of porCuenta.values()) {
-      const pendientes = saldosPendientesFifo(
-        (lista ?? []).map((m) => ({
-          tipo: m.tipo,
-          importe: Number(m.importe),
-          venceEn: m.vence_en,
-          ocurridoEn: m.creado_en,
-        })),
-      );
-      for (const p of pendientes) {
-        if (new Date(`${p.venceEn}T00:00:00Z`) < hoy) vencido += p.importe;
-        else porVencer += p.importe;
-      }
-    }
-
-    const saldoTotal = (cuentas ?? []).reduce((acc, c) => acc + Number(c.saldo), 0);
-    return { saldoTotal, vencido, porVencer, cuentasConSaldo: (cuentas ?? []).filter((c) => Number(c.saldo) > 0).length };
+    return resumenDeCartera(
+      (cuentas ?? []).map((c) => ({ cuentaId: c.id, saldo: Number(c.saldo) })),
+      (movimientos ?? []).map((m) => ({
+        cuentaCorrienteId: m.cuenta_corriente_id,
+        tipo: m.tipo,
+        importe: Number(m.importe),
+        venceEn: m.vence_en,
+        ocurridoEn: m.creado_en,
+      })),
+      comienzoDelDia(new Date()),
+    );
   }),
 
   /**
