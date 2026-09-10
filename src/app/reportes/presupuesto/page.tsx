@@ -6,7 +6,8 @@ import { SimuladorDeVariacion } from './simulador';
 export const metadata: Metadata = { title: 'Presupuesto mensual' };
 
 function formatoDinero(n: number) {
-  return `$${Math.round(n).toLocaleString('es-AR')}`;
+  const signo = n < 0 ? '-' : '';
+  return `${signo}$${Math.round(Math.abs(n)).toLocaleString('es-AR')}`;
 }
 
 function mesLargo(periodo: string) {
@@ -37,7 +38,7 @@ export default async function Presupuesto() {
           Reportes
         </Link>
       </p>
-      <h1 className="font-serif text-3xl capitalize text-fg">Presupuesto de {mesLargo(presupuesto.periodo)}</h1>
+      <h1 className="font-serif text-3xl text-fg">Presupuesto de {mesLargo(presupuesto.periodo)}</h1>
       <p className="mt-1 max-w-2xl text-fg-muted">
         Proyección a partir de los contratos vigentes, la deuda de la cartera y las compras en curso.
         No se guarda: se recalcula cada vez que se abre esta pantalla.
@@ -150,7 +151,10 @@ export default async function Presupuesto() {
       <div className="card mt-6 p-5">
         <h2 className="mb-1 font-serif text-lg text-fg">Simular una variación de precios</h2>
         <div className="mt-3">
-          <SimuladorDeVariacion contratos={presupuesto.contratos} />
+          <SimuladorDeVariacion
+            contratos={presupuesto.contratos}
+            ultimoPeriodoLiquidado={presupuesto.ultimoPeriodoLiquidado}
+          />
         </div>
       </div>
     </div>

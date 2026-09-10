@@ -234,7 +234,6 @@ export const routerPanel = crearRouter({
     const finDePeriodoSiguiente = new Date(Date.UTC(periodoSiguiente.getUTCFullYear(), periodoSiguiente.getUTCMonth() + 1, 0));
 
     const [
-      { data: ultimoEstadoCuenta },
       { data: contratos, error: errorContratos },
       { data: cuentas },
       { data: movimientos },
@@ -244,7 +243,6 @@ export const routerPanel = crearRouter({
       { data: costosSanitarios },
       diasDeCobertura,
     ] = await Promise.all([
-      ctx.supabase.from('estado_cuenta').select('periodo').order('periodo', { ascending: false }).limit(1).maybeSingle(),
       ctx.supabase
         .from('contrato')
         .select(
@@ -254,7 +252,7 @@ export const routerPanel = crearRouter({
         .lte('fecha_inicio', iso(finDePeriodoSiguiente))
         .or(`fecha_fin.is.null,fecha_fin.gte.${isoPeriodoSiguiente}`),
       ctx.supabase.from('cuenta_corriente').select('id, saldo'),
-      ctx.supabase.from('movimiento_cuenta').select('cuenta_corriente_id, tipo, importe, vence_en, creado_en'),
+      ctx.supabase.from('movimiento_cuenta').select('cuenta_corriente_id, tipo, importe, periodo, vence_en, creado_en'),
       ctx.supabase
         .from('orden_compra')
         .select('detalle_orden_compra(cantidad, cantidad_recibida, precio_unitario)')
@@ -306,6 +304,13 @@ export const routerPanel = crearRouter({
       })),
       hoy,
     );
+
+    // «Período liquidado» (alt. 8.a): el último mes con cargos generados, igual
+    // que mira el disparador `trg_tarifa_no_retroactiva`. No el estado de
+    // cuenta emitido, que es un documento posterior y puede no existir todavía.
+    const ultimoPeriodoLiquidado = (movimientos ?? [])
+      .filter((m) => m.tipo === 'cargo' && m.periodo != null)
+      .reduce<string | null>((max, m) => (max === null || m.periodo! > max ? m.periodo! : max), null);
 
     // --- Paso 4: egresos previstos ---
     const detallesAbiertos = (ordenesAbiertas ?? []).flatMap((o) => o.detalle_orden_compra ?? []);
@@ -373,7 +378,7 @@ export const routerPanel = crearRouter({
       deuda: { vencido: cartera.vencido, porVencer: cartera.porVencer, cuentasVencidas: cartera.cuentasVencidas },
       resultado,
       advertencias,
-      ultimoPeriodoLiquidado: ultimoEstadoCuenta?.periodo ?? null,
+      ultimoPeriodoLiquidado,
     };
   }),
 });

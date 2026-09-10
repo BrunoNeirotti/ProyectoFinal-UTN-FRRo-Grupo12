@@ -6,7 +6,8 @@ import { EvolucionFacturacion } from './evolucion-facturacion';
 export const metadata: Metadata = { title: 'Inicio' };
 
 function formatoDinero(n: number) {
-  return `$${Math.round(n).toLocaleString('es-AR')}`;
+  const signo = n < 0 ? '-' : '';
+  return `${signo}$${Math.round(Math.abs(n)).toLocaleString('es-AR')}`;
 }
 
 function formatoVariacion(v: number | null) {

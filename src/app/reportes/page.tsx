@@ -5,15 +5,18 @@ import { llamador } from '@/lib/trpc/servidor';
 export const metadata: Metadata = { title: 'Reportes' };
 
 function formatoDinero(n: number) {
-  return `$${Math.round(n).toLocaleString('es-AR')}`;
+  const signo = n < 0 ? '-' : '';
+  return `${signo}$${Math.round(Math.abs(n)).toLocaleString('es-AR')}`;
 }
 
+/** Con mayúscula sólo al principio: `capitalize` en CSS pondría «Abril De 2026». */
 function mesLargo(periodo: string) {
-  return new Date(`${periodo}T12:00:00Z`).toLocaleDateString('es-AR', {
+  const texto = new Date(`${periodo}T12:00:00Z`).toLocaleDateString('es-AR', {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
   });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
 /**
@@ -78,7 +81,7 @@ export default async function Reportes() {
           <tbody className="tnum">
             {meses.map((m) => (
               <tr key={m.periodo}>
-                <td className="font-medium capitalize">{mesLargo(m.periodo)}</td>
+                <td className="font-medium">{mesLargo(m.periodo)}</td>
                 <td className="num">{formatoDinero(m.ingresos)}</td>
                 <td className="num">{formatoDinero(m.egresos)}</td>
                 <td className={`num ${m.resultado >= 0 ? 'text-ok' : 'text-bad'}`}>{formatoDinero(m.resultado)}</td>

@@ -5,7 +5,16 @@ import Link from 'next/link';
 import { simularVariacion, type ContratoResuelto } from '@/lib/gerencia';
 
 function formatoDinero(n: number) {
-  return `$${Math.round(n).toLocaleString('es-AR')}`;
+  const signo = n < 0 ? '-' : '';
+  return `${signo}$${Math.round(Math.abs(n)).toLocaleString('es-AR')}`;
+}
+
+function mesLargo(periodo: string) {
+  return new Date(`${periodo}T12:00:00Z`).toLocaleDateString('es-AR', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
 }
 
 /**
@@ -15,7 +24,14 @@ function formatoDinero(n: number) {
  * servidor para armar la proyección base: no hace falta ir a la base para
  * saber qué pasaría.
  */
-export function SimuladorDeVariacion({ contratos }: { contratos: ContratoResuelto[] }) {
+export function SimuladorDeVariacion({
+  contratos,
+  ultimoPeriodoLiquidado,
+}: {
+  contratos: ContratoResuelto[];
+  /** ISO yyyy-mm-dd del último mes con cargos generados, o null si todavía no se generó ninguno. */
+  ultimoPeriodoLiquidado: string | null;
+}) {
   const servicios = useMemo(() => {
     const mapa = new Map<string, string>();
     for (const c of contratos) {
@@ -114,7 +130,9 @@ export function SimuladorDeVariacion({ contratos }: { contratos: ContratoResuelt
           <Link href="/configuracion#servicios" className="link">
             Configuración · Servicios y tarifas
           </Link>
-          . Ahí queda con su fecha de vigencia, sin borrar la anterior.
+          . Ahí queda con su fecha de vigencia, sin borrar la anterior
+          {ultimoPeriodoLiquidado && <> — eso sí, tiene que regir después de {mesLargo(ultimoPeriodoLiquidado)}, que es el último período con cargos generados</>}
+          .
         </p>
       )}
     </div>
