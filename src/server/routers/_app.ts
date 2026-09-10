@@ -24,6 +24,7 @@ import { routerEventoSanitario } from './eventoSanitario';
 import { routerInsumo } from './insumo';
 import { routerProveedor } from './proveedor';
 import { routerOrdenCompra } from './ordenCompra';
+import { routerPanel } from './panel';
 import { alcanceDe } from '@/lib/roles';
 
 /**
@@ -105,6 +106,9 @@ export const routerApp = crearRouter({
   insumo: routerInsumo,
   proveedor: routerProveedor,
   ordenCompra: routerOrdenCompra,
+
+  // --- M11 ---
+  panel: routerPanel,
 });
 
 export type RouterApp = typeof routerApp;
